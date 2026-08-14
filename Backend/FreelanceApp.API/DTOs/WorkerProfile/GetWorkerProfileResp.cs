@@ -1,5 +1,5 @@
 namespace FreelanceApp.API.DTOs.WorkerProfile;
-public class WorkerProfileResponse
+public class GetWorkerProfileResp
 {
     public int UserId { get; set; }
 
