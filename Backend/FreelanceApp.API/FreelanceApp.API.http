@@ -1,6 +1,6 @@
 @FreelanceApp.API_HostAddress = http://localhost:5043
 
-GET {{FreelanceApp.API_HostAddress}}/weatherforecast/
+GET {{FreelanceApp.API_HostAddress}}/
 Accept: application/json
 
 ###
