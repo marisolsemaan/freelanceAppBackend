@@ -58,7 +58,18 @@ public class ClientJobPostController : ControllerBase
         return Ok(result);
     }
 
-    private int GetUserId()
+    [HttpGet("client/job-posts/titles")] // get titles of job posts as dropdown so client can choose from for hire offers
+    public async Task<IActionResult> GetJobPostTitles()
+    {
+        var clientId = GetUserId();
+
+        var result =
+            await _service.GetJobPostTitlesAsync(clientId);
+
+        return Ok(result);
+    }
+
+    private int GetUserId() // get client id from the jwt token
     {
         var claim = User.FindFirstValue(
             ClaimTypes.NameIdentifier);

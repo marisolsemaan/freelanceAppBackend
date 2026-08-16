@@ -9,7 +9,10 @@ using FreelanceApp.API.Services.Admin;
 using FreelanceApp.API.Services.ClientProfile;
 using FreelanceApp.API.Services.ClientJobPost;
 using FreelanceApp.API.Services.WorkerJobPost;
+using FreelanceApp.API.Services.HireOffer;
+using FreelanceApp.API.Services.Conversation;
 using System.Text;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -70,7 +73,14 @@ builder.Services.AddCors(options =>
 
 // Add services to the container.
 builder.Services.AddOpenApi();
-builder.Services.AddControllers();
+//return the type into a serialisable string instead of numbers for readability
+builder.Services
+    .AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(
+            new JsonStringEnumConverter());
+    });
 
 builder.Services.AddScoped<DbConnectionFactory>();
 builder.Services.AddScoped<IDocumentService, DocumentService>();
@@ -82,6 +92,10 @@ builder.Services.AddScoped<IClientJobPostService, ClientJobPostService>();
 builder.Services.AddScoped<IWorkerJobPostService,WorkerJobPostService>();
 
 builder.Services.AddScoped< IClientProfileService,ClientProfileService>();
+
+builder.Services.AddScoped<IHireOfferService, HireOfferService>();
+
+builder.Services.AddScoped<IConversationService, ConversationService>();
 
 var app = builder.Build();
 

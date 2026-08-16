@@ -346,4 +346,33 @@ public class ClientJobPostService : IClientJobPostService
                 ClientId = clientId
             });
     }
+
+    public async Task<ApiResponse<IEnumerable<JobPostTitleResp>>> GetJobPostTitlesAsync(int clientId)
+    {
+        using var connection = _dbConnection.CreateConnection();
+
+        const string sql = """
+            SELECT
+                JobPost_Id ,
+                JobPost_Title
+            FROM tbl_JobPost
+            WHERE ClientId = @ClientId
+            AND Status = @OpenStatus
+            """;
+
+        var titles = await connection.QueryAsync<JobPostTitleResp>(
+            sql,
+            new
+            {
+                ClientId = clientId,
+                OpenStatus = (short)JobPostStatus.Open
+            });
+
+        return new ApiResponse<IEnumerable<JobPostTitleResp>>
+        {
+            Success = true,
+            Message = "Job post titles retrieved successfully.",
+            Data = titles
+        };
+    }
 }

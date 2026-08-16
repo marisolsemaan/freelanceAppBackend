@@ -10,14 +10,12 @@ public class ClientProfileService : IClientProfileService
 {
     private readonly DbConnectionFactory _dbConnection;
 
-    public ClientProfileService(
-        DbConnectionFactory dbConnection)
+    public ClientProfileService( DbConnectionFactory dbConnection)
     {
         _dbConnection = dbConnection;
     }
 
-    public async Task<ApiResponse<ClientProfileResp>>
-        GetClientProfileAsync(int clientId)
+    public async Task<ApiResponse<ClientProfileResp>> GetClientProfileAsync(int clientId)
     {
         using var connection =
             _dbConnection.CreateConnection();

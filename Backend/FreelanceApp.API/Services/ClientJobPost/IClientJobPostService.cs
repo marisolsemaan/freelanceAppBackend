@@ -11,4 +11,6 @@ public interface IClientJobPostService
     Task<ApiResponse<object>> GetMyJobPostsAsync( int clientId);
 
     Task<ApiResponse<object>> CloseJobPostAsync( int clientId, int jobPostId);
+
+    Task<ApiResponse<IEnumerable<JobPostTitleResp>>> GetJobPostTitlesAsync(int clientId);
 }
