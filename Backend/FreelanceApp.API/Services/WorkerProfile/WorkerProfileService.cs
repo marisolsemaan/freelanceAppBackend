@@ -1,5 +1,6 @@
 using Dapper;
 using FreelanceApp.API.Data;
+using FreelanceApp.API.DTOs.Rating;
 using FreelanceApp.API.DTOs.WorkerProfile;
 using FreelanceApp.API.Enums;
 using WorkerProfileModel = FreelanceApp.API.Models.WorkerProfile.WorkerProfile;
@@ -120,13 +121,13 @@ public class WorkerProfileService : IWorkerProfileService
                 Review_Id,
                 Review_ReviewerId,
                 Review_Rating,
-                Review_Comment,
+                Review_Description
                 Review_CreatedAt 
             FROM tbl_Review
             WHERE Review_RevieweeId = @WorkerId
             """;
 
-        var reviews = (await connection.QueryAsync<ReviewDto>(
+        var reviews = (await connection.QueryAsync<ReviewResp>(
             reviewsSql,
             new { WorkerId = workerId }))
             .ToList();

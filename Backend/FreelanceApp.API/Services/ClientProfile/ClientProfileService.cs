@@ -54,8 +54,10 @@ public class ClientProfileService : IClientProfileService
         // Fetch reviews for the client
         const string reviewsSql = """
             SELECT
+                Review_Id,
+                Review_ReviewerId,
                 Review_Rating,
-                Review_Comment,
+                Review_Description,
                 Review_CreatedAt
             FROM tbl_Review
             WHERE RatedUserId = @ClientId
@@ -66,7 +68,7 @@ public class ClientProfileService : IClientProfileService
                 reviewsSql,
                 new { ClientId = clientId });
 
-        profile.Reviews = reviews;
+        profile.Reviews = reviews.ToList();
 
         return new ApiResponse<ClientProfileResp>
         {

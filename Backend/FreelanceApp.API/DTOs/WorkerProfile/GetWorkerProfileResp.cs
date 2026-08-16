@@ -1,4 +1,7 @@
+using FreelanceApp.API.DTOs.Rating;
+
 namespace FreelanceApp.API.DTOs.WorkerProfile;
+
 public class GetWorkerProfileResp
 {
     public int UserId { get; set; }
@@ -23,6 +26,6 @@ public class GetWorkerProfileResp
 
     public int ReviewCount { get; set; }
 
-    public List<ReviewDto> Reviews { get; set; } = new();
+    public List<ReviewResp> Reviews { get; set; } = new();
 
 }

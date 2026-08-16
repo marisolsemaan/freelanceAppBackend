@@ -11,5 +11,5 @@ public class ClientProfileResp
 
     public int ReviewCount { get; set; }
 
-    public IEnumerable<ReviewResp> Reviews { get; set; }= new List<ReviewResp>();
+    public List<ReviewResp> Reviews { get; set; } = new();
 }
