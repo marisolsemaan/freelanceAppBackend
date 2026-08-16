@@ -7,6 +7,8 @@ public class GetWorkerProfileResp
 
     public byte[]? ProfilePhoto { get; set; }
 
+    public string? ProfilePhotoContentType { get; set; } //string or short as enum?
+
     public decimal HourlyRate { get; set; }
 
     public string? AboutMe { get; set; }

@@ -11,4 +11,6 @@ public class UpdateWorkerProfileReq
     public List<int> ProfessionIds { get; set; } = new();
 
     public List<int> CityIds { get; set; } = new();
+
+    public IFormFile? ProfilePhoto { get; set; }
 }

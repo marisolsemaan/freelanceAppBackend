@@ -21,4 +21,6 @@ public class User
     public decimal User_AvgRating { get; set; }
 
     public int User_ReviewCount { get; set; }
+
+    public short VerificationStatus { get; set; }
 }

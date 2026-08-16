@@ -97,6 +97,7 @@ public class AuthService: IAuthService
                 Status=(short)UserVerificationStatus.Pending
             }, transaction);
 
+            var verificationStatus = (short)UserVerificationStatus.Pending;
 
             var idDoc=await _documentService.SaveDocumentAsync(idFile,userId,DocumentType.ID,connection,transaction);
 
@@ -162,7 +163,8 @@ public class AuthService: IAuthService
                 Email=user.User_Email,
                 Phone=user.User_Phone,
                 Role=(short)user.User_Role,
-                ExpiresAt=token.ExpiresAt
+                ExpiresAt=token.ExpiresAt,
+                VerificationStatus = verificationStatus,
             };
 
             return ("success registration",response);
@@ -188,8 +190,9 @@ public class AuthService: IAuthService
             User_Role,
             User_CreatedAt,
             User_AvgRating,
-            User_ReviewCount
-            FROM tbl_User
+            User_ReviewCount,
+            UserVerification_Status
+            FROM tbl_User Inner Join tbl_UserVerification on UserVerification_UserId=User_Id
             WHERE User_Email=@Email; 
             """;
         var user = await connection.QuerySingleOrDefaultAsync<User>(usersql, new {Email= request.Email});//find user
@@ -219,7 +222,8 @@ public class AuthService: IAuthService
             Email=user.User_Email,
             Phone=user.User_Phone,
             Role=(short)user.User_Role,
-            ExpiresAt=token.ExpiresAt
+            ExpiresAt=token.ExpiresAt,
+            VerificationStatus = user.VerificationStatus,
             
         };
 

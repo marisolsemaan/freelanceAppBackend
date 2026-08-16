@@ -15,4 +15,6 @@ public class AuthResponse
     public short Role { get; set; }
 
     public DateTime ExpiresAt { get; set; }
+
+    public short VerificationStatus { get; set; }
 }
