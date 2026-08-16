@@ -5,6 +5,10 @@ using FreelanceApp.API.Services.WorkerProfile;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
+using FreelanceApp.API.Services.Admin;
+using FreelanceApp.API.Services.ClientProfile;
+using FreelanceApp.API.Services.ClientJobPost;
+using FreelanceApp.API.Services.WorkerJobPost;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -72,6 +76,12 @@ builder.Services.AddScoped<DbConnectionFactory>();
 builder.Services.AddScoped<IDocumentService, DocumentService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IWorkerProfileService, WorkerProfileService>();
+builder.Services.AddScoped<IAdminVerificationService, AdminVerificationService>();
+builder.Services.AddScoped<IClientJobPostService, ClientJobPostService>();
+
+builder.Services.AddScoped<IWorkerJobPostService,WorkerJobPostService>();
+
+builder.Services.AddScoped< IClientProfileService,ClientProfileService>();
 
 var app = builder.Build();
 
