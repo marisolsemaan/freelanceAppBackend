@@ -3,13 +3,13 @@ namespace FreelanceApp.API.DTOs.ClientProfile;
 
 public class ClientProfileResp
 {
-    public int UserId { get; set; }
+    public int User_Id { get; set; }
 
-    public string FullName { get; set; } = string.Empty;
+    public string User_FullName { get; set; } = string.Empty;
 
-    public decimal AverageRating { get; set; }
+    public decimal User_AvgRating { get; set; }
 
-    public int ReviewCount { get; set; }
+    public int User_ReviewCount { get; set; }
 
     public List<ReviewResp> Reviews { get; set; } = new();
 }

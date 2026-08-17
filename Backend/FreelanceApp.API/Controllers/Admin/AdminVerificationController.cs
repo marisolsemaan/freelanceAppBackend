@@ -117,9 +117,9 @@ public class AdminVerificationController : ControllerBase
         }
 
         return File(
-            document.FileData,
-            document.ContentType,
-            document.FileName);
+            document.Document_FileData,
+            document.Document_ContentType,
+            document.Document_FileName);
     }
 
     [HttpPost("{userId:int}/approve")]

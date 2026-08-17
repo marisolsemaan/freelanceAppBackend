@@ -53,9 +53,9 @@ public class WorkerJobPostService : IWorkerJobPostService
                 JobPost_Status,
                 JobPost_CreatedAt,
 
-                User_Id AS ClientId,
-                User_FullName AS ClientName,
-                User_AvgRating AS ClientAvgRating,
+                JobPost_ClientId ,
+                User_FullName ,
+                User_AvgRating 
 
             FROM tbl_JobPost 
 

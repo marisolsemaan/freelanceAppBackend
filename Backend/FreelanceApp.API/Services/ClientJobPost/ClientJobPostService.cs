@@ -15,12 +15,12 @@ public class ClientJobPostService : IClientJobPostService
         _dbConnection = dbConnect;
     }
 
-    public async Task<ApiResponse<ClientJobPostResp>> CreateOrUpdateJobPostAsync( int clientId, CreateUpdateJobPostReq request)
+    public async Task<ApiResponse<ClientJobPostResp>> CreateJobPostAsync( int clientId, CreateJobPostReq request)
     {
         using var connection = _dbConnection.CreateConnection();
 
         // Basic validation
-        if (string.IsNullOrWhiteSpace(request.Title))
+        if (string.IsNullOrWhiteSpace(request.JobPost_Title))
         {
             return new ApiResponse<ClientJobPostResp>
             {
@@ -29,7 +29,7 @@ public class ClientJobPostService : IClientJobPostService
             };
         }
 
-        if (string.IsNullOrWhiteSpace(request.Description))
+        if (string.IsNullOrWhiteSpace(request.JobPost_Description))
         {
             return new ApiResponse<ClientJobPostResp>
             {
@@ -38,7 +38,7 @@ public class ClientJobPostService : IClientJobPostService
             };
         }
 
-        if (request.Price <= 0)
+        if (request.JobPost_Price <= 0)
         {
             return new ApiResponse<ClientJobPostResp>
             {
@@ -47,7 +47,7 @@ public class ClientJobPostService : IClientJobPostService
             };
         }
 
-        if (!Enum.IsDefined(request.Type))
+        if (!Enum.IsDefined(request.JobPost_BudgetType))
         {
             return new ApiResponse<ClientJobPostResp>
             {
@@ -57,20 +57,19 @@ public class ClientJobPostService : IClientJobPostService
         }
 
         // CREATE the job post 
-        if (request.JobPostId == null)
-        {
+       
             const string insertSql = """
                 INSERT INTO tbl_JobPost
                 (
                     JobPost_Title,
                     JobPost_Description,
                     JobPost_Price,
-                    JobPost_BudgetType,
                     JobPost_ProfessionId,
-                    JobPost_Status,
                     JobPost_CityId,
                     JobPost_ClientId,
-                    JobPost_CreatedAt
+                    JobPost_CreatedAt,
+                    JobPost_Status,
+                    JobPost_BudgetType
                 )
                 OUTPUT INSERTED.JobPost_Id
                 VALUES
@@ -78,12 +77,12 @@ public class ClientJobPostService : IClientJobPostService
                     @Title,
                     @Description,
                     @Price,
-                    @Type,
                     @ProfessionId,
-                    @Status,
                     @CityId,
                     @ClientId,
-                    GETDATE()
+                    GETDATE(),
+                    @Status,
+                    @Type
                 );
                 """;
 
@@ -91,14 +90,14 @@ public class ClientJobPostService : IClientJobPostService
                 insertSql,
                 new
                 {
-                    request.Title,
-                    request.Description,
-                    request.Price,
-                    Type = (short)request.Type,
-                    request.ProfessionId,
+                    Title = request.JobPost_Title,
+                    Description = request.JobPost_Description,
+                    Price = request.JobPost_Price,
+                    ProfessionId = request.JobPost_ProfessionId,
+                    CityId = request.JobPost_CityId,
+                    ClientId = clientId,
                     Status = (short)JobPostStatus.Open,
-                    request.CityId,
-                    ClientId = clientId
+                    Type = (short)request.JobPost_BudgetType
                 });
 
             var jobPost = await GetJobPostAsync(
@@ -112,58 +111,7 @@ public class ClientJobPostService : IClientJobPostService
                 Message = "Job post created successfully.",
                 Data = jobPost
             };
-        }
-
-        // UPDATE/edit the job post done by the client
-        const string updateSql = """
-            UPDATE tbl_JobPost
-            SET
-                JobPost_Title = @Title,
-                JobPost_Description = @Description,
-                JobPost_Price = @Price,
-                JobPost_BudgetType = @Type,
-                JobPost_ProfessionId = @ProfessionId,
-                JobPost_CityId = @CityId
-            WHERE JobPost_Id = @JobPostId
-              AND JobPost_ClientId = @ClientId
-              AND JobPost_Status = @OpenStatus;
-            """;
-
-        var affectedRows = await connection.ExecuteAsync(
-            updateSql,
-            new
-            {
-                request.Title,
-                request.Description,
-                request.Price,
-                Type = (short)request.Type,
-                request.ProfessionId,
-                request.CityId,
-                JobPostId = request.JobPostId.Value,
-                ClientId = clientId,
-                OpenStatus = (short)JobPostStatus.Open
-            });
-
-        if (affectedRows == 0)
-        {
-            return new ApiResponse<ClientJobPostResp>
-            {
-                Success = false,
-                Message = "Job post was not found, does not belong to you, or is already closed."
-            };
-        }
-
-        var updatedJobPost = await GetJobPostAsync(
-            connection,
-            clientId,
-            request.JobPostId.Value);
-
-        return new ApiResponse<ClientJobPostResp>
-        {
-            Success = true,
-            Message = "Job post updated successfully.",
-            Data = updatedJobPost
-        };
+        
     }
 
     public async Task<ApiResponse<object>> GetMyJobPostsAsync(int clientId)
@@ -176,14 +124,14 @@ public class ClientJobPostService : IClientJobPostService
 
                 SUM(
                     CASE
-                        WHEN Status = @OpenStatus THEN 1
+                        WHEN JobPost_Status = @OpenStatus THEN 1
                         ELSE 0
                     END
                 ) AS OpenJobs,
 
                 SUM(
                     CASE
-                        WHEN Status = @ClosedStatus THEN 1
+                        WHEN JobPost_Status = @ClosedStatus THEN 1
                         ELSE 0
                     END
                 ) AS ClosedJobs,
@@ -207,13 +155,13 @@ public class ClientJobPostService : IClientJobPostService
                 JobPost_Title ,
                 JobPost_Description ,
                 JobPost_Price ,
-                JobPost_Type ,
+                JobPost_BudgetType ,
                 JobPost_ProfessionId,
                 JobPost_CityId,
                 JobPost_Status,
                 JobPost_CreatedAt,
-
-                COUNT(JobPostConversation_Id) AS ConversationCount
+                                            
+                COUNT(DISTINCT JobPostConversation_ConversationId) AS ConversationCount
 
             FROM tbl_JobPost 
 
@@ -227,7 +175,7 @@ public class ClientJobPostService : IClientJobPostService
                 JobPost_Title,
                 JobPost_Description,
                 JobPost_Price,
-                JobPost_Type,
+                JobPost_BudgetType,
                 JobPost_ProfessionId,
                 JobPost_CityId,
                 JobPost_Status,
@@ -271,10 +219,10 @@ public class ClientJobPostService : IClientJobPostService
 
         const string sql = """
             UPDATE tbl_JobPost
-            SET Status = @ClosedStatus
+            SET JobPost_Status = @ClosedStatus
             WHERE JobPost_Id = @JobPostId
-              AND ClientId = @ClientId
-              AND Status = @OpenStatus;
+              AND JobPost_ClientId = @ClientId
+              AND JobPost_Status = @OpenStatus;
             """;
 
         var affectedRows = await connection.ExecuteAsync(
@@ -316,7 +264,7 @@ public class ClientJobPostService : IClientJobPostService
                 JobPost_CityId,
                 JobPost_Status,
                 JobPost_CreatedAt,
-                COUNT(JobPostConversation_Id) AS ConversationCount
+                COUNT(DISTINCT JobPostConversation_ConversationId) AS ConversationCount
 
             FROM tbl_JobPost 
 
@@ -356,8 +304,8 @@ public class ClientJobPostService : IClientJobPostService
                 JobPost_Id ,
                 JobPost_Title
             FROM tbl_JobPost
-            WHERE ClientId = @ClientId
-            AND Status = @OpenStatus
+            WHERE JobPost_ClientId = @ClientId
+            AND JobPost_Status = @OpenStatus
             """;
 
         var titles = await connection.QueryAsync<JobPostTitleResp>(

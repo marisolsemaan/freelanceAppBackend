@@ -20,11 +20,11 @@ public class ClientJobPostController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateOrUpdate([FromBody] CreateUpdateJobPostReq request)
+    public async Task<IActionResult> Create([FromBody] CreateJobPostReq request)
     {
         var clientId = GetUserId();
 
-        var result = await _service.CreateOrUpdateJobPostAsync(clientId, request);
+        var result = await _service.CreateJobPostAsync(clientId, request);
 
         if (!result.Success)
             return BadRequest(result);

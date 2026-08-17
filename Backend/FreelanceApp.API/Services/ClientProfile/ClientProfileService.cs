@@ -57,10 +57,10 @@ public class ClientProfileService : IClientProfileService
                 Review_Id,
                 Review_ReviewerId,
                 Review_Rating,
-                Review_Description,
+                Review_Comment,
                 Review_CreatedAt
             FROM tbl_Review
-            WHERE RatedUserId = @ClientId
+            WHERE Review_RevieweeId = @ClientId
             """;
 
         var reviews =

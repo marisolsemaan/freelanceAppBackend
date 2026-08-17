@@ -2,6 +2,6 @@ namespace FreelanceApp.API.DTOs.WorkerProfile;
 
 public class ProfessionDto
 {
-    public int Id { get; set; }
-    public string Title { get; set; } = string.Empty;
+    public int Profession_Id { get; set; }
+    public string Profession_Title { get; set; } = string.Empty;
 }

@@ -4,28 +4,28 @@ namespace FreelanceApp.API.DTOs.JobPost;
 
 public class WorkerJobPostResp
 {
-    public int JobPostId { get; set; }
+    public int JobPost_Id { get; set; }
 
-    public string Title { get; set; } = string.Empty;
+    public string JobPost_Title { get; set; } = string.Empty;
 
-    public string Description { get; set; } = string.Empty;
+    public string JobPost_Description { get; set; } = string.Empty;
 
-    public decimal Price { get; set; }
+    public decimal JobPost_Price { get; set; }
 
-    public JobPostBudgetType Type { get; set; }
+    public JobPostBudgetType JobPost_BudgetType { get; set; }
 
-    public int ProfessionId { get; set; }
+    public int JobPost_ProfessionId { get; set; }
 
-    public int CityId { get; set; }
+    public int JobPost_CityId { get; set; }
 
-    public JobPostStatus Status { get; set; }
+    public JobPostStatus JobPost_Status { get; set; }
 
-    public DateTime CreatedAt { get; set; }
+    public DateTime JobPost_CreatedAt { get; set; }
 
-    public int ClientId { get; set; }
+    public int JobPost_ClientId { get; set; }
 
-    public string ClientName { get; set; } = string.Empty;
+    public string User_FullName { get; set; } = string.Empty;
 
-    public decimal ClientAvgRating { get; set; }
+    public decimal User_AvgRating { get; set; }
 
 }

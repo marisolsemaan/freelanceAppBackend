@@ -22,5 +22,5 @@ public class User
 
     public int User_ReviewCount { get; set; }
 
-    public short VerificationStatus { get; set; }
+    public short UserVerification_Status { get; set; }
 }

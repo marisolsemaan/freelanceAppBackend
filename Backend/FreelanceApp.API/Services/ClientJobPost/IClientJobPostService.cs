@@ -6,7 +6,7 @@ namespace FreelanceApp.API.Services.ClientJobPost;
 
 public interface IClientJobPostService
 {
-    Task<ApiResponse<ClientJobPostResp>> CreateOrUpdateJobPostAsync( int clientId, CreateUpdateJobPostReq request);
+    Task<ApiResponse<ClientJobPostResp>> CreateJobPostAsync( int clientId, CreateJobPostReq request);
 
     Task<ApiResponse<object>> GetMyJobPostsAsync( int clientId);
 

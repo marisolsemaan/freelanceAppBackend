@@ -48,6 +48,15 @@ public class AuthService: IAuthService
 
             var passHash=BCrypt.Net.BCrypt.HashPassword(request.Password); // hash pass on the db
 
+            if (!string.IsNullOrWhiteSpace(request.Phone))
+            {
+                if (!PhoneValidationHelper.IsValidLebanesePhone(request.Phone))
+                {
+                    await transaction.RollbackAsync();
+                    return ("Please enter a valid Lebanese phone number.", null);
+                }
+            }
+
             // await using var transaction= await connection.BeginTransactionAsync(); // use a transaction for the tables
             const string insertUserSql="""
 
@@ -223,7 +232,7 @@ public class AuthService: IAuthService
             Phone=user.User_Phone,
             Role=(short)user.User_Role,
             ExpiresAt=token.ExpiresAt,
-            VerificationStatus = user.VerificationStatus,
+            VerificationStatus = user.UserVerification_Status,
             
         };
 
