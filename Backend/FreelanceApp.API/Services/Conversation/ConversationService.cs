@@ -307,7 +307,7 @@ public class ConversationService : IConversationService
                 HireOffer_Title OfferTitle,
                 HireOffer_Price OfferPrice,
                 HireOffer_ScopeTerms ScopeTerms,
-                HireOffer_Status fferOfferStatus,
+                HireOffer_Status OfferStatus,
                 IsRead 
 
             FROM tbl_HireOffer 

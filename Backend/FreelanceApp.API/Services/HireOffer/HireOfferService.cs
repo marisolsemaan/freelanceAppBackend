@@ -10,8 +10,7 @@ public class HireOfferService : IHireOfferService
 {
     private readonly DbConnectionFactory _dbConnection;
 
-    public HireOfferService(
-        DbConnectionFactory dbC)
+    public HireOfferService(DbConnectionFactory dbC)
     {
         _dbConnection = dbC;
     }
@@ -119,32 +118,6 @@ public class HireOfferService : IHireOfferService
             }
         }
 
-        // // ONLY ONE PENDING OFFER per same job post titlw
-        // const string pendingOfferSql = """
-        //     SELECT COUNT(*)
-        //     FROM tbl_HireOffer
-        //     WHERE ConversationId = @ConversationId
-        //       AND Status = @PendingStatus;
-        //     """;
-
-        // var pendingOffers =
-        //     await connection.ExecuteScalarAsync<int>(
-        //         pendingOfferSql,
-        //         new
-        //         {
-        //             ConversationId = conversationId,
-        //             PendingStatus = (int)HireOfferStatus.Pending
-        //         });
-
-        // if (pendingOffers > 0)
-        // {
-        //     return new ApiResponse<HireOfferResp>
-        //     {
-        //         Success = false,
-        //         Message = "There is already a pending hire offer in this conversation."
-        //     };
-        // }
-
         // create the hire offer speciall card in the conversation between worker and client
         const string insertSql = """
             INSERT INTO tbl_HireOffer
@@ -199,6 +172,7 @@ public class HireOfferService : IHireOfferService
             SELECT
                 HireOffer_Id ,
                 HireOffer_ConversationId,
+                Conversation_WorkerId AS HireOffer_WorkerId,
                 HireOffer_JobPostId,
                 HireOffer_Title,
                 HireOffer_Price, 
@@ -206,6 +180,8 @@ public class HireOfferService : IHireOfferService
                 HireOffer_Status,
                 HireOffer_ScopeTerms
             FROM tbl_HireOffer
+            INNER JOIN tbl_Conversation 
+            ON Conversation_Id = HireOffer_ConversationId
             WHERE HireOffer_Id = @HireOfferId;
             """;
 

@@ -2,13 +2,13 @@ namespace FreelanceApp.API.DTOs.Rating;
 
 public class ReviewResp
 {
-    public int Id { get; set; }
+    public int Review_Id { get; set; }
 
-    public int ReviewerId { get; set; }
+    public int Review_ReviewerId { get; set; }
 
-    public decimal Rating { get; set; }
+    public decimal Review_Rating { get; set; }
 
-    public string? Comment { get; set; }
+    public string? Review_Comment { get; set; }
 
-    public DateTime CreatedAt { get; set; }
+    public DateTime Review_CreatedAt { get; set; }
 }

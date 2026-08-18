@@ -2,6 +2,7 @@ using Dapper;
 using FreelanceApp.API.Data;
 using FreelanceApp.API.DTOs;
 using FreelanceApp.API.DTOs.Rating;
+using FreelanceApp.API.Enums;
 
 namespace FreelanceApp.API.Services.Rating;
 
@@ -34,13 +35,16 @@ public class RatingService : IRatingService
         {
             // Get the participants of the hire offer
             const string hireOfferSql = """
-                SELECT
-                    HireOffer_ClientId,
-                    HireOffer_WorkerId,
-                    HireOffer_Status
-                FROM tbl_HireOffer
-                WHERE HireOffer_Id = @HireOfferId;
-                """;
+            SELECT
+                HireOffer_Id,
+                HireOffer_Status,
+                Conversation_ClientId,
+                Conversation_WorkerId
+            FROM tbl_HireOffer
+            INNER JOIN tbl_Conversation
+                ON Conversation_Id = HireOffer_ConversationId
+            WHERE HireOffer_Id = @HireOfferId;
+            """;
 
             var hireOffer = await connection.QuerySingleOrDefaultAsync<dynamic>(
                 hireOfferSql,
@@ -61,8 +65,8 @@ public class RatingService : IRatingService
                 };
             }
 
-            int clientId = hireOffer.HireOffer_ClientId;
-            int workerId = hireOffer.HireOffer_WorkerId;
+            int clientId = hireOffer.Conversation_ClientId;
+            int workerId = hireOffer.Conversation_WorkerId;
 
             // The reviewer must be either the client or worker
             if (reviewerId != clientId && reviewerId != workerId)
@@ -73,6 +77,17 @@ public class RatingService : IRatingService
                 {
                     Success = false,
                     Message = "You are not a participant in this hire offer."
+                };
+            }
+
+            if ((short)hireOffer.HireOffer_Status != (short)HireOfferStatus.Accepted)
+            {
+                await transaction.RollbackAsync();
+
+                return new ApiResponse<ReviewResp>
+                {
+                    Success = false,
+                    Message = "You can only review an accepted hire offer."
                 };
             }
 
@@ -125,12 +140,12 @@ public class RatingService : IRatingService
                     INSERTED.Review_Id,
                     INSERTED.Review_ReviewerId ,
                     INSERTED.Review_Rating ,
-                    INSERTED.Review_Commment,
+                    INSERTED.Review_Comment,
                     INSERTED.Review_CreatedAt 
                 VALUES
                 (
-                    @ReviewerId,
                     @RevieweeId,
+                    @ReviewerId,
                     @Rating,
                     @Comment,
                     SYSUTCDATETIME(),
