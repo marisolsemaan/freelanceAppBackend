@@ -11,6 +11,7 @@ using FreelanceApp.API.Services.ClientJobPost;
 using FreelanceApp.API.Services.WorkerJobPost;
 using FreelanceApp.API.Services.HireOffer;
 using FreelanceApp.API.Services.Conversation;
+using FreelanceApp.API.Services.Verification;
 using FreelanceApp.API.Services.Rating;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -99,6 +100,8 @@ builder.Services.AddScoped<IHireOfferService, HireOfferService>();
 builder.Services.AddScoped<IConversationService, ConversationService>();
 
 builder.Services.AddScoped<IRatingService, RatingService>();
+
+builder.Services.AddScoped<IUserVerificationService, UserVerificationService>();
 
 var app = builder.Build();
 
