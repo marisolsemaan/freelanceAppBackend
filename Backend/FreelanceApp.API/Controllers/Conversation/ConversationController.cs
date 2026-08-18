@@ -28,8 +28,8 @@ public class ConversationController : ControllerBase
         var result =
             await _conversationService.ConnectToJobPostAsync(
                 workerId,
-                jobPostId,
-                request);
+                jobPostId
+            );
 
         return result.Success
             ? Ok(result)

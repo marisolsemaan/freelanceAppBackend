@@ -22,7 +22,7 @@ public class HireOfferService : IHireOfferService
             _dbConnection.CreateConnection();
 
         // Validate required fields
-        if (string.IsNullOrWhiteSpace(request.Title))
+        if (string.IsNullOrWhiteSpace(request.HireOffer_Title))
         {
             return new ApiResponse<HireOfferResp>
             {
@@ -30,8 +30,8 @@ public class HireOfferService : IHireOfferService
                 Message = "Offer title is required."
             };
         }
-
-        if (request.Price <= 0)
+        //NULL?
+        if (request.HireOffer_Price <= 0)
         {
             return new ApiResponse<HireOfferResp>
             {
@@ -74,7 +74,7 @@ public class HireOfferService : IHireOfferService
         }
 
         // If job post title was selected as a hire offer
-        if (request.JobPostId.HasValue)
+        if (request.HireOffer_JobPostId.HasValue)
         {
             const string jobSql = """
                 SELECT
@@ -88,7 +88,7 @@ public class HireOfferService : IHireOfferService
             var jobPost =
                 await connection.QuerySingleOrDefaultAsync<dynamic>(
                     jobSql,
-                    new { JobPostId = request.JobPostId.Value });
+                    new { JobPostId = request.HireOffer_JobPostId.Value });
 
             if (jobPost == null)
             {
@@ -149,13 +149,13 @@ public class HireOfferService : IHireOfferService
         const string insertSql = """
             INSERT INTO tbl_HireOffer
             (
-                Conversation_Id,
-                Conversation_JobPostId,
-                Conversation_Title,
-                Conversation_Price,
-                Conversation_OfferedAt,
-                Conversation_Status,
-                Conversation_ScopeTerms,
+                HireOffer_ConversationId,
+                HireOffer_JobPostId,
+                HireOffer_Title,
+                HireOffer_Price,
+                HireOffer_Status,
+                HireOffer_OfferedAt,
+                HireOffer_ScopeTerms
             )
             OUTPUT INSERTED.HireOffer_Id
             VALUES
@@ -164,9 +164,9 @@ public class HireOfferService : IHireOfferService
                 @JobPostId,
                 @Title,
                 @Price,
-                GETDATE(),
                 @Status,
-                @ScopeTerms,
+                GETDATE(),
+                @ScopeTerms
             );
             """;
 
@@ -175,19 +175,19 @@ public class HireOfferService : IHireOfferService
                 insertSql,
                 new
                 {
-                    Conversation_Id = conversationId,
-                    request.JobPostId,
-                    request.Title,
-                    request.ScopeTerms,
-                    request.Price,
-                    Status = (short)HireOfferStatus.Pending
+                    ConversationId = conversationId,
+                    JobPostId=request.HireOffer_JobPostId,
+                    Title=request.HireOffer_Title,
+                    Price=request.HireOffer_Price,
+                    Status = (short)HireOfferStatus.Pending,
+                    ScopeTerms=request.HireOffer_ScopeTerms,
                 });
 
         // update the  conversation's LastMessageAt to the current date and time to indicate that a new message (hire offer) has been sent
         const string updateConversationSql = """
             UPDATE tbl_Conversation
-            SET LastMessageAt = GETDATE()
-            WHERE Id = @ConversationId;
+            SET Conversation_LastMessageAt = GETDATE()
+            WHERE Conversation_Id = @ConversationId;
             """;
 
         await connection.ExecuteAsync(
@@ -201,10 +201,10 @@ public class HireOfferService : IHireOfferService
                 HireOffer_ConversationId,
                 HireOffer_JobPostId,
                 HireOffer_Title,
-                HireOffer_Price,
-                HireOffer_Status,
+                HireOffer_Price, 
                 HireOffer_OfferedAt,
-                HireOffer_ScopeTerms,
+                HireOffer_Status,
+                HireOffer_ScopeTerms
             FROM tbl_HireOffer
             WHERE HireOffer_Id = @HireOfferId;
             """;
@@ -228,7 +228,7 @@ public class HireOfferService : IHireOfferService
             _dbConnection.CreateConnection();
 
         // check for the status value to be either accepted or rejected
-        if (request.Status != HireOfferStatus.Accepted && request.Status != HireOfferStatus.Rejected)
+        if (request.HireOffer_Status != HireOfferStatus.Accepted && request.HireOffer_Status != HireOfferStatus.Rejected)
         {
             return new ApiResponse<HireOfferResp>
             {
@@ -272,7 +272,7 @@ public class HireOfferService : IHireOfferService
             };
         }
 
-        if ((int)offer.WorkerId != workerId)
+        if ((int)offer.Conversation_WorkerId != workerId)
         {
             return new ApiResponse<HireOfferResp>
             {
@@ -281,8 +281,7 @@ public class HireOfferService : IHireOfferService
             };
         }
 
-        if ((short)offer.Status !=
-            (short)HireOfferStatus.Pending)
+        if ((short)offer.HireOffer_Status != (short)HireOfferStatus.Pending)
         {
             return new ApiResponse<HireOfferResp>
             {
@@ -294,9 +293,9 @@ public class HireOfferService : IHireOfferService
         //update the hire offer status to either accepted or rejected
         const string updateSql = """
             UPDATE tbl_HireOffer
-            SET Status = @Status
+            SET HireOffer_Status = @Status
             WHERE HireOffer_Id = @HireOfferId
-              AND Status = @PendingStatus;
+              AND HireOffer_Status = @PendingStatus;
             """;
 
         await connection.ExecuteAsync(
@@ -304,7 +303,7 @@ public class HireOfferService : IHireOfferService
             new
             {
                 HireOfferId = hireOfferId,
-                Status = (short)request.Status,
+                Status = (short)request.HireOffer_Status,
                 PendingStatus = (short)HireOfferStatus.Pending
             });
 
@@ -331,7 +330,7 @@ public class HireOfferService : IHireOfferService
         return new ApiResponse<HireOfferResp>
         {
             Success = true,
-            Message = request.Status == HireOfferStatus.Accepted
+            Message = request.HireOffer_Status == HireOfferStatus.Accepted
                 ? "Hire offer accepted successfully."
                 : "Hire offer rejected successfully.",
             Data = updatedOffer

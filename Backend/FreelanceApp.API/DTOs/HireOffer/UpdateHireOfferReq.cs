@@ -4,5 +4,5 @@ namespace FreelanceApp.API.DTOs.HireOffer;
 
 public class UpdateHireOfferStatusReq
 {
-    public HireOfferStatus Status { get; set; }
+    public HireOfferStatus HireOffer_Status { get; set; }
 }

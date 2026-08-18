@@ -15,17 +15,8 @@ public class ConversationService : IConversationService
         _dbConnection = dbC;
     }
 
-    public async Task<ApiResponse<int>> ConnectToJobPostAsync(int workerId, int jobPostId, ConnectJobPostReq request)
+    public async Task<ApiResponse<int>> ConnectToJobPostAsync(int workerId, int jobPostId)
     {
-        if (string.IsNullOrWhiteSpace(request.Message))
-        {
-            return new ApiResponse<int>
-            {
-                Success = false,
-                Message = "Message is required."
-            };
-        }
-
         using var connection = _dbConnection.CreateConnection();
 
         connection.Open();
@@ -34,20 +25,24 @@ public class ConversationService : IConversationService
 
         try
         {
-            // Get job post from the worker pressed on connnect
+            // Get an OPEN job post
             const string jobSql = """
                 SELECT
-                    JobPost_Id,
-                    JobPost_ClientId,
-                    JobPost_Status
+                    JobPost_Id AS JobPostId,
+                    JobPost_ClientId AS ClientId
                 FROM tbl_JobPost
-                WHERE JobPost_Id = @JobPostId;
+                WHERE JobPost_Id = @JobPostId
+                AND JobPost_Status = @OpenStatus;
                 """;
 
             var jobPost =
                 await connection.QuerySingleOrDefaultAsync<dynamic>(
                     jobSql,
-                    new { JobPostId = jobPostId },
+                    new
+                    {
+                        JobPostId = jobPostId,
+                        OpenStatus = (short)JobPostStatus.Open
+                    },
                     transaction);
 
             if (jobPost == null)
@@ -57,11 +52,11 @@ public class ConversationService : IConversationService
                 return new ApiResponse<int>
                 {
                     Success = false,
-                    Message = "Job post not found."
+                    Message = "Job post not found or is no longer available."
                 };
             }
 
-            //  Make sure worker isn't the owner
+            // Worker cannot connect to own job
             if ((int)jobPost.ClientId == workerId)
             {
                 transaction.Rollback();
@@ -73,73 +68,17 @@ public class ConversationService : IConversationService
                 };
             }
 
-            // Job must be open
-            if ((short)jobPost.Status != (short)JobPostStatus.Open)
-            {
-                transaction.Rollback();
-
-                return new ApiResponse<int>
-                {
-                    Success = false,
-                    Message = "This job post is closed."
-                };
-            }
-
-            // Check duplicate connection
-            const string duplicateSql = """
-                SELECT COUNT(*)
-                FROM tbl_Conversation 
-                INNER JOIN tbl_JobPostConversation 
-                    ON JobPostConversation_ConversationId = Conversation_Id
-                WHERE JobPostConversation_JobPostId = @JobPostId
-                  AND ClientId = @ClientId
-                  AND WorkerId = @WorkerId;
-                """;
-
-            var alreadyConnected =
-                await connection.ExecuteScalarAsync<int>(
-                    duplicateSql,
-                    new
-                    {
-                        JobPostId = jobPostId,
-                        ClientId = (int)jobPost.ClientId,
-                        WorkerId = workerId
-                    },
-                    transaction);
-
-            if (alreadyConnected > 0)
-            {
-                transaction.Rollback();
-
-                return new ApiResponse<int>
-                {
-                    Success = false,
-                    Message = "You have already connected to this job post."
-                };
-            }
-
-            // Create conversation between the two end-users
-            const string conversationSql = """
-                INSERT INTO tbl_Conversation
-                (
-                    Conversation_ClientId,
-                    Conversation_WorkerId,
-                    Conversation_CreatedAt,
-                    Conversation_LastMessageAt
-                )
-                OUTPUT INSERTED.Id
-                VALUES
-                (
-                    @ClientId,
-                    @WorkerId,
-                    GETDATE(),
-                    GETDATE()
-                );
+            //  Find existing conversation between worker and client
+            const string conversationCheckSql = """
+                SELECT Conversation_Id
+                FROM tbl_Conversation
+                WHERE Conversation_ClientId = @ClientId
+                AND Conversation_WorkerId = @WorkerId;
                 """;
 
             var conversationId =
-                await connection.ExecuteScalarAsync<int>(
-                    conversationSql,
+                await connection.ExecuteScalarAsync<int?>(
+                    conversationCheckSql,
                     new
                     {
                         ClientId = (int)jobPost.ClientId,
@@ -147,78 +86,103 @@ public class ConversationService : IConversationService
                     },
                     transaction);
 
-            // Link conversation to job post
-            const string relationSql = """
-                INSERT INTO tbl_JobPostConversation
-                (
-                    JobPostConversation_JobPostId,
-                    JobPostConversation_ConversationId,
-                    JobPostConversation_ConnectedAt
-                )
-                VALUES
-                (
-                    @JobPostId,
-                    @ConversationId,
-                    GETDATE()
-                );
+            //  Create conversation if it doesn't exist
+            if (conversationId == null)
+            {
+                const string conversationSql = """
+                    INSERT INTO tbl_Conversation
+                    (
+                        Conversation_ClientId,
+                        Conversation_WorkerId,
+                        Conversation_CreatedAt,
+                        Conversation_LastMessageAt
+                    )
+                    OUTPUT INSERTED.Conversation_Id
+                    VALUES
+                    (
+                        @ClientId,
+                        @WorkerId,
+                        GETDATE(),
+                        GETDATE()
+                    );
+                    """;
+
+                conversationId =
+                    await connection.ExecuteScalarAsync<int>(
+                        conversationSql,
+                        new
+                        {
+                            ClientId = (int)jobPost.ClientId,
+                            WorkerId = workerId
+                        },
+                        transaction);
+            }
+
+            //  Check whether this job is already attached
+            const string jobConversationCheckSql = """
+                SELECT COUNT(*)
+                FROM tbl_JobPostConversation
+                WHERE JobPostConversation_JobPostId = @JobPostId
+                AND JobPostConversation_ConversationId = @ConversationId;
                 """;
 
-            await connection.ExecuteAsync(
-                relationSql,
-                new
-                {
-                    JobPostId = jobPostId,
-                    ConversationId = conversationId
-                },
-                transaction);
+            var alreadyLinked =
+                await connection.ExecuteScalarAsync<int>(
+                    jobConversationCheckSql,
+                    new
+                    {
+                        JobPostId = jobPostId,
+                        ConversationId = conversationId.Value
+                    },
+                    transaction);
 
-            // First message
-            const string messageSql = """
-                INSERT INTO tbl_Message
-                (
-                    Message_ConversationId,
-                    Message_SenderId,
-                    Message_IsRead,
-                    Message_SentAt,
-                    Message_Content
-                )
-                VALUES
-                (
-                    @ConversationId,
-                    @SenderId,
-                    0,
-                    GETDATE(),
-                    @Content
-                );
-                """;
+            //  Attach job to conversation
+            if (alreadyLinked == 0)
+            {
+                const string relationSql = """
+                    INSERT INTO tbl_JobPostConversation
+                    (
+                        JobPostConversation_JobPostId,
+                        JobPostConversation_ConversationId,
+                        JobPostConversation_CreatedAt
+                    )
+                    VALUES
+                    (
+                        @JobPostId,
+                        @ConversationId,
+                        GETDATE()
+                    );
+                    """;
 
-            await connection.ExecuteAsync(
-                messageSql,
-                new
-                {
-                    ConversationId = conversationId,
-                    SenderId = workerId,
-                    Content = request.Message
-                },
-                transaction);
+                await connection.ExecuteAsync(
+                    relationSql,
+                    new
+                    {
+                        JobPostId = jobPostId,
+                        ConversationId = conversationId.Value
+                    },
+                    transaction);
+            }
 
             transaction.Commit();
 
             return new ApiResponse<int>
             {
                 Success = true,
-                Message = "Connected to job post successfully.",
-                Data = conversationId
+                Message = alreadyLinked > 0
+                    ? "Conversation opened."
+                    : "Connected to job post successfully.",
+                Data = conversationId.Value
             };
         }
-        catch
+        catch (Exception ex)
         {
             transaction.Rollback();
 
             return new ApiResponse<int>
             {
                 Success = false,
-                Message = "Failed to connect to the job post."
+                Message = ex.Message
             };
         }
     }
@@ -231,35 +195,26 @@ public class ConversationService : IConversationService
         // Get conversation and the participants
         const string conversationSql = """
             SELECT
-                Conversation_Id ,
+                Conversation_Id AS ConversationId,
 
-                Conversation_ClientId,
-                client.User_FullName as ClientFullName,
-                client.User_AvgRating as ClientAvgRating,
+                Conversation_ClientId AS ClientId,
+                client.User_FullName AS ClientFullName,
+                client.User_AvgRating AS ClientAvgRating,
 
-                Conversation_WorkerId,
+                Conversation_WorkerId AS WorkerId,
                 worker.User_FullName AS WorkerFullName,
                 worker.User_AvgRating AS WorkerAvgRating,
 
-                JobPostConversation_JobPostId,
-                JobPost_Title ,
+                Conversation_CreatedAt AS CreatedAt,
+                Conversation_LastMessageAt AS LastMessageAt
 
-                Conversation_CreatedAt,
-                Conversation_LastMessageAt
-
-            FROM tbl_Conversation 
+            FROM tbl_Conversation
 
             INNER JOIN tbl_User client
                 ON client.User_Id = Conversation_ClientId
 
             INNER JOIN tbl_User worker
                 ON worker.User_Id = Conversation_WorkerId
-
-            LEFT JOIN tbl_JobPostConversation
-                ON JobPostConversation_ConversationId = Conversation_Id
-
-            LEFT JOIN tbl_JobPost 
-                ON JobPost_JobPost_Id = JobPostConversation_JobPostId
 
             WHERE Conversation_Id = @ConversationId;
             """;
@@ -268,6 +223,8 @@ public class ConversationService : IConversationService
             await connection.QuerySingleOrDefaultAsync<ConversationResp>(
                 conversationSql,
                 new { ConversationId = conversationId });
+
+
 
         if (conversation == null)
         {
@@ -288,17 +245,49 @@ public class ConversationService : IConversationService
             };
         }
 
+        const string jobPostsSql = """
+            SELECT
+                CAST(3 AS int) AS Type,
+
+                JobPost_Id AS JobPostId,
+                JobPost_Title AS JobPostTitle,
+                JobPost_Price AS JobPostPrice,
+
+                Profession_Title AS JobPostProfession,
+                City_Name AS JobPostCity,
+
+                JobPostConversation_CreatedAt AS CreatedAt
+
+            FROM tbl_JobPostConversation
+
+            INNER JOIN tbl_JobPost
+                ON JobPost_Id = JobPostConversation_JobPostId
+
+            LEFT JOIN tbl_Profession
+                ON Profession_Id = JobPost_ProfessionId
+
+            LEFT JOIN tbl_City
+                ON City_Id = JobPost_CityId
+
+            WHERE JobPostConversation_ConversationId = @ConversationId;
+            """;
+
+        var jobPosts =
+            await connection.QueryAsync<ConversationItemResp>(
+                jobPostsSql,
+                new { ConversationId = conversationId });
+
         // Normal messages
         const string messagesSql = """
             SELECT
-                CAST(1 AS int) AS Message_Type,
-                Message_Id,
-                Message_SenderId,
-                Message_SentAt AS CreatedAt,
-                Message_Content,
-                Message_IsRead
+                CAST(1 AS int) Type,
+                Message_Id MessageId,
+                Message_SenderId SenderId,
+                Message_SentAt CreatedAt,
+                Message_Content Content,
+                Message_IsRead IsRead
             FROM tbl_Message
-            WHERE ConversationId = @ConversationId;
+            WHERE Message_ConversationId = @ConversationId;
             """;
 
         var messages =
@@ -309,17 +298,17 @@ public class ConversationService : IConversationService
         // Hire offers
         const string offersSql = """
             SELECT
-                CAST(2 AS int) AS HireOffer_Type,
-                HireOffer_Id,
+                CAST(2 AS int) Type,
+                HireOffer_Id HireOfferId,
                 Conversation_ClientId AS SenderId,
                 HireOffer_OfferedAt AS CreatedAt,
 
-                HireOffer_JobPostId,
-                HireOffer_Title,
-                HireOffer_Price,
-                HireOffer_ScopeTerms,
-                HireOffer_Status,
-                HireOffer_IsRead
+                HireOffer_JobPostId JobPostId,
+                HireOffer_Title OfferTitle,
+                HireOffer_Price OfferPrice,
+                HireOffer_ScopeTerms ScopeTerms,
+                HireOffer_Status fferOfferStatus,
+                IsRead 
 
             FROM tbl_HireOffer 
 
@@ -334,8 +323,9 @@ public class ConversationService : IConversationService
                 offersSql,
                 new { ConversationId = conversationId });
 
-        // Combine both types into one ordered timeline 
+        // Combine both types into one ordered timeline type 1 for normal messages and type 2 for the hire offer scpecial card message
         conversation.Items = messages
+            .Concat(jobPosts)
             .Concat(offers)
             .OrderBy(x => x.CreatedAt)
             .ToList();
@@ -365,8 +355,8 @@ public class ConversationService : IConversationService
         const string accessSql = """
             SELECT COUNT(*)
             FROM tbl_Conversation
-            WHERE Id = @ConversationId
-            AND (ClientId = @UserId OR WorkerId = @UserId);
+            WHERE Conversation_Id = @ConversationId
+            AND (Conversation_ClientId = @UserId OR Conversation_WorkerId = @UserId);
             """;
 
         var hasAccess =
@@ -383,7 +373,7 @@ public class ConversationService : IConversationService
             return new ApiResponse<int>
             {
                 Success = false,
-                Message = "You do not have access to this conversation."
+                Message = "You do not have access to this conversation or no conversation exist between two users"
             };
         }
 
@@ -397,7 +387,7 @@ public class ConversationService : IConversationService
                 Message_SentAt,
                 Message_Content
             )
-            OUTPUT INSERTED.Id
+            OUTPUT INSERTED.Message_Id
             VALUES
             (
                 @ConversationId,
@@ -421,8 +411,8 @@ public class ConversationService : IConversationService
         // Update last activity
         const string updateSql = """
             UPDATE tbl_Conversation
-            SET LastMessageAt = GETDATE()
-            WHERE Id = @ConversationId;
+            SET Conversation_LastMessageAt = GETDATE()
+            WHERE Conversation_Id = @ConversationId;
             """;
 
         await connection.ExecuteAsync(
@@ -468,11 +458,11 @@ public class ConversationService : IConversationService
 
         if ((int)conversation.Conversation_ClientId == userId)
         {
-            otherUserId = (int)conversation.WorkerId;
+            otherUserId = (int)conversation.Conversation_WorkerId;
         }
-        else if ((int)conversation.WorkerId == userId)
+        else if ((int)conversation.Conversation_WorkerId == userId)
         {
-            otherUserId = (int)conversation.ClientId;
+            otherUserId = (int)conversation.Conversation_ClientId;
         }
         else
         {
@@ -502,13 +492,13 @@ public class ConversationService : IConversationService
 
         // Hire offers are always sent by the client.
         // Therefore, only a worker needs to mark them as read.
-        if ((int)conversation.WorkerId == userId)
+        if ((int)conversation.Conversation_WorkerId == userId)
         {
             const string offerSql = """
                 UPDATE tbl_HireOffer
-                SET HireOffer_IsRead = 1
+                SET IsRead = 1
                 WHERE HireOffer_ConversationId = @ConversationId
-                AND HireOffer_IsRead = 0;
+                AND IsRead = 0;
                 """;
 
             await connection.ExecuteAsync(

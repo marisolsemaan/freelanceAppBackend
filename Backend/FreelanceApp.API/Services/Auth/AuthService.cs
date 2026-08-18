@@ -207,13 +207,13 @@ public class AuthService: IAuthService
         var user = await connection.QuerySingleOrDefaultAsync<User>(usersql, new {Email= request.Email});//find user
         if(user==null)
         {
-            return ("invalid email ", null);
+            return ("invalid email or pass ", null);
         }
 
         var passValid=BCrypt.Net.BCrypt.Verify(request.Password, user.User_HashedPassword);//compare the entered pass with the stored one
 
         if(!passValid){
-            return("invalid pass", null);
+            return("invalid email or pass", null);
         }
 
         var token = JwtHelper.GenerateToken(

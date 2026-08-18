@@ -4,11 +4,11 @@ public class HireOfferReq
 {
     // NULL = direct offer
     // Value = offer based on one of the client's existing jobs
-    public int? JobPostId { get; set; }
+    public int? HireOffer_JobPostId { get; set; }
 
-    public string Title { get; set; } = string.Empty;
+    public string HireOffer_Title { get; set; } = string.Empty;
 
-    public decimal Price { get; set; }
+    public decimal HireOffer_Price { get; set; }
 
-    public string ScopeTerms { get; set; } = string.Empty;
+    public string? HireOffer_ScopeTerms { get; set; } 
 }

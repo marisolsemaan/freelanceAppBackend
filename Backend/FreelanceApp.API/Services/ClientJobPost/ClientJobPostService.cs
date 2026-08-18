@@ -56,7 +56,54 @@ public class ClientJobPostService : IClientJobPostService
             };
         }
 
-        // CREATE the job post 
+        const string professionSql = """
+            SELECT COUNT(1)
+            FROM tbl_Profession
+            WHERE Profession_Id = @ProfessionId
+            """;
+
+        var professionExists = await connection.ExecuteScalarAsync<int>(
+            professionSql,
+            new
+            {
+                ProfessionId = request.JobPost_ProfessionId
+            });
+
+        if (professionExists == 0)
+        {
+            return new ApiResponse<ClientJobPostResp>
+            {
+                Success = false,
+                Message = "Selected profession does not exist."
+            };
+        }
+
+        if (request.JobPost_CityId.HasValue)
+        {
+            const string citySql = """
+                SELECT COUNT(1)
+                FROM tbl_City
+                WHERE City_Id = @CityId
+                AND City_Name <> 'All Cities'
+                """;
+
+            var cityExists = await connection.ExecuteScalarAsync<int>(
+                citySql,
+                new
+                {
+                    CityId = request.JobPost_CityId.Value
+                });
+
+            if (cityExists == 0)
+            {
+                return new ApiResponse<ClientJobPostResp>
+                {
+                    Success = false,
+                    Message = "Selected city does not exist or is not available for job posts."
+                };
+            }
+        }
+        // Create the job post 
        
             const string insertSql = """
                 INSERT INTO tbl_JobPost

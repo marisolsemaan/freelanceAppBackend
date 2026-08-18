@@ -16,7 +16,7 @@ public class RatingService : IRatingService
 
     public async Task<ApiResponse<ReviewResp>> CreateReviewAsync(int reviewerId, CreateReviewReq request)
     {
-        if (request.Rating < 1 || request.Rating > 5)
+        if (request.Review_Rating < 1 || request.Review_Rating > 5)
         {
             return new ApiResponse<ReviewResp>
             {
@@ -46,7 +46,7 @@ public class RatingService : IRatingService
                 hireOfferSql,
                 new
                 {
-                    HireOfferId = request.HireOfferId
+                    HireOfferId = request.Review_HireOfferId
                 },
                 transaction);
 
@@ -95,7 +95,7 @@ public class RatingService : IRatingService
                 new
                 {
                     ReviewerId = reviewerId,
-                    HireOfferId = request.HireOfferId
+                    HireOfferId = request.Review_HireOfferId
                 },
                 transaction);
 
@@ -114,19 +114,19 @@ public class RatingService : IRatingService
             const string insertSql = """
                 INSERT INTO tbl_Review
                 (
-                    Review_ReviewerId,
                     Review_RevieweeId,
+                    Review_ReviewerId,
                     Review_Rating,
-                    Review_Description,
+                    Review_Comment,
                     Review_CreatedAt,
                     Review_HireOfferId
                 )
                 OUTPUT
-                    INSERTED.Review_Id AS Id,
-                    INSERTED.Review_ReviewerId AS ReviewerId,
-                    INSERTED.Review_Rating AS Rating,
-                    INSERTED.Review_Description AS Comment,
-                    INSERTED.Review_CreatedAt AS CreatedAt
+                    INSERTED.Review_Id,
+                    INSERTED.Review_ReviewerId ,
+                    INSERTED.Review_Rating ,
+                    INSERTED.Review_Commment,
+                    INSERTED.Review_CreatedAt 
                 VALUES
                 (
                     @ReviewerId,
@@ -142,11 +142,11 @@ public class RatingService : IRatingService
                 insertSql,
                 new
                 {
-                    ReviewerId = reviewerId,
                     RevieweeId = revieweeId,
-                    Rating = request.Rating,
-                    Comment = request.Comment,
-                    HireOfferId = request.HireOfferId
+                    ReviewerId = reviewerId,
+                    Rating = request.Review_Rating,
+                    Comment = request.Review_Comment,
+                    HireOfferId = request.Review_HireOfferId
                 },
                 transaction);
 
@@ -190,14 +190,14 @@ public class RatingService : IRatingService
                 Data = review
             };
         }
-        catch
+        catch(Exception ex)
         {
             await transaction.RollbackAsync();
 
             return new ApiResponse<ReviewResp>
             {
                 Success = false,
-                Message = "Failed to submit review."
+                Message = $"Failed to submit review.{ex.Message}"
             };
         }
     }

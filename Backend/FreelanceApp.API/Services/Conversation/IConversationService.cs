@@ -5,7 +5,7 @@ namespace FreelanceApp.API.Services.Conversation;
 
 public interface IConversationService
 {
-    Task<ApiResponse<int>> ConnectToJobPostAsync(int workerId, int jobPostId, ConnectJobPostReq request);
+    Task<ApiResponse<int>> ConnectToJobPostAsync(int workerId, int jobPostId);
 
     Task<ApiResponse<ConversationResp>> GetConversationAsync( int userId, int conversationId);
 
