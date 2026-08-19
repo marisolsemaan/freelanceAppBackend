@@ -247,8 +247,6 @@ public class ConversationService : IConversationService
 
         const string jobPostsSql = """
             SELECT
-                CAST(3 AS int) AS Type,
-
                 JobPost_Id AS JobPostId,
                 JobPost_Title AS JobPostTitle,
                 JobPost_Price AS JobPostPrice,
@@ -273,14 +271,19 @@ public class ConversationService : IConversationService
             """;
 
         var jobPosts =
-            await connection.QueryAsync<ConversationItemResp>(
+            await connection.QueryAsync<ConversationJobPostResp>(
                 jobPostsSql,
                 new { ConversationId = conversationId });
+        
+        var jobPostItems = jobPosts.Select(jobPost=> new ConversationItemResp{
+            Type="JobPost",
+            CreatedAt=jobPost.CreatedAt,
+            JobPost=jobPost
+        });
 
         // Normal messages
         const string messagesSql = """
             SELECT
-                CAST(1 AS int) Type,
                 Message_Id MessageId,
                 Message_SenderId SenderId,
                 Message_SentAt CreatedAt,
@@ -291,14 +294,20 @@ public class ConversationService : IConversationService
             """;
 
         var messages =
-            await connection.QueryAsync<ConversationItemResp>(
+            await connection.QueryAsync<ConversationMessageResp>(
                 messagesSql,
                 new { ConversationId = conversationId });
+
+        var messageItems= messages.Select(message=> new ConversationItemResp{
+
+                Type="Message",
+                CreatedAt=message.CreatedAt,
+                Message=message
+        });
 
         // Hire offers
         const string offersSql = """
             SELECT
-                CAST(2 AS int) Type,
                 HireOffer_Id HireOfferId,
                 Conversation_ClientId AS SenderId,
                 HireOffer_OfferedAt AS CreatedAt,
@@ -319,14 +328,20 @@ public class ConversationService : IConversationService
             """;
 
         var offers =
-            await connection.QueryAsync<ConversationItemResp>(
+            await connection.QueryAsync<ConversationHireOfferResp>(
                 offersSql,
                 new { ConversationId = conversationId });
 
+        var offerItems= offers.Select(offer=>new ConversationItemResp{
+            Type="Hire Offer",
+            CreatedAt=offer.CreatedAt,
+            HireOffer=offer
+        });
+
         // Combine both types into one ordered timeline type 1 for normal messages and type 2 for the hire offer scpecial card message
-        conversation.Items = messages
-            .Concat(jobPosts)
-            .Concat(offers)
+        conversation.Items = messageItems
+            .Concat(jobPostItems)
+            .Concat(offerItems)
             .OrderBy(x => x.CreatedAt)
             .ToList();
 

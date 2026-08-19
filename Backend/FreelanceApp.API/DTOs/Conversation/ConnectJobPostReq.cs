@@ -1,6 +1,6 @@
-namespace FreelanceApp.API.DTOs.Conversation;
+// namespace FreelanceApp.API.DTOs.Conversation;
 
-public class ConnectJobPostReq
-{
-    public string Message { get; set; } = string.Empty;
-}
+// public class ConnectJobPostReq
+// {
+//     public string Message { get; set; } = string.Empty;
+// }

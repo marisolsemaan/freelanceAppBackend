@@ -19,9 +19,9 @@ public class ConversationResp
 
     public decimal WorkerAvgRating { get; set; }
 
-    public int? JobPostId { get; set; }
+    // public int? JobPostId { get; set; }
 
-    public string? JobPostTitle { get; set; }
+    // public string? JobPostTitle { get; set; }
 
     public DateTime CreatedAt { get; set; }
 

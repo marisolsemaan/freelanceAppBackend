@@ -2,7 +2,7 @@ namespace FreelanceApp.API.Enums;
 
 public enum HireOfferStatus
 {
-    Pending = 1,
-    Accepted = 2,
-    Rejected = 3
+    Pending = 0,
+    Accepted = 1,
+    Rejected = 2
 }

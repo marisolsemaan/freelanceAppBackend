@@ -21,7 +21,7 @@ public class ConversationController : ControllerBase
 
     // Worker clicks on connect in a job post
     [HttpPost("/api/worker/job-posts/{jobPostId}/connect")]
-    public async Task<IActionResult> ConnectToJobPost(int jobPostId, [FromBody] ConnectJobPostReq request)
+    public async Task<IActionResult> ConnectToJobPost(int jobPostId)
     {
         var workerId = GetUserId();
 
