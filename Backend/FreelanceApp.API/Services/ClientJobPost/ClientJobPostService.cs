@@ -3,20 +3,33 @@ using FreelanceApp.API.DTOs;
 using FreelanceApp.API.DTOs.JobPost;
 using FreelanceApp.API.Data;
 using FreelanceApp.API.Enums;
+using FreelanceApp.API.Services.Verification;
 
 namespace FreelanceApp.API.Services.ClientJobPost;
 
 public class ClientJobPostService : IClientJobPostService
 {
     private readonly DbConnectionFactory _dbConnection;
+    private readonly IUserVerificationService _verificationService;
 
-    public ClientJobPostService(DbConnectionFactory dbConnect)
+    public ClientJobPostService(DbConnectionFactory dbConnect, IUserVerificationService vs)
     {
         _dbConnection = dbConnect;
+        _verificationService=vs;
     }
 
     public async Task<ApiResponse<ClientJobPostResp>> CreateJobPostAsync( int clientId, CreateJobPostReq request)
     {
+        var IsVerified= await _verificationService.IsUserVerifiedAsync(clientId);
+        if(!IsVerified){
+
+            return new ApiResponse<ClientJobPostResp>{
+
+                Success=false,
+                Message="client not verified by admin cant post"
+            };
+        }
+
         using var connection = _dbConnection.CreateConnection();
 
         // Basic validation

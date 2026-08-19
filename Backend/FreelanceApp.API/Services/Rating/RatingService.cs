@@ -3,20 +3,35 @@ using FreelanceApp.API.Data;
 using FreelanceApp.API.DTOs;
 using FreelanceApp.API.DTOs.Rating;
 using FreelanceApp.API.Enums;
+using FreelanceApp.API.Services.Verification;
 
 namespace FreelanceApp.API.Services.Rating;
 
 public class RatingService : IRatingService
 {
     private readonly DbConnectionFactory _db;
+    private readonly IUserVerificationService _verificationService;
 
-    public RatingService(DbConnectionFactory db)
+    public RatingService(DbConnectionFactory db, IUserVerificationService vs)
     {
         _db = db;
+        _verificationService= vs;
     }
 
     public async Task<ApiResponse<ReviewResp>> CreateReviewAsync(int reviewerId, CreateReviewReq request)
     {
+
+        var isVerified = await _verificationService.IsUserVerifiedAsync(reviewerId);
+
+        if (!isVerified)
+        {
+            return new ApiResponse<ReviewResp>
+            {
+                Success = false,
+                Message = "Your account must be verified before you can submit a review."
+            };
+        }
+
         if (request.Review_Rating < 1 || request.Review_Rating > 5)
         {
             return new ApiResponse<ReviewResp>

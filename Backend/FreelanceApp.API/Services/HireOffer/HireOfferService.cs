@@ -3,6 +3,7 @@ using FreelanceApp.API.DTOs;
 using FreelanceApp.API.Data;
 using FreelanceApp.API.DTOs.HireOffer;
 using FreelanceApp.API.Enums;
+using FreelanceApp.API.Services.Verification;
 
 namespace FreelanceApp.API.Services.HireOffer;
 
@@ -10,13 +11,27 @@ public class HireOfferService : IHireOfferService
 {
     private readonly DbConnectionFactory _dbConnection;
 
-    public HireOfferService(DbConnectionFactory dbC)
+    private readonly IUserVerificationService _verificationService;
+
+    public HireOfferService(DbConnectionFactory dbC,IUserVerificationService vs )
     {
         _dbConnection = dbC;
+        _verificationService=vs;
     }
 
     public async Task<ApiResponse<HireOfferResp>> CreateHireOfferAsync(int clientId, int conversationId, HireOfferReq request)
     {
+        var isVerified = await _verificationService.IsUserVerifiedAsync(clientId);
+
+        if (!isVerified)
+        {
+            return new ApiResponse<HireOfferResp>
+            {
+                Success = false,
+                Message = "Your account must be verified before you can send a hire offer."
+            };
+        }
+
         using var connection =
             _dbConnection.CreateConnection();
 
@@ -200,6 +215,17 @@ public class HireOfferService : IHireOfferService
 
     public async Task<ApiResponse<HireOfferResp>>  UpdateOfferStatusAsync(int workerId, int hireOfferId, UpdateHireOfferStatusReq request)
     {
+        var isVerified = await _verificationService.IsUserVerifiedAsync(workerId);
+
+        if (!isVerified)
+        {
+            return new ApiResponse<HireOfferResp>
+            {
+                Success = false,
+                Message = "Your account must be verified by the admin"
+            };
+        }
+
         using var connection =
             _dbConnection.CreateConnection();
 

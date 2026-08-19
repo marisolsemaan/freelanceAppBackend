@@ -3,6 +3,7 @@ using FreelanceApp.API.DTOs;
 using FreelanceApp.API.DTOs.Conversation;
 using FreelanceApp.API.Enums;
 using FreelanceApp.API.Data;
+using FreelanceApp.API.Services.Verification;
 
 namespace FreelanceApp.API.Services.Conversation;
 
@@ -10,13 +11,28 @@ public class ConversationService : IConversationService
 {
     private readonly DbConnectionFactory _dbConnection;
 
-    public ConversationService(DbConnectionFactory dbC)
+    private readonly IUserVerificationService _verificationService;
+
+    public ConversationService(DbConnectionFactory dbC, IUserVerificationService vs )
     {
         _dbConnection = dbC;
+        _verificationService= vs;
     }
 
     public async Task<ApiResponse<int>> ConnectToJobPostAsync(int workerId, int jobPostId)
     {
+
+        var isVerified = await _verificationService.IsUserVerifiedAsync(workerId);
+
+        if (!isVerified)
+        {
+            return new ApiResponse<int>
+            {
+                Success = false,
+                Message = "Your account must be verified before you can connect to a job post."
+            };
+        }
+
         using var connection = _dbConnection.CreateConnection();
 
         connection.Open();
