@@ -1,0 +1,37 @@
+:root {
+  /* Brand */
+  --FrelanceApp-primary: #0f9fa6;
+  --FrelanceApp-primary-dark: #0b7f85;
+
+  /* Backgrounds */
+  --FrelanceApp-background: #f8fafc;
+  --FrelanceApp-surface: #ffffff;
+
+  /* Text */
+  --FrelanceApp-text: #1e293b;
+  --FrelanceApp-secondary: #64748b;
+  --FrelanceApp-muted: #94a3b8;
+
+  /* Borders */
+  --FrelanceApp-border: #e2e8f0;
+
+  /* States */
+  --FrelanceApp-danger: #dc3545;
+  --FrelanceApp-danger-background: #fff1f2;
+  --FrelanceApp-danger-border: #fecdd3;
+
+  --FrelanceApp-success: #16a34a;
+
+  /* Shadows */
+  --FrelanceApp-shadow:
+    0 10px 30px -12px rgba(15, 23, 42, 0.12);
+}
+
+.FrelanceApp-primary {
+  background-color: var(--FrelanceApp-primary);
+  color: white;
+}
+
+.FrelanceApp-primary:hover:not(:disabled) {
+  background-color: var(--FrelanceApp-primary-dark);
+}
