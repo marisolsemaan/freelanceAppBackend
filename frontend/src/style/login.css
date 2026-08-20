@@ -158,3 +158,17 @@
     padding: 22px 18px 16px;
   }
 }
+
+.input-error {
+  border-color: var(--FrelanceApp-danger) !important;
+}
+
+.input-error:focus {
+  border-color: var(--FrelanceApp-danger) !important;
+  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.12);
+}
+
+.field-error {
+  font-size: 0.78rem;
+  color: var(--FrelanceApp-danger);
+}

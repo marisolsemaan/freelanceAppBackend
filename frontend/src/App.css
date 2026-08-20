@@ -35,3 +35,18 @@
 .FrelanceApp-primary:hover:not(:disabled) {
   background-color: var(--FrelanceApp-primary-dark);
 }
+
+.auth-input.input-error {
+  border-color: var(--FrelanceApp-danger);
+}
+
+.auth-input.input-error:focus {
+  border-color: var(--FrelanceApp-danger);
+  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.12);
+}
+
+.field-error {
+  margin-top: -2px;
+  font-size: 0.75rem;
+  color: var(--FrelanceApp-danger);
+}
