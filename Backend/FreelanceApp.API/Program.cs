@@ -15,6 +15,7 @@ using FreelanceApp.API.Services.Verification;
 using FreelanceApp.API.Services.Rating;
 using System.Text;
 using System.Text.Json.Serialization;
+using FreelanceApp.API.Services.Lookup;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -113,6 +114,8 @@ builder.Services.AddScoped<IConversationService, ConversationService>();
 builder.Services.AddScoped<IRatingService, RatingService>();
 
 builder.Services.AddScoped<IUserVerificationService, UserVerificationService>();
+
+builder.Services.AddScoped<ILookupService, LookupService>();
 
 var app = builder.Build();
 

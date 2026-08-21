@@ -12,7 +12,7 @@ public class RegisterRequest
 
     public string? Phone { get; set; }
 
-    [Required, MinLength(6)]
+    [Required, MinLength(8)]
     public string Password { get; set; } = "";
 
     [Required]

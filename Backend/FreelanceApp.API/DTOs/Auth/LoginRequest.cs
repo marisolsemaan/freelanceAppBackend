@@ -4,7 +4,7 @@ namespace FreelanceApp.API.DTOs.Auth;
 
 public class LoginRequest
 {
-    [Required, EmailAddress]
+    [Required]
     public string Email { get; set; } = "";
 
     [Required]

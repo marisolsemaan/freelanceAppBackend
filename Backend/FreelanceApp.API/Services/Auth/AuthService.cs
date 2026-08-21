@@ -4,6 +4,7 @@ using FreelanceApp.API.Enums;
 using FreelanceApp.API.Helpers;
 using FreelanceApp.API.Models.Auth;
 using System.Data;
+using FreelanceApp.API.DTOs;
 using FreelanceApp.API.DTOs.Auth;
 using FreelanceApp.API.Services.Documents;
 using Microsoft.Data.SqlClient;
@@ -55,6 +56,12 @@ public class AuthService: IAuthService
                     await transaction.RollbackAsync();
                     return ("Please enter a valid Lebanese phone number.", null);
                 }
+            }
+
+            //pass must be longer than 8 char
+            if (request.Password.Length < 8)
+            {
+                return new ("Pass must be longer than 8 char", null);
             }
 
             // await using var transaction= await connection.BeginTransactionAsync(); // use a transaction for the tables

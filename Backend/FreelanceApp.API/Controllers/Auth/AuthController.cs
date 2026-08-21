@@ -19,11 +19,7 @@ public class AuthController : ControllerBase
     // registration contains files, the request uses
     // multipart/form-data 
     [HttpPost("register")]
-    public async Task<IActionResult> Register(
-        [FromForm] RegisterRequest request,
-        IFormFile idFile,
-        IFormFile photoFile,
-        IFormFile? professionProofFile)
+    public async Task<IActionResult> Register( [FromForm] RegisterRequest request, IFormFile idFile, IFormFile photoFile,  IFormFile? professionProofFile)
     {
         // Call the authentication service.
         var result = await _auth.RegisterAsync(
@@ -50,8 +46,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("login")]
-    public async Task<IActionResult> Login(
-        [FromBody] LoginRequest request)
+    public async Task<IActionResult> Login( [FromBody] LoginRequest request)
     {
         // Call authentication service.
         var result = await _auth.LoginAsync(request);
