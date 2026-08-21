@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { loginUser } from "../services/authService";
-import "../style/login.css";
-import { saveAuth } from "../utils/jwtStorage";
+import { loginUser } from "../../services/authService";
+import "../../style/login.css";
+import { saveAuth } from "../../utils/jwtStorage";
+import { getApiErrorMessage } from "../../utils/apiError";
 
 function Login() {
   const navigate = useNavigate();
@@ -12,7 +13,7 @@ function Login() {
     password: "",
   });
 
-  const [error, setError] = useState("");
+  const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
@@ -23,15 +24,33 @@ function Login() {
       [name]: value,
     }));
 
-    setError("");
+    setErrors((previous)=>({
+      ...previous,
+      [name]:"",
+    }));
+  };
+
+  const validateForm = () => {
+  const newErrors = {};
+
+  if (!formData.email.trim()) {
+    newErrors.email = "Email is required.";
+  }
+
+  if (!formData.password) {
+    newErrors.password = "Password is required.";
+  }
+
+  return newErrors;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
+    const validationErrors= validateForm();
 
-    if (!formData.email.trim() || !formData.password) {
-      setError("Email and password are required.");
+    setErrors(validationErrors);
+
+    if(Object.keys(validationErrors).length>0){
       return;
     }
 
@@ -45,16 +64,23 @@ function Login() {
 
       saveAuth(result);
 
-      console.log("login response: ", result);
+      console.log("login success: ", result);
 
-      navigate("/")
+      if(result.role ===1 ){
+        navigate("/client/jobs");
+      }
+      else if(result.role===2){
+        navigate("/worker/jobs");
+
+      }
 
     } catch (error) {
-      if (error.response?.data?.message) {
-        setError(error.response.data.message);
-      } else {
-        setError("Could not connect to the server. Please try again.");
-      }
+    console.error("login error:", error);
+
+    setErrors({
+      server: getApiErrorMessage(error),
+    });
+    
     } finally {
       setLoading(false);
     }
@@ -75,7 +101,7 @@ function Login() {
           <p className="auth-subheading">Sign in to your account.</p>
 
           {/* error */}
-          {error && <div className="auth-error">{error}</div>}
+          {errors.server && <div className="auth-error">{errors.server}</div>}
 
           <form onSubmit={handleSubmit} className="auth-form" noValidate>
             {/* email */}
@@ -90,9 +116,10 @@ function Login() {
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="you@example.com"
-                className="auth-input"
+                className={`auth-input ${ errors.email ? "input-error" : ""}`}
                 autoComplete="email"
               />
+              {errors.email && (<span className="field-error">{errors.email}</span>)}
             </div>
 
             {/* password */}
@@ -107,9 +134,10 @@ function Login() {
                 value={formData.password}
                 onChange={handleChange}
                 placeholder="••••••••"
-                className="auth-input"
+                className={`auth-input ${errors.password ? "input-error" : ""}`}
                 autoComplete="current-password"
               />
+              {errors.password && (<span className="field-error">{errors.password}</span>)}
             </div>
 
             {/* submit */}
@@ -136,3 +164,4 @@ function Login() {
 }
 
 export default Login;
+

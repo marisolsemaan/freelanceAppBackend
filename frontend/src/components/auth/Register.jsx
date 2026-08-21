@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { registerUser } from "../services/authService";
-import { saveAuth } from "../utils/jwtStorage";
-import "../style/register.css";
+import { registerUser } from "../../services/authService";
+import { saveAuth } from "../../utils/jwtStorage";
+import "../../style/register.css";
+import { getApiErrorMessage } from "../../utils/apiError";
 
 function Register() {
   const navigate = useNavigate();
@@ -102,18 +103,20 @@ function Register() {
 
         console.log("registration response:", result);
       
-        navigate("/")
-          
+      if(result.role ===1 ){
+        navigate("/client/jobs");
+      }
+      else if(result.role===2){
+        navigate("/worker/jobs");
+
+      }
     } 
     catch (error) {
+      console.error("Registration error:", error);
 
-    console.error("Registration error:", error);
-
-    if (error.response?.data?.message) {
-      setServerError(error.response.data.message);
-    } else {
-      setServerError("Could not connect to the server. Please try again.");
-    }
+      setErrors({
+        server: getApiErrorMessage(error),
+      });
 
     } finally {
 
@@ -247,7 +250,7 @@ function Register() {
             {/* role */}
             <div className="auth-field">
               <label htmlFor="role">
-                Role <span className=" text-danger ">*</span>
+                Role 
               </label>
               <select
                 id="role"
@@ -338,3 +341,4 @@ function Register() {
 }
 
 export default Register;
+

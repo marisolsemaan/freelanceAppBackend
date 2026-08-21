@@ -1,0 +1,245 @@
+.my-jobs-page {
+  min-height: calc(100vh - 64px);
+  background: #f8f9fa;
+}
+
+/* Header */
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 1rem;
+
+  margin-bottom: 2rem;
+}
+
+.page-header h1 {
+  font-size: 1.8rem;
+  font-weight: 700;
+
+  margin-bottom: 0.25rem;
+}
+
+.page-header p {
+  color: #6c757d;
+
+  margin-bottom: 0;
+}
+
+.post-job-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  white-space: nowrap;
+}
+
+/* Stats */
+
+.stats-card {
+  border: 1px solid #e9ecef;
+
+  border-radius: 12px;
+
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.stats-icon {
+  width: 38px;
+  height: 38px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 10px;
+
+  margin-bottom: 1rem;
+
+  background: #f1f3f5;
+
+  font-size: 1.1rem;
+}
+
+.stats-card h3 {
+  font-size: 1.5rem;
+
+  font-weight: 700;
+
+  margin-bottom: 0.2rem;
+}
+
+.stats-card p {
+  margin: 0;
+
+  color: #6c757d;
+
+  font-size: 0.875rem;
+}
+
+/* Section */
+
+.jobs-section-header {
+  margin-bottom: 1rem;
+}
+
+.jobs-section-header i {
+  font-size: 1.1rem;
+}
+
+.jobs-section-header h4 {
+  font-size: 1rem;
+
+  font-weight: 600;
+
+  margin: 0;
+}
+
+.jobs-section-header span {
+  color: #6c757d;
+
+  font-size: 0.9rem;
+}
+
+/* Jobs */
+
+.jobs-list {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 0.75rem;
+}
+
+.job-card {
+  border: 1px solid #e9ecef;
+
+  border-radius: 12px;
+
+  transition: 0.2s ease;
+
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+.job-card:hover {
+  transform: translateY(-1px);
+
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.job-title {
+  font-size: 1rem;
+
+  font-weight: 600;
+}
+
+.job-description {
+  color: #6c757d;
+
+  font-size: 0.9rem;
+
+  margin-bottom: 0.75rem;
+
+  max-width: 850px;
+}
+
+.job-meta {
+  display: flex;
+
+  align-items: center;
+
+  flex-wrap: wrap;
+
+  gap: 0.5rem;
+
+  color: #6c757d;
+
+  font-size: 0.85rem;
+}
+
+.meta-divider {
+  color: #adb5bd;
+}
+
+/* Status */
+
+.job-status {
+  padding: 0.2rem 0.6rem;
+
+  border-radius: 20px;
+
+  font-size: 0.75rem;
+
+  font-weight: 600;
+}
+
+.job-status-open {
+  background: #e8f7ee;
+
+  color: #198754;
+}
+
+.job-status-closed {
+  background: #f1f3f5;
+
+  color: #6c757d;
+}
+
+.job-id {
+  color: #adb5bd;
+
+  font-size: 0.8rem;
+}
+
+/* Actions */
+
+.job-actions {
+  display: flex;
+
+  align-items: center;
+
+  gap: 1rem;
+
+  flex-shrink: 0;
+}
+
+.conversation-count {
+  display: flex;
+
+  align-items: center;
+
+  gap: 0.4rem;
+
+  color: #6c757d;
+
+  font-size: 0.9rem;
+}
+
+/* Mobile */
+
+@media (max-width: 576px) {
+
+  .page-header {
+    align-items: flex-start;
+
+    flex-direction: column;
+  }
+
+  .post-job-button {
+    width: 100%;
+
+    justify-content: center;
+  }
+
+  .job-card-content {
+    flex-direction: column;
+  }
+
+  .job-actions {
+    width: 100%;
+
+    justify-content: space-between;
+  }
+}
