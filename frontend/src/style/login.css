@@ -4,14 +4,14 @@
   align-items: center;
   justify-content: center;
   padding: 24px 16px;
-  background-color: var(--FrelanceApp-background);
+  background-color: var(--FreelanceApp-background);
 }
 
 .auth-card {
   width: 100%;
   max-width: 440px;
   background: #ffffff;
-  border: 1px solid var(--FrelanceApp-border);
+  border: 1px solid var(--FreelanceApp-border);
   border-radius: 16px;
   box-shadow: 0 10px 30px -12px rgba(15, 23, 42, 0.12);
   overflow: hidden;
@@ -21,7 +21,7 @@
 .auth-brand {
   padding: 28px 24px 20px;
   text-align: center;
-  background: var(--FrelanceApp-primary);
+  background: var(--FreelanceApp-primary);
   color: #ffffff;
 }
 
@@ -51,20 +51,20 @@
   margin: 0;
   font-size: 1.25rem;
   font-weight: 700;
-  color: var(--FrelanceApp-text);
+  color: var(--FreelanceApp-text);
 }
 
 .auth-subheading {
   margin: 6px 0 20px;
   font-size: 0.9rem;
-  color: var(--FrelanceApp-secondary);
+  color: var(--FreelanceApp-secondary);
 }
 
 .auth-error {
   margin-bottom: 16px;
   padding: 10px 12px;
   font-size: 0.85rem;
-  color: var(--FrelanceApp-danger);
+  color: var(--FreelanceApp-danger);
   background: rgba(220, 53, 69, 0.08);
   border: 1px solid rgba(220, 53, 69, 0.25);
   border-radius: 8px;
@@ -85,7 +85,7 @@
 .auth-field label {
   font-size: 0.85rem;
   font-weight: 600;
-  color: var(--FrelanceApp-text);
+  color: var(--FreelanceApp-text);
 }
 
 .auth-input {
@@ -93,9 +93,9 @@
   height: 44px;
   padding: 0 12px;
   font-size: 0.95rem;
-  color: var(--FrelanceApp-text);
+  color: var(--FreelanceApp-text);
   background: #ffffff;
-  border: 1px solid var(--FrelanceApp-border);
+  border: 1px solid var(--FreelanceApp-border);
   border-radius: 8px;
   outline: none;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
@@ -106,7 +106,7 @@
 }
 
 .auth-input:focus {
-  border-color: var(--FrelanceApp-primary);
+  border-color: var(--FreelanceApp-primary);
   box-shadow: 0 0 0 3px rgba(15, 159, 166, 0.15);
 }
 
@@ -120,8 +120,12 @@
   cursor: pointer;
   border: 1px solid transparent;
   transition: background-color 0.15s ease, transform 0.05s ease;
+  background-color: var(--FreelanceApp-primary);
+  color: white;
 }
-
+.auth-button:hover{
+  background-color: var(--FreelanceApp-primary-dark);
+}
 .auth-button:disabled {
   opacity: 0.7;
   cursor: not-allowed;
@@ -135,17 +139,17 @@
   margin: 22px 0 0;
   text-align: center;
   font-size: 0.9rem;
-  color: var(--FrelanceApp-secondary);
+  color: var(--FreelanceApp-secondary);
 }
 
 .auth-switch {
-  color: var(--FrelanceApp-primary);
+  color: var(--FreelanceApp-primary);
   text-decoration: none;
   font-weight: 600;
 }
 
 .auth-switch:hover {
-  color: var(--FrelanceApp-primary-dark);
+  color: var(--FreelanceApp-primary-dark);
   text-decoration: underline;
 }
 
@@ -160,15 +164,15 @@
 }
 
 .input-error {
-  border-color: var(--FrelanceApp-danger) !important;
+  border-color: var(--FreelanceApp-danger) !important;
 }
 
 .input-error:focus {
-  border-color: var(--FrelanceApp-danger) !important;
+  border-color: var(--FreelanceApp-danger) !important;
   box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.12);
 }
 
 .field-error {
   font-size: 0.78rem;
-  color: var(--FrelanceApp-danger);
+  color: var(--FreelanceApp-danger);
 }

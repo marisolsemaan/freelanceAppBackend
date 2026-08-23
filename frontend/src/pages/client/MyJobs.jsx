@@ -1,5 +1,5 @@
 import { useState } from "react";
-
+import { useNavigate } from "react-router-dom";
 import Navbar from "../../components/layout/Navbar";
 import JobStats from "../../components/client/jobs/JobStats";
 import JobCard from "../../components/client/jobs/JobCard";
@@ -7,6 +7,9 @@ import JobCard from "../../components/client/jobs/JobCard";
 import "../../style/myJob.css";
 
 function MyJobs() {
+
+  const navigate = useNavigate();
+
   const [jobs, setJobs] = useState([
     {
       jobPost_Id: 1,
@@ -83,14 +86,14 @@ function MyJobs() {
           <div className="page-header">
 
             <div>
-              <h1>My Jobs</h1>
+              <h1>My Posts</h1>
 
               <p>
                 Manage your job posts and conversations.
               </p>
             </div>
 
-            <button className="btn FrelanceApp-primary post-job-button">
+            <button className="btn  post-job-button" onClick={() => navigate("/client/jobs/create")}>
 
               <i className="bi bi-plus-lg"></i>
 

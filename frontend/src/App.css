@@ -1,52 +1,52 @@
 :root {
   /* Brand */
-  --FrelanceApp-primary: #0f9fa6;
-  --FrelanceApp-primary-dark: #0b7f85;
+  --FreelanceApp-primary: #0f9fa6;
+  --FreelanceApp-primary-dark: #0b7f85;
 
   /* Backgrounds */
-  --FrelanceApp-background: #f8fafc;
-  --FrelanceApp-surface: #ffffff;
+  --FreelanceApp-background: #f8fafc;
+  --FreelanceApp-surface: #ffffff;
 
   /* Text */
-  --FrelanceApp-text: #1e293b;
-  --FrelanceApp-secondary: #64748b;
-  --FrelanceApp-muted: #94a3b8;
+  --FreelanceApp-text: #1e293b;
+  --FreelanceApp-secondary: #64748b;
+  --FreelanceApp-muted: #94a3b8;
 
   /* Borders */
-  --FrelanceApp-border: #e2e8f0;
+  --FreelanceApp-border: #e2e8f0;
 
   /* States */
-  --FrelanceApp-danger: #dc3545;
-  --FrelanceApp-danger-background: #fff1f2;
-  --FrelanceApp-danger-border: #fecdd3;
+  --FreelanceApp-danger: #dc3545;
+  --FreelanceApp-danger-background: #fff1f2;
+  --FreelanceApp-danger-border: #fecdd3;
 
-  --FrelanceApp-success: #16a34a;
+  --FreelanceApp-success: #16a34a;
 
   /* Shadows */
-  --FrelanceApp-shadow:
+  --FreelanceApp-shadow:
     0 10px 30px -12px rgba(15, 23, 42, 0.12);
 }
 
-.FrelanceApp-primary {
-  background-color: var(--FrelanceApp-primary);
+.FreelanceApp-primary {
+  background-color: var(--FreelanceApp-primary);
   color: white;
 }
 
-.FrelanceApp-primary:hover:not(:disabled) {
-  background-color: var(--FrelanceApp-primary-dark);
+.FreelanceApp-primary:hover(:enabled) {
+  background-color: var(--FreelanceApp-primary-dark);
 }
 
 .auth-input.input-error {
-  border-color: var(--FrelanceApp-danger);
+  border-color: var(--FreelanceApp-danger);
 }
 
 .auth-input.input-error:focus {
-  border-color: var(--FrelanceApp-danger);
+  border-color: var(--FreelanceApp-danger);
   box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.12);
 }
 
 .field-error {
   margin-top: -2px;
   font-size: 0.75rem;
-  color: var(--FrelanceApp-danger);
+  color: var(--FreelanceApp-danger);
 }

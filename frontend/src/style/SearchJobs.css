@@ -1,0 +1,328 @@
+/* =========================
+   PAGE
+========================= */
+
+.search-jobs-page {
+  min-height: calc(100vh - 70px);
+
+  background: #f8fafb;
+}
+
+.search-jobs-page .container-xl {
+  max-width: 1400px;
+}
+
+
+/* =========================
+   PAGE HEADER
+========================= */
+
+.search-page-header {
+  display: flex;
+
+  align-items: flex-end;
+
+  justify-content: space-between;
+
+  gap: 2rem;
+
+  margin-bottom: 2rem;
+}
+
+.search-page-eyebrow {
+  display: block;
+
+  margin-bottom: 0.35rem;
+
+  color: var(--FreelanceApp-primary);
+
+  font-size: 0.7rem;
+
+  font-weight: 700;
+
+  letter-spacing: 0.08em;
+}
+
+.page-title {
+  margin-bottom: 0.35rem;
+
+  font-family: var(--font-display);
+
+  color: var(--slate-900);
+
+  font-size: 1.8rem;
+
+  font-weight: 700;
+}
+
+.page-subtitle {
+  margin: 0;
+
+  color: var(--slate-500);
+
+  font-size: 0.9rem;
+}
+
+
+/* =========================
+   JOB COUNT
+========================= */
+
+.jobs-count {
+  min-width: 115px;
+
+  padding: 0.75rem 1rem;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  border: 1px solid var(--slate-200);
+
+  border-radius: 12px;
+
+  background: #ffffff;
+
+  color: var(--slate-500);
+
+  font-size: 0.7rem;
+}
+
+
+
+/* =========================
+   SEARCH
+========================= */
+
+.search-icon {
+  position: absolute;
+
+  left: 14px;
+
+  top: 50%;
+
+  transform: translateY(-50%);
+
+  color: var(--slate-500);
+
+  font-size: 0.9rem;
+
+  pointer-events: none;
+}
+
+.search-input {
+  height: 46px;
+
+  padding-left: 2.5rem;
+
+  border: 1px solid var(--slate-200);
+
+  background: #ffffff;
+
+  font-size: 0.9rem;
+}
+
+.search-input:focus {
+  border-color: var(--FreelanceApp-primary);
+
+  box-shadow:
+    0 0 0 3px rgba(15, 159, 166, 0.1);
+}
+
+
+/* =========================
+   FILTER BUTTON
+========================= */
+
+.filter-toggle {
+  height: 46px;
+
+  padding: 0 1rem;
+
+  border: 1px solid var(--slate-200);
+
+  background: #ffffff;
+
+  color: var(--slate-700);
+
+  font-weight: 600;
+}
+
+.filter-toggle:hover {
+  border-color: var(--FreelanceApp-primary);
+
+  color: var(--FreelanceApp-primary);
+
+  background: rgba(15, 159, 166, 0.05);
+}
+
+.filter-toggle.active {
+  border-color: var(--FreelanceApp-primary);
+
+  background: var(--FreelanceApp-primary);
+
+  color: #ffffff;
+}
+
+
+/* =========================
+   FILTER PANEL
+========================= */
+
+.filter-panel {
+  margin-top: 0.5rem;
+
+  padding: 1.25rem;
+
+  background: #ffffff;
+
+  border: 1px solid var(--slate-200);
+
+  border-radius: 14px;
+
+  box-shadow:
+    0 8px 25px rgba(15, 23, 42, 0.04);
+}
+
+.filter-panel .form-label {
+  margin-bottom: 0.4rem;
+
+  color: var(--slate-700);
+
+  font-size: 0.78rem;
+
+  font-weight: 600;
+}
+
+.filter-panel .form-control,
+.filter-panel .form-select {
+  min-height: 42px;
+
+  border-color: var(--slate-200);
+
+  font-size: 0.85rem;
+}
+
+.filter-panel .form-control:focus,
+.filter-panel .form-select:focus {
+  border-color: var(--FreelanceApp-primary);
+
+  box-shadow:
+    0 0 0 3px rgba(15, 159, 166, 0.1);
+}
+
+
+/* =========================
+   FILTER ACTIONS
+========================= */
+
+.filter-actions {
+  display: flex;
+
+  gap: 0.75rem;
+
+  margin-top: 1.25rem;
+}
+
+.apply-btn,
+.clear-btn {
+  min-height: 42px;
+
+  padding: 0 1.2rem;
+
+  font-weight: 600;
+
+
+
+ 
+}
+
+.apply-btn {
+  border: none;
+
+  background: var(--FreelanceApp-primary);
+
+  color: #ffffff;
+}
+
+.apply-btn:hover {
+  background: var(--FreelanceApp-primary-dark);
+
+  color: #ffffff;
+}
+
+.clear-btn {
+  background: #f1f3f5;
+
+  color: #6c757d
+}
+
+.clear-btn:hover {
+  background: rgb(208, 204, 204);
+
+  color: #6c757d
+
+}
+
+
+/* =========================
+   EMPTY STATE
+========================= */
+
+.empty-jobs {
+  padding: 5rem 1rem;
+
+  text-align: center;
+}
+
+.empty-jobs-icon {
+  width: 56px;
+  height: 56px;
+
+  margin: 0 auto 1rem;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: rgba(15, 159, 166, 0.1);
+
+  color: var(--FreelanceApp-primary);
+
+  font-size: 1.4rem;
+}
+
+.empty-jobs h5 {
+  color: var(--slate-900);
+
+  font-weight: 700;
+}
+
+.empty-jobs p {
+  margin: 0;
+
+  color: var(--slate-500);
+
+  font-size: 0.9rem;
+}
+
+
+@media (max-width: 768px) {
+
+  .search-page-header {
+    align-items: flex-start;
+
+    flex-direction: column;
+
+    gap: 1rem;
+  }
+
+
+
+}

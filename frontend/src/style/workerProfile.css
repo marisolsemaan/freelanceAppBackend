@@ -1,0 +1,727 @@
+.worker-profile-page {
+  min-height: 100vh;
+  background-color: var(--FreelanceApp-background);
+  padding: 2rem 1rem 3rem;
+}
+
+.worker-profile-container {
+  width: 100%;
+  max-width: 850px;
+  margin: 0 auto;
+}
+
+.back-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+
+  padding: 0;
+  margin-bottom: 1.5rem;
+
+  border: none;
+  background: transparent;
+
+  color: var(--FreelanceApp-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+
+  cursor: pointer;
+}
+
+.back-button:hover {
+  color: var(--FreelanceApp-primary);
+}
+
+.worker-profile-header {
+  margin-bottom: 1.5rem;
+}
+
+.worker-profile-header h1 {
+  margin-bottom: 0.4rem;
+
+  color: var(--FreelanceApp-text);
+  font-size: 1.75rem;
+  font-weight: 700;
+}
+
+.worker-profile-header p {
+  margin: 0;
+
+  color: var(--FreelanceApp-secondary);
+  font-size: 0.95rem;
+}
+
+/* PROFILE SECTIONS */
+
+.profile-section {
+  margin-bottom: 1rem;
+  padding: 1.5rem;
+
+  background-color: var(--FreelanceApp-surface);
+  border: 1px solid var(--FreelanceApp-border);
+  border-radius: 10px;
+
+  box-shadow: var(--FreelanceApp-shadow);
+}
+
+.section-header {
+  margin-bottom: 1.25rem;
+}
+
+.section-header h2 {
+  margin: 0 0 0.25rem;
+
+  color: var(--FreelanceApp-text);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.section-header h2 span,
+.form-group label span {
+  color: var(--FreelanceApp-danger);
+}
+
+.section-header p {
+  margin: 0;
+
+  color: var(--FreelanceApp-secondary);
+  font-size: 0.875rem;
+}
+
+/* MULTIPLE SELECTION */
+
+.selection-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+
+.selection-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+
+  padding: 0.55rem 0.85rem;
+
+  border: 1px solid var(--FreelanceApp-border);
+  border-radius: 7px;
+
+  background-color: var(--FreelanceApp-surface);
+  color: var(--FreelanceApp-text);
+
+  font-size: 0.875rem;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s,
+    border-color 0.2s,
+    color 0.2s;
+}
+
+.selection-option:hover {
+  border-color: var(--FreelanceApp-primary);
+  color: var(--FreelanceApp-primary);
+}
+
+.selection-option.selected {
+  border-color: var(--FreelanceApp-primary);
+  background-color: rgba(15, 159, 166, 0.08);
+  color: var(--FreelanceApp-primary-dark);
+  font-weight: 500;
+}
+
+/* FORM */
+
+.form-group {
+  margin-bottom: 1.2rem;
+}
+
+.form-group:last-child {
+  margin-bottom: 0;
+}
+
+.form-group label {
+  display: block;
+
+  margin-bottom: 0.45rem;
+
+  color: var(--FreelanceApp-text);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+
+  padding: 0.7rem 0.8rem;
+
+  border: 1px solid var(--FreelanceApp-border);
+  border-radius: 7px;
+
+  background-color: var(--FreelanceApp-surface);
+  color: var(--FreelanceApp-text);
+
+  font-size: 0.9rem;
+  outline: none;
+
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  border-color: var(--FreelanceApp-primary);
+  box-shadow: 0 0 0 3px rgba(15, 159, 166, 0.1);
+}
+
+.form-group small {
+  display: block;
+  margin-top: 0.4rem;
+
+  color: var(--FreelanceApp-muted);
+  font-size: 0.75rem;
+}
+
+/* HOURLY RATE */
+
+.rate-input {
+  display: flex;
+  align-items: center;
+
+  max-width: 250px;
+
+  border: 1px solid var(--FreelanceApp-border);
+  border-radius: 7px;
+
+  overflow: hidden;
+}
+
+.rate-input:focus-within {
+  border-color: var(--FreelanceApp-primary);
+  box-shadow: 0 0 0 3px rgba(15, 159, 166, 0.1);
+}
+
+.rate-input span {
+  padding-left: 0.8rem;
+
+  color: var(--FreelanceApp-secondary);
+  font-weight: 600;
+}
+
+.rate-input input {
+  border: none;
+  box-shadow: none;
+}
+
+.rate-input input:focus {
+  border: none;
+  box-shadow: none;
+}
+
+.rate-input small {
+  margin: 0;
+  padding-right: 0.8rem;
+
+  white-space: nowrap;
+}
+
+/* PROFILE TOP */
+
+.worker-profile-top {
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 1rem;
+
+  margin-bottom: 1.5rem;
+
+}
+
+.worker-profile-info {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 1rem;
+
+}
+
+.worker-profile-info h1 {
+
+  margin: 0 0 0.25rem;
+
+  color: var(--FreelanceApp-text);
+
+  font-size: 1.5rem;
+
+  font-weight: 700;
+
+}
+
+.worker-profile-info p {
+
+  margin: 0;
+
+  color: var(--FreelanceApp-secondary);
+
+  font-size: 0.875rem;
+
+}
+
+.edit-profile-button {
+
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 0.5rem;
+
+  border: none;
+
+  padding: 0.65rem 1rem;
+
+  border-radius: 7px;
+
+  font-size: 0.875rem;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+}
+
+.edit-profile-button:Hover{
+    background-color: var(--FreelanceApp-primary-dark);
+}
+
+/* PROFILE PHOTO */
+
+.worker-photo {
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  width: 64px;
+
+  height: 64px;
+
+  flex-shrink: 0;
+
+  overflow: hidden;
+
+  border-radius: 50%;
+
+  background-color: rgba(15, 159, 166, 0.1);
+
+  color: var(--FreelanceApp-primary);
+
+  font-size: 1.8rem;
+
+}
+
+.worker-photo img {
+
+  width: 100%;
+
+  height: 100%;
+
+  object-fit: cover;
+
+}
+
+.worker-photo.large {
+
+  width: 90px;
+
+  height: 90px;
+
+  font-size: 2.5rem;
+
+}
+
+.photo-upload {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 1rem;
+
+}
+
+.photo-upload input {
+
+  display: none;
+
+}
+
+.upload-photo-button {
+
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 0.5rem;
+
+  padding: 0.6rem 0.9rem;
+
+  border: 1px solid var(--FreelanceApp-border);
+
+  border-radius: 7px;
+
+  color: var(--FreelanceApp-text);
+
+  font-size: 0.875rem;
+
+  font-weight: 500;
+
+  cursor: pointer;
+
+}
+
+.upload-photo-button:hover {
+
+  border-color: var(--FreelanceApp-primary);
+
+  color: var(--FreelanceApp-primary);
+
+}
+
+/* MULTI SELECT */
+
+.profile-multi-select {
+
+  width: 100%;
+
+  min-height: 160px;
+
+  padding: 0.5rem;
+
+  border: 1px solid var(--FreelanceApp-border);
+
+  border-radius: 7px;
+
+  background-color: var(--FreelanceApp-surface);
+
+  color: var(--FreelanceApp-text);
+
+  font-size: 0.9rem;
+
+  outline: none;
+
+}
+
+.profile-multi-select:focus {
+
+  border-color: var(--FreelanceApp-primary);
+
+  box-shadow: 0 0 0 3px rgba(15, 159, 166, 0.1);
+
+}
+
+.profile-multi-select option {
+
+  padding: 0.6rem;
+
+}
+
+/* PROFILE TAGS */
+
+.profile-tags {
+
+  display: flex;
+
+  flex-wrap: wrap;
+
+  gap: 0.6rem;
+
+}
+
+.profile-tag {
+
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 0.35rem;
+
+  padding: 0.5rem 0.8rem;
+
+  border-radius: 6px;
+
+  background-color: rgba(15, 159, 166, 0.08);
+
+  color: var(--FreelanceApp-primary-dark);
+
+  font-size: 0.85rem;
+
+  font-weight: 500;
+
+}
+
+/* PROFILE VALUES */
+
+.profile-value {
+
+  margin: 0;
+
+  color: var(--FreelanceApp-text);
+
+  font-size: 0.9rem;
+
+  line-height: 1.6;
+
+}
+
+.profile-description {
+
+  white-space: pre-line;
+
+}
+
+.worker-name-row {
+  display: flex;
+
+  align-items: center;
+
+  flex-wrap: wrap;
+
+  gap: 0.75rem;
+}
+
+.worker-name-row h1 {
+  margin: 0;
+}
+
+.profile-rating {
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 0.3rem;
+
+  color: var(--FreelanceApp-text);
+
+  font-size: 0.875rem;
+
+  font-weight: 600;
+}
+
+.profile-rating i {
+  color: #f5a623;
+}
+
+.review-count {
+  color: var(--FreelanceApp-secondary);
+
+  font-weight: 400;
+}
+
+/* MOBILE */
+
+@media (max-width: 576px) {
+  .worker-profile-page {
+    padding: 1.25rem 0.75rem 2rem;
+  }
+
+  .profile-section {
+    padding: 1.1rem;
+  }
+
+  .worker-profile-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .profile-actions {
+    flex-direction: column-reverse;
+  }
+
+  .cancel-button,
+  .save-profile-button {
+    width: 100%;
+  }
+
+  .rate-input {
+    max-width: 100%;
+  }
+
+  .worker-profile-top {
+
+  align-items: flex-start;
+
+  flex-direction: column;
+
+  }
+
+  .edit-profile-button {
+
+  width: 100%;
+
+  justify-content: center;
+
+  }
+
+  .photo-upload {
+
+  align-items: flex-start;
+
+  flex-direction: column;
+
+  }
+}
+
+.reviews-header {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 1rem;
+}
+
+.reviews-summary {
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 0.35rem;
+
+  white-space: nowrap;
+
+  font-size: 0.875rem;
+}
+
+.reviews-summary i {
+  color: #f5a623;
+}
+
+.reviews-summary span {
+  color: var(--FreelanceApp-secondary);
+}
+
+.reviews-list {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 1.25rem;
+}
+
+.review-item {
+  padding-bottom: 1.25rem;
+
+  border-bottom: 1px solid var(--FreelanceApp-border);
+}
+
+.review-item:last-child {
+  padding-bottom: 0;
+
+  border-bottom: none;
+}
+
+.review-top {
+  display: flex;
+
+  align-items: center;
+
+  gap: 0.75rem;
+}
+
+.reviewer-avatar {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  width: 38px;
+
+  height: 38px;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+
+  background-color: var(--FreelanceApp-background);
+
+  color: var(--FreelanceApp-secondary);
+}
+
+.review-info {
+  display: flex;
+
+  flex: 1;
+
+  flex-direction: column;
+}
+
+.reviewer-name {
+  color: var(--FreelanceApp-text);
+
+  font-size: 0.875rem;
+
+  font-weight: 600;
+}
+
+.review-date {
+  color: var(--FreelanceApp-muted);
+
+  font-size: 0.75rem;
+}
+
+.review-rating {
+  display: flex;
+
+  align-items: center;
+
+  gap: 0.25rem;
+
+  color: var(--FreelanceApp-text);
+
+  font-size: 0.875rem;
+
+  font-weight: 600;
+}
+
+.review-rating i {
+  color: #f5a623;
+}
+
+.review-comment {
+  margin: 0.8rem 0 0 3.1rem;
+
+  color: var(--FreelanceApp-secondary);
+
+  font-size: 0.9rem;
+
+  line-height: 1.6;
+}
+
+.empty-reviews {
+  padding: 2rem;
+
+  color: var(--FreelanceApp-secondary);
+
+  text-align: center;
+}
+
+.empty-reviews i {
+  font-size: 1.5rem;
+}

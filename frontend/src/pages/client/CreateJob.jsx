@@ -1,14 +1,7 @@
-import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-import { createJobPost } from "../../services/jobPostClientService";
-
-import {
-  getCities,
-  getProfessions,
-} from "../../services/lookupService";
-
-import { getApiErrorMessage } from "../../utils/apiError";
+import Navbar from "../../components/layout/Navbar";
 
 import "../../style/createJob.css";
 
@@ -24,43 +17,62 @@ function CreateJob() {
     jobPost_BudgetType: "Fixed",
   });
 
-  const [professions, setProfessions] = useState([]);
-  const [cities, setCities] = useState([]);
-
   const [errors, setErrors] = useState({});
-  const [loadingLookups, setLoadingLookups] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
 
-  const loadLookups = async () => {
-    try {
-      setLoadingLookups(true);
+  // Temporary data for UI.
+  // Later these will come from the backend.
+  const professions = [
+    {
+      profession_Id: 1,
+      profession_Title: "Electrical",
+    },
+    {
+      profession_Id: 2,
+      profession_Title: "Plumbing",
+    },
+    {
+      profession_Id: 3,
+      profession_Title: "Painting",
+    },
+    {
+      profession_Id: 4,
+      profession_Title: "Landscaping",
+    },
+    {
+      profession_Id: 5,
+      profession_Title: "HVAC",
+    },
+    {
+      profession_Id: 6,
+      profession_Title: "Carpentry",
+    },
+  ];
 
-      const [professionsData, citiesData] =
-        await Promise.all([
-          getProfessions(),
-          getCities(),
-        ]);
+  const cities = [
+    {
+      city_Id: 1,
+      city_Name: "Beirut",
+    },
+    {
+      city_Id: 2,
+      city_Name: "Tripoli",
+    },
+    {
+      city_Id: 3,
+      city_Name: "Sidon",
+    },
+    {
+      city_Id: 4,
+      city_Name: "Jounieh",
+    },
+    {
+      city_Id: 5,
+      city_Name: "Zahle",
+    },
+  ];
 
-      setProfessions(professionsData);
-      setCities(citiesData);
-    } catch (error) {
-      console.error("Failed to load form data:", error);
-
-      setErrors({
-        server: getApiErrorMessage(error),
-      });
-    } finally {
-      setLoadingLookups(false);
-    }
-  };
-
-  useEffect(() => {
-    loadLookups();
-  }, []);
-
-
-  const handleChange = (event) => {
-    const { name, value } = event.target;
+  const handleChange = (e) => {
+    const { name, value } = e.target;
 
     setFormData((previous) => ({
       ...previous,
@@ -70,30 +82,14 @@ function CreateJob() {
     setErrors((previous) => ({
       ...previous,
       [name]: "",
-      server: "",
     }));
   };
-
 
   const validateForm = () => {
     const newErrors = {};
 
     if (!formData.jobPost_Title.trim()) {
-      newErrors.jobPost_Title =
-        "Job title is required.";
-    }
-
-    if (!formData.jobPost_Description.trim()) {
-      newErrors.jobPost_Description =
-        "Job description is required.";
-    }
-
-    if (!formData.jobPost_Price) {
-      newErrors.jobPost_Price =
-        "Price is required.";
-    } else if (Number(formData.jobPost_Price) <= 0) {
-      newErrors.jobPost_Price =
-        "Price must be greater than zero.";
+      newErrors.jobPost_Title = "Job title is required.";
     }
 
     if (!formData.jobPost_ProfessionId) {
@@ -101,17 +97,16 @@ function CreateJob() {
         "Please select a profession.";
     }
 
-    if (!formData.jobPost_BudgetType) {
-      newErrors.jobPost_BudgetType =
-        "Please select a budget type.";
+    if (!formData.jobPost_Description.trim()) {
+      newErrors.jobPost_Description =
+        "Job description is required.";
     }
 
     return newErrors;
   };
 
-
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+  const handleSubmit = (e) => {
+    e.preventDefault();
 
     const validationErrors = validateForm();
 
@@ -121,447 +116,373 @@ function CreateJob() {
       return;
     }
 
-    try {
-      setSubmitting(true);
+    // TEMPORARY
+    // Later:
+    //
+    // await createJobPost({
+    //   ...formData,
+    //   jobPost_Price: Number(formData.jobPost_Price),
+    //   jobPost_ProfessionId: Number(formData.jobPost_ProfessionId),
+    //   jobPost_CityId: formData.jobPost_CityId
+    //     ? Number(formData.jobPost_CityId)
+    //     : null,
+    // });
 
-      const jobPost = {
-        jobPost_Title:
-          formData.jobPost_Title.trim(),
+    console.log("Job data:", formData);
 
-        jobPost_Description:
-          formData.jobPost_Description.trim(),
-
-        jobPost_Price:
-          Number(formData.jobPost_Price),
-
-        jobPost_ProfessionId:
-          Number(formData.jobPost_ProfessionId),
-
-        jobPost_CityId:
-          formData.jobPost_CityId
-            ? Number(formData.jobPost_CityId)
-            : null,
-
-        jobPost_BudgetType:
-          formData.jobPost_BudgetType,
-      };
-
-      await createJobPost(jobPost);
-
-      navigate("/client/jobs");
-
-    } catch (error) {
-      console.error("Failed to create job post:", error);
-
-      setErrors({
-        server: getApiErrorMessage(error),
-      });
-    } finally {
-      setSubmitting(false);
-    }
+    navigate("/client/jobs");
   };
 
-
-  if (loadingLookups) {
-    return (
-      <div className="container py-4">
-
-        <div className="create-job-loading">
-
-          <div
-            className="spinner-border"
-            role="status"
-          >
-            <span className="visually-hidden">
-              Loading...
-            </span>
-          </div>
-
-          <p className="text-secondary mb-0">
-            Preparing your job form...
-          </p>
-
-        </div>
-
-      </div>
-    );
-  }
-
-
   return (
-    <div className="container py-4 create-job-page">
+    <>
+      <Navbar />
 
-      {/* Header */}
+      <main className="create-job-page">
+        <div className="container create-job-container">
 
-      <div className="create-job-header">
+          {/* Back button */}
 
-        <div>
-
-          <Link
-            to="/client/jobs"
-            className="back-link"
+          <button
+            type="button"
+            className="back-button"
+            onClick={() => navigate("/client/jobs")}
           >
             <i className="bi bi-arrow-left"></i>
 
             Back to My Jobs
-          </Link>
+          </button>
 
-          <h1>
-            Post a Job
-          </h1>
+          {/* Page title */}
 
-          <p>
-            Tell workers what you need and receive offers.
-          </p>
+          <div className="create-job-header">
+            <h1>Post a New Job</h1>
 
-        </div>
-
-      </div>
-
-
-      {/* Form */}
-
-      <div className="create-job-card">
-
-        {errors.server && (
-
-          <div className="alert alert-danger">
-
-            {errors.server}
-
+            <p>
+              Tell professionals what you need and find
+              the right person for the job.
+            </p>
           </div>
 
-        )}
+          {/* Form */}
 
-        <form
-          onSubmit={handleSubmit}
-          noValidate
-        >
+          <div className="card create-job-card">
+            <div className="card-body p-4">
 
-          {/* Job title */}
+              <form
+                onSubmit={handleSubmit}
+                noValidate
+              >
 
-          <div className="form-field">
+                {/* Job Title */}
 
-            <label htmlFor="jobPost_Title">
+                <div className="mb-4">
 
-              Job Title
+                  <label
+                    htmlFor="jobPost_Title"
+                    className="form-label create-job-label"
+                  >
+                    <i className="bi bi-file-earmark-text"></i>
 
-              <span className="required-star">
-                *
-              </span>
+                    Job Title
 
-            </label>
-
-            <input
-              type="text"
-              id="jobPost_Title"
-              name="jobPost_Title"
-              value={formData.jobPost_Title}
-              onChange={handleChange}
-              className={`form-control ${
-                errors.jobPost_Title
-                  ? "input-error"
-                  : ""
-              }`}
-              placeholder="Example: Electrical panel upgrade"
-            />
-
-            {errors.jobPost_Title && (
-
-              <span className="field-error">
-
-                {errors.jobPost_Title}
-
-              </span>
-
-            )}
-
-          </div>
-
-
-          {/* Description */}
-
-          <div className="form-field">
-
-            <label htmlFor="jobPost_Description">
-
-              Description
-
-              <span className="required-star">
-                *
-              </span>
-
-            </label>
-
-            <textarea
-              id="jobPost_Description"
-              name="jobPost_Description"
-              value={formData.jobPost_Description}
-              onChange={handleChange}
-              className={`form-control ${
-                errors.jobPost_Description
-                  ? "input-error"
-                  : ""
-              }`}
-              placeholder="Describe the work you need..."
-              rows="5"
-            />
-
-            {errors.jobPost_Description && (
-
-              <span className="field-error">
-
-                {errors.jobPost_Description}
-
-              </span>
-
-            )}
-
-          </div>
-
-
-          <div className="row g-3">
-
-            {/* Profession */}
-
-            <div className="col-md-6">
-
-              <div className="form-field">
-
-                <label htmlFor="jobPost_ProfessionId">
-
-                  Profession
-
-                  <span className="required-star">
-                    *
-                  </span>
-
-                </label>
-
-                <select
-                  id="jobPost_ProfessionId"
-                  name="jobPost_ProfessionId"
-                  value={formData.jobPost_ProfessionId}
-                  onChange={handleChange}
-                  className={`form-select ${
-                    errors.jobPost_ProfessionId
-                      ? "input-error"
-                      : ""
-                  }`}
-                >
-
-                  <option value="">
-                    Select a profession
-                  </option>
-
-                  {professions.map((profession) => (
-
-                    <option
-                      key={profession.profession_Id}
-                      value={profession.profession_Id}
-                    >
-
-                      {profession.profession_Title}
-
-                    </option>
-
-                  ))}
-
-                </select>
-
-                {errors.jobPost_ProfessionId && (
-
-                  <span className="field-error">
-
-                    {errors.jobPost_ProfessionId}
-
-                  </span>
-
-                )}
-
-              </div>
-
-            </div>
-
-
-            {/* City */}
-
-            <div className="col-md-6">
-
-              <div className="form-field">
-
-                <label htmlFor="jobPost_CityId">
-
-                  City
-
-                  <span className="optional-label">
-                    Optional
-                  </span>
-
-                </label>
-
-                <select
-                  id="jobPost_CityId"
-                  name="jobPost_CityId"
-                  value={formData.jobPost_CityId}
-                  onChange={handleChange}
-                  className="form-select"
-                >
-
-                  <option value="">
-                    Any city
-                  </option>
-
-                  {cities.map((city) => (
-
-                    <option
-                      key={city.city_Id}
-                      value={city.city_Id}
-                    >
-
-                      {city.city_Name}
-
-                    </option>
-
-                  ))}
-
-                </select>
-
-              </div>
-
-            </div>
-
-          </div>
-
-
-          <div className="row g-3">
-
-            {/* Budget type */}
-
-            <div className="col-md-6">
-
-              <div className="form-field">
-
-                <label htmlFor="jobPost_BudgetType">
-
-                  Budget Type
-
-                  <span className="required-star">
-                    *
-                  </span>
-
-                </label>
-
-                <select
-                  id="jobPost_BudgetType"
-                  name="jobPost_BudgetType"
-                  value={formData.jobPost_BudgetType}
-                  onChange={handleChange}
-                  className="form-select"
-                >
-
-                  <option value="Fixed">
-                    Fixed Price
-                  </option>
-
-                  <option value="Hourly">
-                    Hourly
-                  </option>
-
-                </select>
-
-              </div>
-
-            </div>
-
-
-            {/* Price */}
-
-            <div className="col-md-6">
-
-              <div className="form-field">
-
-                <label htmlFor="jobPost_Price">
-
-                  Price
-
-                  <span className="required-star">
-                    *
-                  </span>
-
-                </label>
-
-                <div className="input-group">
-
-                  <span className="input-group-text">
-                    $
-                  </span>
+                    <span className="required-star">
+                      *
+                    </span>
+                  </label>
 
                   <input
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    id="jobPost_Price"
-                    name="jobPost_Price"
-                    value={formData.jobPost_Price}
+                    id="jobPost_Title"
+                    type="text"
+                    name="jobPost_Title"
+                    value={formData.jobPost_Title}
                     onChange={handleChange}
-                    className={`form-control ${
-                      errors.jobPost_Price
+                    className={`form-control create-job-input ${
+                      errors.jobPost_Title
                         ? "input-error"
                         : ""
                     }`}
-                    placeholder="0.00"
+                    placeholder="Enter job title"
                   />
+
+                  {errors.jobPost_Title && (
+                    <div className="field-error">
+                      {errors.jobPost_Title}
+                    </div>
+                  )}
 
                 </div>
 
-                {errors.jobPost_Price && (
+                {/* Profession + City */}
 
-                  <span className="field-error">
+                <div className="row g-3 mb-4">
 
-                    {errors.jobPost_Price}
+                  <div className="col-md-6">
 
-                  </span>
+                    <label
+                      htmlFor="jobPost_ProfessionId"
+                      className="form-label create-job-label"
+                    >
+                      <i className="bi bi-tag"></i>
 
-                )}
+                      Profession
 
-              </div>
+                      <span className="required-star">
+                        *
+                      </span>
+                    </label>
+
+                    <select
+                      id="jobPost_ProfessionId"
+                      name="jobPost_ProfessionId"
+                      value={formData.jobPost_ProfessionId}
+                      onChange={handleChange}
+                      className={`form-select create-job-input ${
+                        errors.jobPost_ProfessionId
+                          ? "input-error"
+                          : ""
+                      }`}
+                    >
+                      <option value="">
+                        Select profession
+                      </option>
+
+                      {professions.map((profession) => (
+                        <option
+                          key={profession.profession_Id}
+                          value={profession.profession_Id}
+                        >
+                          {profession.profession_Title}
+                        </option>
+                      ))}
+
+                    </select>
+
+                    {errors.jobPost_ProfessionId && (
+                      <div className="field-error">
+                        {errors.jobPost_ProfessionId}
+                      </div>
+                    )}
+
+                  </div>
+
+                  <div className="col-md-6">
+
+                    <label
+                      htmlFor="jobPost_CityId"
+                      className="form-label create-job-label"
+                    >
+                      <i className="bi bi-geo-alt"></i>
+
+                      City
+
+                    </label>
+
+                    <select
+                      id="jobPost_CityId"
+                      name="jobPost_CityId"
+                      value={formData.jobPost_CityId}
+                      onChange={handleChange}
+                      className="form-select create-job-input"
+                    >
+                      <option value="">
+                        Select city
+                      </option>
+
+                      {cities.map((city) => (
+                        <option
+                          key={city.city_Id}
+                          value={city.city_Id}
+                        >
+                          {city.city_Name}
+                        </option>
+                      ))}
+
+                    </select>
+
+                  </div>
+
+                </div>
+
+                {/* Budget Type */}
+
+                <div className="mb-4">
+
+                  <label className="form-label create-job-label">
+                    <i className="bi bi-cash"></i>
+
+                    Budget Type
+                  </label>
+
+                  <div className="budget-type-container">
+
+                    <label
+                      className={`budget-type-option ${
+                        formData.jobPost_BudgetType === "Fixed"
+                          ? "budget-type-active"
+                          : ""
+                      }`}
+                    >
+
+                      <input
+                        type="radio"
+                        name="jobPost_BudgetType"
+                        value="Fixed"
+                        checked={
+                          formData.jobPost_BudgetType === "Fixed"
+                        }
+                        onChange={handleChange}
+                      />
+
+                      <div>
+                        <strong>Fixed Price</strong>
+
+                  
+                      </div>
+
+                    </label>
+
+                    <label
+                      className={`budget-type-option ${
+                        formData.jobPost_BudgetType === "Hourly"
+                          ? "budget-type-active"
+                          : ""
+                      }`}
+                    >
+
+                      <input
+                        type="radio"
+                        name="jobPost_BudgetType"
+                        value="Hourly"
+                        checked={
+                          formData.jobPost_BudgetType === "Hourly"
+                        }
+                        onChange={handleChange}
+                      />
+
+                      <div>
+                        <strong>Hourly</strong>
+
+                      </div>
+
+                    </label>
+
+                  </div>
+
+                </div>
+
+                {/* Price */}
+
+                <div className="mb-4">
+
+                  <label
+                    htmlFor="jobPost_Price"
+                    className="form-label create-job-label" >
+                    <i className="bi bi-currency-dollar"></i>
+                    Price (USD)
+                  </label>
+
+                  <div className="price-input-wrapper">
+
+                    <input
+                      id="jobPost_Price"
+                      type="number"
+                      name="jobPost_Price"
+                      value={formData.jobPost_Price}
+                      onChange={handleChange}
+                      className={`form-control create-job-input price-input ${
+                        errors.jobPost_Price
+                          ? "input-error"
+                          : ""
+                      }`}
+                      placeholder={
+                        formData.jobPost_BudgetType === "Fixed"
+                          ? "Enter total price"
+                          : "Enter hourly rate"
+                      }
+                      min="0"
+                    />
+
+                  </div>
+
+                  {errors.jobPost_Price && (
+                    <div className="field-error">
+                      {errors.jobPost_Price}
+                    </div>
+                  )}
+
+                </div>
+
+                {/* Description */}
+
+                <div className="mb-4">
+
+                  <label
+                    htmlFor="jobPost_Description"
+                    className="form-label create-job-label"
+                  >
+                    <i className="bi bi-card-text"></i>
+
+                    Description
+
+                    <span className="required-star">
+                      *
+                    </span>
+                  </label>
+
+                  <textarea
+                    id="jobPost_Description"
+                    name="jobPost_Description"
+                    value={formData.jobPost_Description}
+                    onChange={handleChange}
+                    className={`form-control create-job-textarea ${
+                      errors.jobPost_Description
+                        ? "input-error"
+                        : ""
+                    }`}
+                    rows="5"
+                    placeholder="Describe the work needed, special requirements, access information, or anything the professional should know."
+                  />
+
+                  {errors.jobPost_Description && (
+                    <div className="field-error">
+                      {errors.jobPost_Description}
+                    </div>
+                  )}
+
+                </div>
+
+                {/* Actions */}
+
+                <div className="create-job-actions">
+
+                  <button
+                    type="button"
+                    className="btn btn-outline-secondary cancel-job-button"
+                    onClick={() =>
+                      navigate("/client/jobs")
+                    }
+                  >
+                    Cancel
+                  </button>
+
+                  <button
+                    type="submit"
+                    className="btn  publish-job-button"
+                  >
+                    <i className="bi bi-send"></i>
+
+                    Publish Job
+                  </button>
+
+                </div>
+
+              </form>
 
             </div>
-
           </div>
-
-
-          {/* Actions */}
-
-          <div className="create-job-actions">
-
-            <Link
-              to="/client/jobs"
-              className="btn btn-light border"
-            >
-              Cancel
-            </Link>
-
-            <button
-              type="submit"
-              className="btn FrelanceApp-primary"
-              disabled={submitting}
-            >
-
-              {submitting
-                ? "Posting Job..."
-                : "Post Job"}
-
-            </button>
-
-          </div>
-
-        </form>
-
-      </div>
-
-    </div>
+        </div>
+      </main>
+    </>
   );
 }
 

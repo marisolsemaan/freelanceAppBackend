@@ -8,16 +8,6 @@ function Navbar() {
         <Link to="/client/jobs" className="app-logo">
           ConnectedIn <span>LB</span>
         </Link>
-
-        <div className="d-flex align-items-center gap-3">
-          <button className="navbar-icon-button">
-            <i className="bi bi-bell"></i>
-          </button>
-
-          <div className="user-avatar">
-            M
-          </div>
-        </div>
       </div>
     </nav>
   );

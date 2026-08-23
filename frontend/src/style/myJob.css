@@ -32,10 +32,15 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-
+  background-color: var(--FreelanceApp-primary);
+  color: white;
   white-space: nowrap;
 }
 
+.post-job-button:hover{
+  background-color: var(--FreelanceApp-primary-dark);
+  color: white;
+}
 /* Stats */
 
 .stats-card {
@@ -176,9 +181,9 @@
 }
 
 .job-status-open {
-  background: #e8f7ee;
+  background: var(--FreelanceApp-primary);
 
-  color: #198754;
+  color: white;
 }
 
 .job-status-closed {

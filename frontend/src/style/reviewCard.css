@@ -1,0 +1,128 @@
+/* REVIEW LIST */
+
+.reviews-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+/* REVIEW CARD */
+
+.review-card {
+  padding: 1rem;
+
+  border: 1px solid var(--FreelanceApp-border);
+  border-radius: 8px;
+
+  background-color: var(--FreelanceApp-surface);
+
+  box-shadow: var(--FreelanceApp-shadow);
+
+  transition:
+    border-color 0.2s,
+    transform 0.2s,
+    box-shadow 0.2s;
+}
+
+.review-card:hover {
+  border-color: rgba(15, 159, 166, 0.35);
+  transform: translateY(-1px);
+}
+
+/* REVIEW HEADER */
+
+.review-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.reviewer-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.reviewer-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 40px;
+  height: 40px;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+
+  background-color: rgba(15, 159, 166, 0.1);
+
+  color: var(--FreelanceApp-primary);
+
+  font-size: 1rem;
+}
+
+.reviewer-info h3 {
+  margin: 0 0 0.15rem;
+
+  color: var(--FreelanceApp-text);
+
+  font-size: 0.875rem;
+
+  font-weight: 600;
+}
+
+.reviewer-info span {
+  color: var(--FreelanceApp-muted);
+
+  font-size: 0.75rem;
+}
+
+/* RATING */
+
+.review-rating {
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 0.3rem;
+
+  padding: 0.35rem 0.55rem;
+
+  border-radius: 5px;
+
+  background-color: rgba(245, 166, 35, 0.08);
+
+  color: var(--FreelanceApp-text);
+
+  font-size: 0.8rem;
+}
+
+.review-rating i {
+  color: #f5a623;
+}
+
+/* COMMENT */
+
+.review-comment {
+  margin: 0.85rem 0 0;
+
+  padding-top: 0.75rem;
+
+  border-top: 1px solid var(--FreelanceApp-border);
+
+  color: var(--FreelanceApp-secondary);
+
+  font-size: 0.875rem;
+
+  line-height: 1.6;
+}
+
+/* MOBILE */
+
+@media (max-width: 576px) {
+  .review-card-header {
+    align-items: flex-start;
+  }
+}
