@@ -11,4 +11,6 @@ public class ReviewResp
     public string? Review_Comment { get; set; }
 
     public DateTime Review_CreatedAt { get; set; }
+
+    public string ReviewerFullName { get; set; } = string.Empty;
 }

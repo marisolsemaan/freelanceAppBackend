@@ -57,10 +57,14 @@ public class ClientProfileService : IClientProfileService
                 Review_Id,
                 Review_ReviewerId,
                 Review_Rating,
+                User_FullName AS ReviewerFullName,
                 Review_Comment,
                 Review_CreatedAt
             FROM tbl_Review
+            INNER JOIN tbl_User u
+            ON User_Id = Review_ReviewerId
             WHERE Review_RevieweeId = @ClientId
+            ORDER BY Review_CreatedAt DESC;
             """;
 
         var reviews =

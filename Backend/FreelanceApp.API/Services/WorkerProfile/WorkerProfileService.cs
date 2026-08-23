@@ -118,11 +118,14 @@ public class WorkerProfileService : IWorkerProfileService
             SELECT
                 Review_Id,
                 Review_ReviewerId,
+                User_FullName as ReviewerFullName
                 Review_Rating,
                 Review_Comment,
                 Review_CreatedAt 
-            FROM tbl_Review
+            FROM tbl_Review Inner Join tbl_User 
+            on User_Id=Review_ReviewerId
             WHERE Review_RevieweeId = @WorkerId
+            ORDER BY Review_CreatedAt DESC;
             """;
 
         var reviews = (await connection.QueryAsync<ReviewResp>(
