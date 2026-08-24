@@ -19,8 +19,7 @@ public class ClientProfileController : ControllerBase
     [HttpGet("{userId}/profile")]
     public async Task<IActionResult> GetProfile(int userId)
     {
-        var result =
-            await _service.GetClientProfileAsync(userId);
+        var result =  await _service.GetClientProfileAsync(userId);
 
         if (!result.Success)
             return NotFound(result);

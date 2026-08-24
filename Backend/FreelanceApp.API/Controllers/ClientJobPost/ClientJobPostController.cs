@@ -71,8 +71,7 @@ public class ClientJobPostController : ControllerBase
 
     private int GetUserId() // get client id from the jwt token
     {
-        var claim = User.FindFirstValue(
-            ClaimTypes.NameIdentifier);
+        var claim = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
         if (string.IsNullOrEmpty(claim))
             throw new UnauthorizedAccessException(

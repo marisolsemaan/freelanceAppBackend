@@ -70,8 +70,7 @@ public class ConversationController : ControllerBase
 
     // Mark received items as read
     [HttpPatch("{conversationId}/read")]
-    public async Task<IActionResult> MarkAsRead(
-        int conversationId)
+    public async Task<IActionResult> MarkAsRead( int conversationId)
     {
         var userId = GetUserId();
 

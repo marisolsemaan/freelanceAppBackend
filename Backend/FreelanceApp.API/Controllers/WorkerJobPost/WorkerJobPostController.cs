@@ -18,11 +18,7 @@ public class WorkerJobPostController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetJobPosts(
-        [FromQuery] int? cityId,
-        [FromQuery] int? professionId,
-        [FromQuery] JobPostBudgetType? type,
-        [FromQuery] decimal? maxPrice)
+    public async Task<IActionResult> GetJobPosts(  [FromQuery] int? cityId,  [FromQuery] int? professionId, [FromQuery] JobPostBudgetType? type,[FromQuery] decimal? maxPrice)
     {
         var result = await _service.GetJobPostsAsync(
             cityId,

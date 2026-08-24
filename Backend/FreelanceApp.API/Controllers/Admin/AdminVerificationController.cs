@@ -73,8 +73,7 @@ public class AdminVerificationController : ControllerBase
 
     // user details
     [HttpGet("{userId:int}")]
-    public async Task<IActionResult> GetUserVerification(
-        int userId)
+    public async Task<IActionResult> GetUserVerification( int userId)
     {
         if (!IsAdmin())
             return Forbid();
@@ -96,9 +95,7 @@ public class AdminVerificationController : ControllerBase
     // documents details
 
     [HttpGet("{userId:int}/documents/{documentId:int}")]
-    public async Task<IActionResult> GetDocument(
-        int userId,
-        int documentId)
+    public async Task<IActionResult> GetDocument( int userId,  int documentId)
     {
         if (!IsAdmin())
             return Forbid();
@@ -123,8 +120,7 @@ public class AdminVerificationController : ControllerBase
     }
 
     [HttpPost("{userId:int}/approve")]
-    public async Task<IActionResult> ApproveUser(
-        int userId)
+    public async Task<IActionResult> ApproveUser( int userId)
     {
         if (!IsAdmin())
             return Forbid();
@@ -170,8 +166,7 @@ public class AdminVerificationController : ControllerBase
     }
 
     [HttpPost("{userId:int}/reject")]
-    public async Task<IActionResult> RejectUser(
-        int userId)
+    public async Task<IActionResult> RejectUser( int userId)
     {
         if (!IsAdmin())
             return Forbid();

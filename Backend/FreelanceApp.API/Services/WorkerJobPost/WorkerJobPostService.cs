@@ -15,11 +15,7 @@ public class WorkerJobPostService : IWorkerJobPostService
         _dbConnection = dbC;
     }
 
-    public async Task<ApiResponse<IEnumerable<WorkerJobPostResp>>> GetJobPostsAsync(
-            int? cityId,
-            int? professionId,
-            JobPostBudgetType? type,
-            decimal? maxPrice)
+    public async Task<ApiResponse<IEnumerable<WorkerJobPostResp>>> GetJobPostsAsync(  int? cityId, int? professionId, JobPostBudgetType? type, decimal? maxPrice)
     {
         using var connection = _dbConnection.CreateConnection();
 

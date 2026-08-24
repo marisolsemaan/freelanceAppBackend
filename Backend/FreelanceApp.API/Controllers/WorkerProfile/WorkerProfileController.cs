@@ -42,8 +42,7 @@ public class WorkerProfileController : ControllerBase
     // PUT: api/worker/profile
     [Authorize]
     [HttpPut("profile")]
-    public async Task<IActionResult> UpdateWorkerProfile(
-        [FromForm] UpdateWorkerProfileReq request)
+    public async Task<IActionResult> UpdateWorkerProfile(  [FromForm] UpdateWorkerProfileReq request)
     {
         var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
