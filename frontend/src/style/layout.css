@@ -19,3 +19,71 @@
   color: var( --FreelanceApp-primary-dark);
 }
 
+.navbar-links {
+  flex: 1;
+  justify-content: center;
+}
+
+.navbar-link {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: #555;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 0.4rem 0.65rem;
+  border-radius: 6px;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.navbar-link:hover {
+  background-color: var(--FreelanceApp-primary-dark);
+  color: #e7f1ff;
+}
+
+.navbar-link-active {
+  background-color: var(--FreelanceApp-primary);
+  color: #e7f1ff;
+}
+
+.status-pill {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.status-pill-accepted {
+  background-color: #d1f5e0;
+  color: #1a7f4e;
+}
+
+.status-pill-pending {
+  background-color: #fff3cd;
+  color: #92700c;
+}
+
+.status-pill-rejected {
+  background-color: #fde2e1;
+  color: #b42318;
+}
+
+.navbar-logout {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+@media (max-width: 768px) {
+  .navbar-link span {
+    display: none;
+  }
+
+  .status-pill {
+    display: none;
+  }
+}

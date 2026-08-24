@@ -30,7 +30,7 @@ export default function HireOfferCard({
    * Hire offers are created by the client.
    * Therefore the client owns/sent the offer.
    *
-   * Depending on the exact DTO returned by your API,
+   * Depending on the exact DTO returned by the API,
    * SenderId or HireOffer_WorkerId may be present.
    */
   const isMine =

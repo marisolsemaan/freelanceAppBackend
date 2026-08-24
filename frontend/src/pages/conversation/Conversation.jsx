@@ -18,9 +18,7 @@ export default function Conversation() {
           <p className="text-secondary small mb-3">Conversation with {state?.clientName ?? "the client"}</p>
 
           <div className="alert alert-info small mb-0">
-            Messaging isn't wired up yet — there's no conversation/message backend in what's been shared
-            so far. Send over those endpoints (start conversation, list messages, send a message — and
-            whether it's poll-based or real-time) and this becomes the real thread.
+            Messaging isn't wired up yet — there's no conversation/message 
           </div>
         </div>
       </div>

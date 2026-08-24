@@ -59,8 +59,6 @@ export default function Messages() {
   /*
    * Existing login flow stores the authenticated user.
    *
-   * If your auth storage uses a different key,
-   * change only this line.
    */
   const currentUser = JSON.parse(
     localStorage.getItem("user") || "null"
@@ -469,10 +467,6 @@ export default function Messages() {
 
       <div className="message-layout">
 
-        {/* =====================================================
-            CONVERSATION SIDEBAR
-        ====================================================== */}
-
         <aside className="conversation-sidebar">
 
           <div className="conversation-sidebar-header">
@@ -536,10 +530,6 @@ export default function Messages() {
 
         </aside>
 
-
-        {/* =====================================================
-            MAIN CONVERSATION
-        ====================================================== */}
 
         <section className="conversation-main">
 
@@ -621,18 +611,12 @@ export default function Messages() {
           </header>
 
 
-          {/* =====================================================
-              TIMELINE
-          ====================================================== */}
 
           <div className="conversation-timeline">
 
             {conversation.items?.map(
               (item, index) => {
 
-                /* ---------------------------
-                   JOB POST
-                ---------------------------- */
 
                 if (
                   item.type ===
@@ -704,10 +688,6 @@ export default function Messages() {
                 }
 
 
-                /* ---------------------------
-                   NORMAL MESSAGE
-                ---------------------------- */
-
                 if (
                   item.type ===
                   "Message"
@@ -768,10 +748,6 @@ export default function Messages() {
                   );
                 }
 
-
-                /* ---------------------------
-                   HIRE OFFER
-                ---------------------------- */
 
                 if (
                   item.type ===
@@ -870,11 +846,6 @@ export default function Messages() {
 
           </div>
 
-
-          {/* =====================================================
-              MESSAGE INPUT
-          ====================================================== */}
-
           <div className="message-input-area">
 
             <button
@@ -953,9 +924,6 @@ export default function Messages() {
       </div>
 
 
-      {/* =========================================================
-          HIRE OFFER MODAL
-      ========================================================== */}
 
       {showHireModal && (
         <div
@@ -1197,9 +1165,6 @@ export default function Messages() {
       )}
 
 
-      {/* =========================================================
-          REVIEW MODAL
-      ========================================================== */}
 
       {showReviewModal && (
         <div

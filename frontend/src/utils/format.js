@@ -25,7 +25,7 @@ export function getInitials(fullName = "") {
 }
 
 // budgetType 2 == "Hourly rate" per the BUDGET_TYPES guess in
-// constants/lookups.js — update both together if that guess is wrong.
+// constants/lookups.js 
 export function formatPrice(price, budgetType) {
   const amount = Number(price).toLocaleString("en-US", {
     maximumFractionDigits: 0,

@@ -21,13 +21,13 @@ api.interceptors.request.use(
 );
 
 api.interceptors.response.use(
-  (response) => {
-    return response;
-  },
+  (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
-      clearAuth();
+    const url = error.config?.url || "";
+    const isAuthRequest = url.includes("/auth/login") || url.includes("/auth/register");
 
+    if (error.response?.status === 401 && !isAuthRequest) {
+      clearAuth();
       window.location.href = "/login";
     }
 

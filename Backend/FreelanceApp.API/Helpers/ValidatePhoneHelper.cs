@@ -11,15 +11,11 @@ public static class PhoneValidationHelper
             return true;
         }
 
-        phone = phone
-            .Replace(" ", "")
-            .Replace("-", "")
-            .Replace("(", "")
-            .Replace(")", "");
+        // Strip everything except digits (removes spaces, +, -, (, ), etc.)
+        string cleanPhone = Regex.Replace(phone, @"\D", "");
 
-        return Regex.IsMatch(
-            phone,
-            @"^(?:[3-9]\d{6}|0[3-9]\d{6}|\+961[3-9]\d{6})$"
-        );
+        // Accepts 7 to 8 digits locally (e.g., 3xxxxxx or 81xxxxxx)
+        // or 10 to 11 digits with country code 961 (e.g., 9613xxxxxx or 96181xxxxxx)
+        return Regex.IsMatch(cleanPhone, @"^(?:961)?(?:0?[1-9]\d{6,7})$");
     }
 }

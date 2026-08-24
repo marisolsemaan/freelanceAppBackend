@@ -90,3 +90,13 @@ export const isAuthenticated = () => {
 
   return true;
 };
+
+export const getUserRole = () => {
+  const auth = getAuth();
+  return auth?.role || null;
+};
+
+export const getUserStatus = () => {
+  const auth = getAuth();
+  return auth?.verificationStatus || null;
+};

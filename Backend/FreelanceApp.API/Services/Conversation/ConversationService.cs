@@ -545,4 +545,61 @@ public class ConversationService : IConversationService
         };
     }
 
+    // public async Task< ApiResponse< List< ConversationListItemResp > > > GetUserConversationsAsync(int userId)
+    // {
+    //     using var connection = _dbConnection.CreateConnection();
+
+    //     const string sql = """
+    //         SELECT
+    //             Conversation_Id,
+
+    //             CASE
+    //                 WHEN Conversation_ClientId = @UserId
+    //                     THEN Conversation_WorkerId
+    //                 ELSE Conversation_ClientId
+    //             END AS OtherUser_Id,
+
+    //             CASE
+    //                 WHEN Conversation_ClientId = @UserId
+    //                     THEN worker.User_FullName
+    //                 ELSE client.User_FullName
+    //             END AS OtherUser_FullName,
+
+    //             CASE
+    //                 WHEN Conversation_ClientId = @UserId
+    //                     THEN worker.User_Role
+    //                 ELSE client.User_Role
+    //             END AS OtherUser_Role,
+
+    //             Conversation_LastMessageAt
+
+    //         FROM tbl_Conversation 
+
+    //         INNER JOIN tbl_User client
+    //             ON client.User_Id = Conversation_ClientId
+
+    //         INNER JOIN tbl_User worker
+    //             ON worker.User_Id = Conversation_WorkerId
+
+    //         WHERE
+    //             Conversation_ClientId = @UserId
+    //             OR Conversation_WorkerId = @UserId
+
+    //         ORDER BY
+    //             Conversation_LastMessageAt DESC;
+    //         """;
+
+    //     var conversations =
+    //         await connection.QueryAsync<ConversationListItemResp>(
+    //             sql,
+    //             new { UserId = userId });
+
+    //     return new ApiResponse<List<ConversationListItemResp>>
+    //     {
+    //         Success = true,
+    //         Message = "Conversations retrieved successfully.",
+    //         Data = conversations.ToList()
+    //     };
+    // }
+
 }

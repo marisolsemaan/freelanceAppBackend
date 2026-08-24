@@ -15,7 +15,7 @@ import ClientProfile from "./pages/client/ClientProfile";
 
 import Messages from "./pages/conversation/Messages";
 
-// import MessagesPage from "./pages/messages/MessagesPage";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
 
 
 function App() {
@@ -28,21 +28,49 @@ function App() {
 
         <Route path="/register" element={<Register />} />
 
-        <Route path="/client/jobs" element={<MyJobs />} />
+        <Route path="/client/jobs" element={<ProtectedRoute allowedRole={1}> <MyJobs /> </ProtectedRoute>} />
 
-        <Route path="/client/jobs/create" element={<CreateJob />}/>
+        <Route path="/client/jobs/create" element={
+            <ProtectedRoute allowedRole={1}>
+              <CreateJob />
+            </ProtectedRoute>
+          }/>
 
         {/* <Route path="/worker/jobs" element={<WorkerJobs />} /> */}
 
-        <Route path="/worker/search-jobs" element={<SearchJobs />} />
+        <Route
+          path="/worker/search-jobs"
+          element={
+            <ProtectedRoute allowedRole={2}>
+              <SearchJobs />
+            </ProtectedRoute>
+          }
+        />
 
-        <Route path="/worker/conversations:jobPostId" element={<Conversation />}/>
+
+        <Route path="/worker/conversations/:jobPostId" element={<Conversation />}/>
 ,
-       <Route path="/worker/profile" element ={<WorkerProfile />} />
+        <Route
+          path="/worker/profile"
+          element={
+            <ProtectedRoute allowedRole={2}>
+              <WorkerProfile />
+            </ProtectedRoute>
+          }
+        />
 
-       <Route path="/client/profile" element={<ClientProfile/>}/>
+        <Route path="/client/profile"
+          element={
+            <ProtectedRoute allowedRole={1}>
+              <ClientProfile />
+            </ProtectedRoute>
+          }
+        />
 
        <Route path="/messages/:conversationId" element={<Messages />}/>
+
+       <Route path="/messages" element={<Messages />} />
+
       </Routes>
     </BrowserRouter>
   );

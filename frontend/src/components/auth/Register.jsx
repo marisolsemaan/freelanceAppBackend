@@ -107,7 +107,7 @@ function Register() {
         navigate("/client/jobs");
       }
       else if(result.role===2){
-        navigate("/worker/jobs");
+        navigate("/worker/search-jobs");
 
       }
     } 
@@ -173,7 +173,7 @@ function Register() {
 
         <div className="auth-card-body">
           <h2 className="auth-heading mb-2" >Create account</h2>
-          {serverError && ( <div className="auth-error"> {serverError} </div> )}
+          {errors.server && ( <div className="auth-error"> {errors.server} </div> )}
           <form onSubmit={handleSubmit} className="auth-form" noValidate>
             {/* full name */}
             <div className="auth-field">

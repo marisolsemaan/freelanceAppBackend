@@ -12,7 +12,8 @@ public class RegisterRequest
 
     public string? Phone { get; set; }
 
-    [Required, MinLength(8)]
+    [MinLength(8, ErrorMessage = "Password must be at least 8 characters long.")]
+    [Required]
     public string Password { get; set; } = "";
 
     [Required]

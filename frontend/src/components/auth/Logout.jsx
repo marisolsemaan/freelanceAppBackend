@@ -1,4 +1,4 @@
-import { logout } from "../utils/authStorage";
+import { logout } from "../utils/jwtStorage";
 import { useNavigate } from "react-router-dom";
 
 function LogoutButton() {
