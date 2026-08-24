@@ -70,7 +70,7 @@ function Login() {
         navigate("/client/jobs");
       }
       else if(result.role===2){
-        navigate("/worker/jobs");
+        navigate("/worker/search-jobs");
 
       }
 
