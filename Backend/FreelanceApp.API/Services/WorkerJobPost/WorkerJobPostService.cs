@@ -71,7 +71,8 @@ public class WorkerJobPostService : IWorkerJobPostService
 
               AND (@MaxPrice IS NULL
                    OR JobPost_Price <= @MaxPrice)
-
+            
+            Order By JobPost_CreatedAt Desc; 
             """;
 
         var jobs = await connection.QueryAsync<WorkerJobPostResp>(

@@ -26,7 +26,7 @@ public class ClientJobPostService : IClientJobPostService
             return new ApiResponse<ClientJobPostResp>{
 
                 Success=false,
-                Message="client not verified by admin cant post"
+                Message="Unverified status, you are not allowed to post"
             };
         }
 
@@ -51,7 +51,19 @@ public class ClientJobPostService : IClientJobPostService
             };
         }
 
-        if (request.JobPost_Price <= 0)
+        var hasPrice = request.JobPost_Price.HasValue;
+        var hasBudgetType = request.JobPost_BudgetType.HasValue;
+
+        if (hasPrice != hasBudgetType)
+        {
+            return new ApiResponse<ClientJobPostResp>
+            {
+                Success = false,
+                Message = "Price and budget type must be provided together."
+            };
+        }
+
+        if (hasPrice && request.JobPost_Price <= 0)
         {
             return new ApiResponse<ClientJobPostResp>
             {
@@ -60,14 +72,19 @@ public class ClientJobPostService : IClientJobPostService
             };
         }
 
-        if (!Enum.IsDefined(request.JobPost_BudgetType))
+        // Get the short value
+        short? budgetTypeVal = (short?)request.JobPost_BudgetType;
+
+        if (budgetTypeVal.HasValue && budgetTypeVal != 1 && budgetTypeVal != 2)
         {
             return new ApiResponse<ClientJobPostResp>
             {
                 Success = false,
-                Message = "Invalid job post type. fixed or hourly"
+                Message = "Invalid budget type."
             };
         }
+
+
 
         const string professionSql = """
             SELECT COUNT(1)
@@ -157,7 +174,9 @@ public class ClientJobPostService : IClientJobPostService
                     CityId = request.JobPost_CityId,
                     ClientId = clientId,
                     Status = (short)JobPostStatus.Open,
-                    Type = (short)request.JobPost_BudgetType
+                    Type = request.JobPost_BudgetType.HasValue
+                        ? (short?)request.JobPost_BudgetType.Value
+                        : null
                 });
 
             var jobPost = await GetJobPostAsync(

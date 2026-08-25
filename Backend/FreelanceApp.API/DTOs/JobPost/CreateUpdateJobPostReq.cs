@@ -16,5 +16,5 @@ public class CreateJobPostReq
 
     public int? JobPost_CityId { get; set; }
 
-    public JobPostBudgetType JobPost_BudgetType { get; set; }
+    public JobPostBudgetType? JobPost_BudgetType { get; set; }
 }
