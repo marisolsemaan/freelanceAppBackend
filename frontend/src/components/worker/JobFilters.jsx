@@ -1,5 +1,15 @@
 import { useState } from "react";
-import { CITIES,PROFESSIONS, BUDGET_TYPES,} from "../../constants/prefixedData";
+
+const BUDGET_TYPES = [
+  {
+    value: 1,
+    label: "Fixed",
+  },
+  {
+    value: 2,
+    label: "Hourly",
+  },
+];
 
 const emptyDraft = {
   cityId: "",
@@ -8,10 +18,8 @@ const emptyDraft = {
   maxPrice: "",
 };
 
-export default function JobFilters({
-  onApply,
-  onSearchChange,
-}) {
+export default function JobFilters({cities, professions, onApply,onSearchChange,})
+{
   const [search, setSearch] = useState("");
   const [showPanel, setShowPanel] = useState(false);
   const [draft, setDraft] = useState(emptyDraft);
@@ -87,22 +95,22 @@ export default function JobFilters({
                 City
               </label>
 
-              <select
-                className="form-select rounded-3"
-                value={draft.cityId}
-                onChange={handleField("cityId")}
-              >
-                <option value="">Any city</option>
+            <select
+              className="form-select rounded-3"
+              value={draft.cityId}
+              onChange={handleField("cityId")}
+            >
+              <option value="">Any city</option>
 
-                {CITIES.map((city) => (
-                  <option
-                    key={city.id}
-                    value={city.id}
-                  >
-                    {city.name}
-                  </option>
-                ))}
-              </select>
+              {cities.map((city) => (
+                <option
+                  key={city.city_Id}
+                  value={city.city_Id}
+                >
+                  {city.city_Name}
+                </option>
+              ))}
+            </select>
             </div>
 
             <div className="col-12 col-sm-6 col-lg-3">
@@ -110,24 +118,24 @@ export default function JobFilters({
                 Profession
               </label>
 
-              <select
-                className="form-select rounded-3"
-                value={draft.professionId}
-                onChange={handleField("professionId")}
-              >
-                <option value="">
-                  Any profession
-                </option>
+            <select
+              className="form-select rounded-3"
+              value={draft.professionId}
+              onChange={handleField("professionId")}
+            >
+              <option value="">
+                Any profession
+              </option>
 
-                {PROFESSIONS.map((profession) => (
-                  <option
-                    key={profession.id}
-                    value={profession.id}
-                  >
-                    {profession.name}
-                  </option>
-                ))}
-              </select>
+              {professions.map((profession) => (
+                <option
+                  key={profession.profession_Id}
+                  value={profession.profession_Id}
+                >
+                  {profession.profession_Title}
+                </option>
+              ))}
+            </select>
             </div>
 
             <div className="col-12 col-sm-6 col-lg-3">

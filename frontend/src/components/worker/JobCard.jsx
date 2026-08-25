@@ -1,17 +1,25 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import {
-  getCityName,
-  getProfessionName,
-} from "../../constants/prefixedData";
-import {
-  timeAgo,
-  getInitials,
-  formatPrice,
-} from "../../utils/format";
+
+import {timeAgo, getInitials, formatPrice,} from "../../utils/format";
 import "../../style/jobCard.css";
 
-export default function JobCard({ job }) {
+export default function JobCard({job, cities, professions,})
+{
+  console.log("cities:", cities);
+console.log("professions:", professions);
+console.log("job:", job);
+  const city = cities.find(
+    (item) =>
+      Number(item.city_Id) === Number(job.cityId)
+  );
+
+  const profession = professions.find(
+    (item) =>
+      Number(item.profession_Id) === Number(job.professionId)
+  );
+
+  const hasPrice =Number(job.price) > 0;
   const navigate = useNavigate();
   const [expanded, setExpanded] = useState(false);
 
@@ -48,28 +56,39 @@ export default function JobCard({ job }) {
             </span>
           </div>
 
+          {hasPrice && (
           <div className="job-price-section">
-            <span className="job-price">
-              {formatPrice(job.price, job.budgetType)}
-            </span>
+                <span className="job-price">
+                  {formatPrice(job.price)}
+                </span>
+              
+                <span className="job-budget-type">
+                  {job.budgetType}
+                </span>
           </div>
+          )}
+            
         </div>
 
-        <div className="job-tags-row">
-          <span className="job-tag job-tag-profession">
-            <i className="bi bi-tag" />
-            {getProfessionName(job.professionId)}
-          </span>
+          <div className="job-tags-row">
+      
+            {profession && (
+              <span className="job-tag job-tag-profession">
+                <i className="bi bi-tag" />
+                {profession.profession_Title}
+              </span>
+            )}
+          
 
-          <span className="job-tag job-tag-city">
-            <i className="bi bi-geo-alt" />
-            {getCityName(job.cityId)}
-          </span>
+          
+            {city && ( <span className="job-tag job-tag-city"> <i className="bi bi-geo-alt" />{city.city_Name}</span> )}
+        
 
           <span className="job-time">
             <i className="bi bi-clock" />
             {timeAgo(job.createdAt)}
           </span>
+
         </div>
 
        <div className={`job-card-desc ${expanded ? "expanded" : ""}`}>

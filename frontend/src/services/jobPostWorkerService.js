@@ -11,6 +11,7 @@ function mapJobPost(raw) {
     budgetType: raw.jobPost_BudgetType,
     professionId: raw.jobPost_ProfessionId,
     cityId: raw.jobPost_CityId,
+    status: raw.jobPost_Status,
     createdAt: raw.jobPost_CreatedAt,
     clientId: raw.jobPost_ClientId,
     clientName: raw.user_FullName,
@@ -27,31 +28,41 @@ export async function getJobPosts({
   const params = {};
 
   if (cityId) {
-    params.cityId = cityId;
+    params.cityId = Number(cityId);
   }
 
   if (professionId) {
-    params.professionId = professionId;
+    params.professionId = Number(professionId);
   }
 
-  if (budgetType) {
-    params.type = budgetType;
+  if (budgetType !== "" && budgetType !== undefined) {
+    params.type = Number(budgetType);
   }
 
   if (maxPrice) {
-    params.maxPrice = maxPrice;
+    params.maxPrice = Number(maxPrice);
   }
 
-  const { data } = await axiosClient.get(
-    BASE_PATH,
-    { params }
-  );
+  try {
+    const { data } = await axiosClient.get(BASE_PATH, {
+      params,
+    });
 
-  if (!data.success) {
+    if (!data.success) {
+      throw new Error(
+        data.message || "Could not load job posts."
+      );
+    }
+
+    return (data.data ?? []).map(mapJobPost);
+  } catch (err) {
+    const backendMessage =
+      err.response?.data?.message;
+
     throw new Error(
-      data.message || "Could not load job posts."
+      backendMessage ||
+      err.message ||
+      "Could not load job posts."
     );
   }
-
-  return (data.data ?? []).map(mapJobPost);
 }

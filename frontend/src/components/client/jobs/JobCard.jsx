@@ -1,5 +1,5 @@
 function JobCard({ job, onClose }) {
-  const isOpen = job.jobPost_Status === 0;
+  const isOpen = job.jobPost_Status === "Open";
 
   return (
     <div className="card job-card">
@@ -46,7 +46,7 @@ function JobCard({ job, onClose }) {
               <span className="meta-divider">•</span>
 
               <span>
-                {job.jobPost_BudgetType === 0
+                {job.jobPost_BudgetType === "Fixed"
                   ? "Fixed Price"
                   : "Hourly"}
               </span>

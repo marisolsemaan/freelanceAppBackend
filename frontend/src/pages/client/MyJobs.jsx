@@ -1,76 +1,81 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../../components/layout/Navbar";
 import JobStats from "../../components/client/jobs/JobStats";
 import JobCard from "../../components/client/jobs/JobCard";
-
+import { getMyJobPosts, closeJobPost,} from "../../services/jobPostClientService";
 import "../../style/myJob.css";
 
 function MyJobs() {
 
   const navigate = useNavigate();
+  const [jobs, setJobs] = useState([]);
+  const [stats, setStats] = useState({
+    totalJobs: 0,
+    openJobs: 0,
+    closedJobs: 0,
+    totalConversations: 0,
+  });
 
-  const [jobs, setJobs] = useState([
-    {
-      jobPost_Id: 1,
-      jobPost_Title: "Electrical panel upgrade for apartment",
-      jobPost_Description:
-        "Looking for an experienced electrician to upgrade an apartment electrical panel.",
-      jobPost_Price: 300,
-      jobPost_BudgetType: 0,
-      jobPost_Status: 0,
-      conversationCount: 3,
-    },
-    {
-      jobPost_Id: 2,
-      jobPost_Title: "Kitchen cabinet repainting",
-      jobPost_Description:
-        "Need a professional painter to repaint kitchen cabinets.",
-      jobPost_Price: 150,
-      jobPost_BudgetType: 0,
-      jobPost_Status: 0,
-      conversationCount: 2,
-    },
-    {
-      jobPost_Id: 3,
-      jobPost_Title: "Generator maintenance",
-      jobPost_Description:
-        "Looking for someone experienced in generator maintenance.",
-      jobPost_Price: 80,
-      jobPost_BudgetType: 1,
-      jobPost_Status: 1,
-      conversationCount: 6,
-    },
-  ]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const stats = {
-    totalJobs: jobs.length,
+  useEffect(() => {loadJobs();}, []);
 
-    openJobs: jobs.filter(
-      (job) => job.jobPost_Status === 0
-    ).length,
+  const loadJobs = async () => {
+    try {
+      setLoading(true);
+      setError("");
 
-    closedJobs: jobs.filter(
-      (job) => job.jobPost_Status === 1
-    ).length,
+      const response = await getMyJobPosts();
 
-    totalConversations: jobs.reduce(
-      (total, job) => total + job.conversationCount,
-      0
-    ),
+      if (!response.success) {
+        setError(
+          response.message ||
+            "Unable to load your job posts."
+        );
+        return;
+      }
+
+      setJobs(response.data.jobs || []);
+
+      setStats(
+        response.data.stats || {
+          totalJobs: 0,
+          openJobs: 0,
+          closedJobs: 0,
+          totalConversations: 0,
+        }
+      );
+    } catch (error) {
+      console.error("Failed to load job posts:", error);
+
+      setError(
+        "Unable to load your job posts. Please try again."
+      );
+    } finally {
+      setLoading(false);
+    }
   };
+  
+  const handleCloseJob = async (jobPostId) => {
+    try {
+      setError("");
 
-  const handleCloseJob = (jobPostId) => {
-    setJobs((previousJobs) =>
-      previousJobs.map((job) =>
-        job.jobPost_Id === jobPostId
-          ? {
-              ...job,
-              jobPost_Status: 1,
-            }
-          : job
-      )
-    );
+      await closeJobPost(jobPostId);
+
+      await loadJobs();
+    } catch (error) {
+      console.error(
+        "Failed to close job post:",
+        error
+      );
+
+      setError(
+        error.response?.data?.message ||
+          "Unable to close the job post."
+      );
+    }
   };
 
   return (

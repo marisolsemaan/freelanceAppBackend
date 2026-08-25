@@ -3,13 +3,13 @@ import api from "./axios";
 export const getMyJobPosts = async () => {
   const response = await api.get("/client/job-posts");
 
-  return response.data.data;
+  return response.data;
 };
 
 export const createJobPost = async (jobPost) => {
   const response = await api.post("/client/job-posts", jobPost);
 
-  return response.data.data;
+  return response.data;
 };
 
 export const closeJobPost = async (jobPostId) => {
@@ -17,8 +17,17 @@ export const closeJobPost = async (jobPostId) => {
     `/client/job-posts/${jobPostId}/close`
   );
 
-  return response.data.data;
+  return response.data;
 };
 
+export const getProfessions = async () => {
+  const response = await api.get("/lookups/professions");
 
+  return response.data;
+};
 
+export const getCities = async () => {
+  const response = await api.get("/lookups/cities");
+
+  return response.data;
+};
