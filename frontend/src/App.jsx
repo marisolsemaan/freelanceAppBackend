@@ -30,7 +30,11 @@ function App() {
 
         <Route path="/client/jobs" element={<ProtectedRoute allowedRole={1}> <MyJobs /> </ProtectedRoute>} />
 
-        <Route path="/client/jobs/create" element={ <ProtectedRoute allowedRole={1}>  <CreateJob />  </ProtectedRoute> }/>
+        <Route path="/client/jobs/create" element={
+            <ProtectedRoute allowedRole={1}>
+              <CreateJob />
+            </ProtectedRoute>
+        }/>
 
         {/* <Route path="/worker/jobs" element={<WorkerJobs />} /> */}
 
@@ -41,8 +45,7 @@ function App() {
 ,
         <Route path="/worker/profile" element={ <ProtectedRoute allowedRole={2}> <WorkerProfile /> </ProtectedRoute> } />
 
-        <Route path="/client/profile"
-          element={  <ProtectedRoute allowedRole={1}><ClientProfile /></ProtectedRoute> } />
+        <Route path="/client/profile" element={  <ProtectedRoute allowedRole={1}><ClientProfile /></ProtectedRoute> } />
 
        <Route path="/messages/:conversationId" element={<Messages />}/>
 
