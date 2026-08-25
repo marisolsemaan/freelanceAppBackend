@@ -30,19 +30,12 @@ function App() {
 
         <Route path="/client/jobs" element={<ProtectedRoute allowedRole={1}> <MyJobs /> </ProtectedRoute>} />
 
-        <Route path="/client/jobs/create" element={
-            <ProtectedRoute allowedRole={1}>
-              <CreateJob />
-            </ProtectedRoute>
-        }/>
-
-        {/* <Route path="/worker/jobs" element={<WorkerJobs />} /> */}
+        <Route path="/client/jobs/create" element={<ProtectedRoute allowedRole={1}> <CreateJob /> </ProtectedRoute>}/>
 
         <Route path="/worker/search-jobs" element={ <ProtectedRoute allowedRole={2}>  <SearchJobs />  </ProtectedRoute> }  />
 
-
         <Route path="/worker/conversations/:jobPostId" element={<Conversation />}/>
-,
+
         <Route path="/worker/profile" element={ <ProtectedRoute allowedRole={2}> <WorkerProfile /> </ProtectedRoute> } />
 
         <Route path="/client/profile" element={  <ProtectedRoute allowedRole={1}><ClientProfile /></ProtectedRoute> } />

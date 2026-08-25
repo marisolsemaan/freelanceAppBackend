@@ -1,19 +1,20 @@
-// namespace FreelanceApp.API.DTOs.Conversation
-// {
-//     public class ConversationListItemResp
-//     {
-//         public int Conversation_Id { get; set; }
+namespace FreelanceApp.API.DTOs.Conversation;
 
-//         public int OtherUser_Id { get; set; }
+public class ConversationListItemResp
+{
+    public int Conversation_Id { get; set; }
 
-//         public string OtherUser_FullName { get; set; } = string.Empty;
+    public int OtherUser_Id { get; set; }
 
-//         public short OtherUser_Role { get; set; }
+    public string OtherUser_FullName { get; set; } = string.Empty;
 
-//         public string? LastMessage { get; set; }
+    public short OtherUser_Role { get; set; }
 
-//         public DateTime Conversation_LastMessageAt { get; set; }
+    public DateTime Conversation_LastMessageAt { get; set; }
 
-//         public int UnreadCount { get; set; }
-//     }
-// }
+    public string? LastMessage { get; set; }
+
+    public string LastActivityType { get; set; } = string.Empty;
+
+    public int UnreadCount { get; set; }
+}

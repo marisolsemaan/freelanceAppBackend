@@ -1,9 +1,16 @@
 import api from "./axios";
 
-// Get one conversation with its complete timeline
+// Get all conversations for the logged-in user
+export const getUserConversations = async () => {
+  const response = await api.get("/api/conversations");
+
+  return response.data;
+};
+
+// Get one conversation with its complete ordered timeline
 export const getConversation = async (conversationId) => {
   const response = await api.get(
-    `/api/conversation/${conversationId}`
+    `/api/conversations/${conversationId}`
   );
 
   return response.data;
@@ -12,7 +19,7 @@ export const getConversation = async (conversationId) => {
 // Send normal message
 export const sendMessage = async (conversationId, content) => {
   const response = await api.post(
-    `/api/conversation/${conversationId}/messages`,
+    `/api/conversations/${conversationId}/messages`,
     {
       content,
     }
@@ -21,10 +28,10 @@ export const sendMessage = async (conversationId, content) => {
   return response.data;
 };
 
-// Mark conversation messages/offers as read
+// Mark conversation as read
 export const markConversationAsRead = async (conversationId) => {
   const response = await api.patch(
-    `/api/conversation/${conversationId}/read`
+    `/api/conversations/${conversationId}/read`
   );
 
   return response.data;
@@ -45,7 +52,7 @@ export const createHireOffer = async (
   offer
 ) => {
   const response = await api.post(
-    `/api/conversation/${conversationId}/hire-offers`,
+    `/api/conversations/${conversationId}/hire-offers`,
     offer
   );
 
@@ -70,7 +77,7 @@ export const updateHireOfferStatus = async (
 // Create review
 export const createReview = async (review) => {
   const response = await api.post(
-    `/api/reviews`,
+    "/api/reviews",
     review
   );
 

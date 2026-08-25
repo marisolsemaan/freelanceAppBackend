@@ -13,5 +13,5 @@ public interface IConversationService
 
     Task<ApiResponse<bool>> MarkConversationAsReadAsync(int userId, int conversationId);
 
-    // Task<ApiResponse<List<ConversationListItemResp>>> GetUserConversationsAsync(int userId);
+    Task<ApiResponse<List<ConversationListItemResp>>> GetUserConversationsAsync(int userId);
 }

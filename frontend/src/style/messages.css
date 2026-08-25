@@ -1,68 +1,34 @@
-/* =========================================================
-   MESSAGE PAGE
-========================================================= */
+.messages-page {
+  background: var(--FreelanceApp-background);
+  min-height: calc(100vh - 56px);
+}
 
-.message-page {
+.messages-container {
   height: calc(100vh - 56px);
-  overflow: hidden;
-  background: var(--slate-50, #f8fafc);
-}
-
-.message-layout {
   display: flex;
-  height: 100%;
   overflow: hidden;
 }
 
+/* sidebar */
 
-/* =========================================================
-   SIDEBAR
-========================================================= */
-
-.conversation-sidebar {
-  width: 300px;
+.messages-sidebar {
+  width: 320px;
   flex-shrink: 0;
+  background: var(--FreelanceApp-surface);
+  border-right: 1px solid var(--FreelanceApp-border);
   display: flex;
   flex-direction: column;
-  background: #fff;
-  border-right: 1px solid var(--slate-200, #e2e8f0);
 }
 
-.conversation-sidebar-header {
-  padding: 16px 16px 12px;
-  border-bottom: 1px solid var(--slate-200, #e2e8f0);
+.messages-sidebar-header {
+  padding: 20px;
+  border-bottom: 1px solid var(--FreelanceApp-border);
 }
 
-.conversation-sidebar-header h6 {
-  margin: 0 0 14px;
+.messages-sidebar-header h5 {
+  margin: 0;
+  color: var(--FreelanceApp-text);
   font-weight: 700;
-  font-size: 0.95rem;
-  color: var(--slate-900, #0f172a);
-}
-
-.role-switcher {
-  display: flex;
-  width: 100%;
-  padding: 3px;
-  background: var(--slate-100, #f1f5f9);
-  border-radius: 8px;
-}
-
-.role-btn {
-  flex: 1;
-  border: 0;
-  background: transparent;
-  border-radius: 6px;
-  padding: 6px 8px;
-  color: var(--slate-500, #64748b);
-  font-size: 0.75rem;
-  font-weight: 600;
-}
-
-.role-btn.active {
-  background: #fff;
-  color: var(--FreelanceApp-primary, #0f9fa6);
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
 }
 
 .conversation-list {
@@ -70,132 +36,191 @@
   overflow-y: auto;
 }
 
-.conversation-list-placeholder {
+.conversation-list-item {
+  width: 100%;
   display: flex;
-  align-items: center;
   gap: 12px;
   padding: 14px 16px;
-  border-bottom: 1px solid var(--slate-100, #f1f5f9);
-  background: var(--slate-50, #f8fafc);
+  border: 0;
+  border-bottom: 1px solid var(--FreelanceApp-border);
+  background: transparent;
+  text-align: left;
+  transition: background 0.15s ease;
 }
 
-.message-mini-avatar {
-  width: 40px;
-  height: 40px;
-  flex-shrink: 0;
+.conversation-list-item:hover {
+  background: #f8fafc;
+}
+
+.conversation-list-item.active {
+  background: rgba(15, 159, 166, 0.08);
+}
+
+.conversation-avatar,
+.conversation-header-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--FreelanceApp-primary);
+  color: white;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
-  background: var(--FreelanceApp-primary, #0f9fa6);
-  color: #fff;
-  font-size: 0.85rem;
   font-weight: 700;
+  flex-shrink: 0;
 }
 
-.conversation-preview-name {
-  font-size: 0.82rem;
-  font-weight: 600;
-  color: var(--slate-800, #1e293b);
-}
-
-.conversation-preview-role {
-  margin-top: 2px;
-  color: var(--slate-500, #64748b);
-  font-size: 0.7rem;
-}
-
-
-/* =========================================================
-   MAIN CONVERSATION
-========================================================= */
-
-.conversation-main {
+.conversation-list-content {
   min-width: 0;
   flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  background: var(--slate-50, #f8fafc);
 }
 
-
-/* =========================================================
-   HEADER
-========================================================= */
-
-.conversation-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 12px 20px;
-  flex-shrink: 0;
-  background: #fff;
-  border-bottom: 1px solid var(--slate-200, #e2e8f0);
-}
-
-.conversation-user {
-  min-width: 0;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.message-avatar {
-  width: 40px;
-  height: 40px;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  border: 2px solid var(--FreelanceApp-primary, #0f9fa6);
-  background: #fff;
-  color: var(--FreelanceApp-primary-dark, #0b7f85);
-  font-size: 0.85rem;
-  font-weight: 700;
-}
-
-.conversation-user-name {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  color: var(--slate-900, #0f172a);
-  font-size: 0.88rem;
-  font-weight: 700;
-}
-
-.conversation-user-meta {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  margin-top: 2px;
-  color: var(--slate-500, #64748b);
-  font-size: 0.7rem;
-}
-
-.conversation-user-meta i {
-  color: var(--amber-500, #f59e0b);
-  font-size: 0.6rem;
-}
-
-.conversation-header-actions {
+.conversation-list-top,
+.conversation-list-bottom {
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+.conversation-list-top {
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.conversation-name {
+  color: var(--FreelanceApp-text);
+  font-size: 0.9rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.conversation-time {
+  color: var(--FreelanceApp-muted);
+  font-size: 0.7rem;
+  white-space: nowrap;
+}
+
+.conversation-preview {
+  flex: 1;
+  min-width: 0;
+  color: var(--FreelanceApp-secondary);
+  font-size: 0.8rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.conversation-unread {
+  min-width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--FreelanceApp-primary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.conversation-list-state {
+  height: 100%;
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--FreelanceApp-secondary);
+}
+
+/* conversation */
+
+.conversation-panel {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  background: #f8fafc;
+  position: relative;
+}
+
+.conversation-placeholder,
+.conversation-loading,
+.conversation-empty-timeline {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--FreelanceApp-secondary);
+  text-align: center;
+}
+
+.conversation-placeholder i,
+.conversation-empty-timeline i {
+  font-size: 3rem;
+  color: var(--FreelanceApp-muted);
+  margin-bottom: 12px;
+}
+
+.conversation-placeholder h5 {
+  color: var(--FreelanceApp-text);
+  margin-bottom: 6px;
+}
+
+.conversation-placeholder p {
+  margin: 0;
+}
+
+/* header */
+
+.conversation-header {
+  background: var(--FreelanceApp-surface);
+  border-bottom: 1px solid var(--FreelanceApp-border);
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
   flex-shrink: 0;
 }
 
+.conversation-header-info {
+  flex: 1;
+  min-width: 0;
+}
 
-/* =========================================================
-   TIMELINE
-========================================================= */
+.conversation-header-name {
+  color: var(--FreelanceApp-text);
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.conversation-header-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--FreelanceApp-secondary);
+  font-size: 0.75rem;
+}
+
+.conversation-header-meta i {
+  color: #f59e0b;
+}
+
+.conversation-back-btn {
+  display: none;
+  border: 0;
+  background: transparent;
+  color: var(--FreelanceApp-text);
+  font-size: 1.2rem;
+  padding: 4px;
+}
+
+/* timekine */
 
 .conversation-timeline {
   flex: 1;
   overflow-y: auto;
-  padding: 20px 24px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -203,478 +228,188 @@
 
 .message-row {
   display: flex;
-  justify-content: flex-start;
 }
 
 .message-row-me {
   justify-content: flex-end;
 }
 
-.message-wrapper {
-  max-width: min(70%, 620px);
+.message-row-them {
+  justify-content: flex-start;
+}
+
+.message-content-wrapper {
+  max-width: min(72%, 600px);
 }
 
 .message-bubble {
-  padding: 9px 13px;
+  padding: 10px 14px;
   border-radius: 14px;
-  font-size: 0.86rem;
+  font-size: 0.9rem;
   line-height: 1.5;
-  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
-.bubble-them {
-  background: #fff;
-  color: var(--slate-800, #1e293b);
-  border: 1px solid var(--slate-200, #e2e8f0);
-  border-top-left-radius: 4px;
+.message-bubble-me {
+  background: var(--FreelanceApp-primary);
+  color: white;
+  border-bottom-right-radius: 4px;
 }
 
-.bubble-me {
-  background: var(--FreelanceApp-primary, #0f9fa6);
-  color: #fff;
-  border-top-right-radius: 4px;
+.message-bubble-them {
+  background: var(--FreelanceApp-surface);
+  color: var(--FreelanceApp-text);
+  border: 1px solid var(--FreelanceApp-border);
+  border-bottom-left-radius: 4px;
 }
 
-.message-time {
+.message-time,
+.timeline-card-time {
+  color: var(--FreelanceApp-muted);
+  font-size: 0.68rem;
   margin-top: 4px;
   padding: 0 4px;
-  color: var(--slate-400, #94a3b8);
-  font-size: 0.63rem;
 }
 
+/*job post card */
 
-/* =========================================================
-   JOB POST CONTEXT CARD
-========================================================= */
-
-.timeline-system-row {
-  display: flex;
-  justify-content: center;
-  margin: 4px 0;
+.timeline-job-post {
+  align-self: center;
+  width: 100%;
+  max-width: 420px;
 }
 
-.job-context-card {
-  width: min(100%, 430px);
-  padding: 14px;
-  background: #fff;
-  border: 1px solid var(--slate-200, #e2e8f0);
+.job-post-message-card {
+  background: var(--FreelanceApp-surface);
+  border: 1px solid var(--FreelanceApp-border);
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05);
 }
 
-.job-context-header {
+.job-post-message-header {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 12px;
-}
-
-.job-context-icon {
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 8px;
-  background: rgba(15, 159, 166, 0.1);
-  color: var(--FreelanceApp-primary, #0f9fa6);
-}
-
-.job-context-label {
+  gap: 8px;
+  padding: 10px 14px;
+  background: rgba(15, 159, 166, 0.08);
+  color: var(--FreelanceApp-primary-dark);
   font-size: 0.72rem;
   font-weight: 700;
-  text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--FreelanceApp-primary-dark, #0b7f85);
 }
 
-.job-context-date {
-  margin-top: 2px;
-  color: var(--slate-400, #94a3b8);
-  font-size: 0.65rem;
+.job-post-message-body {
+  padding: 16px;
 }
 
-.job-context-card h6 {
-  margin-bottom: 8px;
-  color: var(--slate-900, #0f172a);
+.job-post-message-body h6 {
+  color: var(--FreelanceApp-text);
   font-weight: 700;
+  margin-bottom: 10px;
 }
 
-.job-context-meta {
+.job-post-message-details {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
-  color: var(--slate-500, #64748b);
-  font-size: 0.72rem;
-}
-
-.job-context-price {
-  margin-top: 10px;
-  color: var(--FreelanceApp-primary-dark, #0b7f85);
-  font-size: 1rem;
-  font-weight: 700;
-}
-
-
-/* =========================================================
-   HIRE OFFER
-========================================================= */
-
-.hire-offer-row {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-}
-
-.hire-offer-card {
-  width: min(100%, 370px);
-  overflow: hidden;
-  background: #fff;
-  border: 1px solid var(--slate-200, #e2e8f0);
-  border-radius: 12px;
-  box-shadow: 0 3px 12px rgba(15, 23, 42, 0.07);
-}
-
-.hire-offer-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   gap: 10px;
-  padding: 10px 12px;
-  background: rgba(15, 159, 166, 0.07);
-  border-bottom: 1px solid rgba(15, 159, 166, 0.12);
-}
-
-.hire-offer-icon {
-  color: var(--FreelanceApp-primary, #0f9fa6);
-  font-size: 0.9rem;
-}
-
-.hire-offer-label {
-  color: var(--FreelanceApp-primary-dark, #0b7f85);
-  font-size: 0.68rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
-
-.hire-offer-subtitle {
-  margin-top: 1px;
-  color: var(--slate-500, #64748b);
-  font-size: 0.62rem;
-}
-
-.hire-offer-id {
-  color: var(--slate-400, #94a3b8);
-  font-family: monospace;
-  font-size: 0.65rem;
-}
-
-.hire-offer-body {
-  padding: 14px;
-}
-
-.hire-offer-title {
-  margin-bottom: 7px;
-  color: var(--slate-900, #0f172a);
-  font-size: 0.9rem;
-  font-weight: 700;
-}
-
-.hire-offer-price {
-  margin-bottom: 8px;
-  color: var(--FreelanceApp-primary-dark, #0b7f85);
-  font-size: 1.45rem;
-  font-weight: 800;
-}
-
-.hire-offer-scope {
+  color: var(--FreelanceApp-secondary);
+  font-size: 0.78rem;
   margin-bottom: 12px;
-  color: var(--slate-500, #64748b);
-  font-size: 0.76rem;
-  line-height: 1.5;
 }
 
-.hire-offer-status {
-  display: inline-flex;
-  align-items: center;
-  padding: 5px 9px;
-  border-radius: 999px;
-  font-size: 0.7rem;
-  font-weight: 600;
+.job-post-message-price {
+  color: var(--FreelanceApp-primary-dark);
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 14px;
 }
 
-.hire-offer-status.pending {
-  background: #fff7ed;
-  color: #c2410c;
+.timeline-card-time {
+  text-align: center;
 }
 
-.hire-offer-status.accepted {
-  background: #ecfdf5;
-  color: #047857;
-}
+/*  INPUT */
 
-.hire-offer-status.rejected {
-  background: #fef2f2;
-  color: #dc2626;
-}
-
-.hire-offer-actions {
+.message-input-container {
+  background: var(--FreelanceApp-surface);
+  border-top: 1px solid var(--FreelanceApp-border);
+  padding: 14px 20px;
   display: flex;
-  gap: 8px;
-  margin-top: 14px;
-}
-
-.hire-offer-actions button {
-  flex: 1;
-}
-
-.hire-rate-button {
-  margin-top: 12px;
-  color: #fff;
-  background: var(--amber-500, #f59e0b);
-  border: 0;
-  font-weight: 600;
-}
-
-.hire-rate-button:hover {
-  color: #fff;
-  opacity: 0.92;
-}
-
-
-/* =========================================================
-   MESSAGE INPUT
-========================================================= */
-
-.message-input-area {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 20px;
+  gap: 10px;
   flex-shrink: 0;
-  background: #fff;
-  border-top: 1px solid var(--slate-200, #e2e8f0);
 }
 
-.message-input {
+.message-input-container input {
   min-width: 0;
 }
 
-.message-attachment-button {
+.message-send-btn {
+  width: 42px;
   flex-shrink: 0;
 }
 
-.hire-button,
-.send-button {
-  flex-shrink: 0;
+/* hire offer css for now*/
+
+.timeline-pending-component {
+  align-self: center;
+  padding: 10px 16px;
+  border-radius: 8px;
+  background: var(--FreelanceApp-surface);
+  border: 1px dashed var(--FreelanceApp-border);
+  color: var(--FreelanceApp-secondary);
+  font-size: 0.8rem;
 }
 
-
-/* =========================================================
-   MODAL
-========================================================= */
-
-.message-modal-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 1055;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  background: rgba(15, 23, 42, 0.45);
-}
-
-.message-modal {
-  width: min(100%, 520px);
-  max-height: calc(100vh - 40px);
-  overflow-y: auto;
-  background: #fff;
-  border-radius: 14px;
-  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.2);
-}
-
-.message-modal-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 18px 20px;
-  border-bottom: 1px solid var(--slate-200, #e2e8f0);
-}
-
-.message-modal-header h5 {
-  margin: 0;
-  color: var(--slate-900, #0f172a);
-  font-size: 1rem;
-  font-weight: 700;
-}
-
-.message-modal-header p {
-  margin: 4px 0 0;
-  color: var(--slate-500, #64748b);
-  font-size: 0.75rem;
-}
-
-.message-modal-body {
-  padding: 20px;
-}
-
-.message-modal-footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-  padding: 14px 20px;
-  border-top: 1px solid var(--slate-200, #e2e8f0);
-}
-
-.message-form-label {
-  display: block;
-  margin-bottom: 6px;
-  color: var(--slate-700, #334155);
-  font-size: 0.75rem;
-  font-weight: 600;
-}
-
-.required-star {
-  margin-left: 3px;
-  color: #dc2626;
-}
-
-.message-modal .form-control,
-.message-modal .form-select {
-  font-size: 0.82rem;
-}
-
-.message-modal textarea {
-  resize: vertical;
-}
-
-
-/* =========================================================
-   RATING
-========================================================= */
-
-.review-modal {
-  max-width: 480px;
-}
-
-.rating-selector {
-  display: flex;
-  justify-content: center;
-  gap: 7px;
-}
-
-.rating-star {
-  padding: 4px;
-  border: 0;
-  background: transparent;
-  color: var(--slate-300, #cbd5e1);
-  font-size: 1.8rem;
-  transition: transform 0.15s ease;
-}
-
-.rating-star:hover {
-  transform: scale(1.08);
-}
-
-.rating-star.selected {
-  color: var(--amber-500, #f59e0b);
-}
-
-.rating-text {
-  margin-top: 6px;
-  text-align: center;
-  color: var(--slate-500, #64748b);
-  font-size: 0.75rem;
-}
-
-
-/* =========================================================
-   LOADING / EMPTY
-========================================================= */
-
-.message-loading,
-.message-empty {
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  gap: 10px;
-  color: var(--slate-500, #64748b);
-}
-
-.message-empty > i {
-  color: var(--FreelanceApp-primary, #0f9fa6);
-  font-size: 2rem;
-}
-
-.message-empty h5 {
-  color: var(--slate-800, #1e293b);
-}
-
-
-/* =========================================================
-   RESPONSIVE
-========================================================= */
+/*moile */
 
 @media (max-width: 767.98px) {
-
-  .message-page {
-    height: calc(100vh - 56px);
+  .messages-container {
+    position: relative;
   }
 
-  .conversation-sidebar {
+  .messages-sidebar {
+    width: 100%;
+    border-right: 0;
+  }
+
+  .conversation-panel {
     display: none;
+    width: 100%;
+  }
+
+  .conversation-panel.conversation-open {
+    display: flex;
+  }
+
+  .messages-sidebar.conversation-selected {
+    display: none;
+  }
+
+  .conversation-back-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .conversation-header {
-    padding: 11px 14px;
+    padding: 10px 14px;
   }
 
   .conversation-timeline {
-    padding: 16px 12px;
+    padding: 14px;
   }
 
-  .message-input-area {
-    padding: 10px 12px;
+  .message-input-container {
+    padding: 10px 14px;
   }
 
-  .message-wrapper {
+  .message-content-wrapper {
     max-width: 85%;
   }
 
-  .hire-offer-card {
-    width: min(100%, 340px);
-  }
-
-  .conversation-header-actions {
+  .conversation-header .btn-outline-secondary {
     display: none;
   }
-
-  .conversation-user-name {
-    max-width: 170px;
-  }
-
-  .message-modal-backdrop {
-    padding: 10px;
-  }
-
-  .message-modal {
-    max-height: calc(100vh - 20px);
-  }
-
-  
-}
-
-.GoBack-btn{
-    background-color: var(--FreelanceApp-primary);
-    color:white;
-}
-
-.GoBack-btn:Hover{
-    background-color: var(--FreelanceApp-primary-dark);
-    color:white;
 }

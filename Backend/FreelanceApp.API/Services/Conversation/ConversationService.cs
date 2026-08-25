@@ -205,8 +205,7 @@ public class ConversationService : IConversationService
 
     public async Task<ApiResponse<ConversationResp>> GetConversationAsync( int userId, int conversationId)
     {
-        using var connection =
-            _dbConnection.CreateConnection();
+        using var connection = _dbConnection.CreateConnection();
 
         // Get conversation and the participants
         const string conversationSql = """
@@ -545,61 +544,118 @@ public class ConversationService : IConversationService
         };
     }
 
-    // public async Task< ApiResponse< List< ConversationListItemResp > > > GetUserConversationsAsync(int userId)
-    // {
-    //     using var connection = _dbConnection.CreateConnection();
+    public async Task<ApiResponse<List<ConversationListItemResp>>> GetUserConversationsAsync(int userId)
+    {
+    using var connection = _dbConnection.CreateConnection();
 
-    //     const string sql = """
-    //         SELECT
-    //             Conversation_Id,
+    const string sql = """
+        SELECT
+            Conversation_Id,
 
-    //             CASE
-    //                 WHEN Conversation_ClientId = @UserId
-    //                     THEN Conversation_WorkerId
-    //                 ELSE Conversation_ClientId
-    //             END AS OtherUser_Id,
+            CASE
+                WHEN Conversation_ClientId = @UserId
+                    THEN Conversation_WorkerId
+                ELSE Conversation_ClientId
+            END AS OtherUser_Id,
 
-    //             CASE
-    //                 WHEN Conversation_ClientId = @UserId
-    //                     THEN worker.User_FullName
-    //                 ELSE client.User_FullName
-    //             END AS OtherUser_FullName,
+            otherUser.User_FullName AS OtherUser_FullName,
 
-    //             CASE
-    //                 WHEN Conversation_ClientId = @UserId
-    //                     THEN worker.User_Role
-    //                 ELSE client.User_Role
-    //             END AS OtherUser_Role,
+            otherUser.User_Role AS OtherUser_Role,
 
-    //             Conversation_LastMessageAt
+            Conversation_LastMessageAt,
 
-    //         FROM tbl_Conversation 
+            unread.UnreadCount,
 
-    //         INNER JOIN tbl_User client
-    //             ON client.User_Id = Conversation_ClientId
+            activity.LastActivityType,
 
-    //         INNER JOIN tbl_User worker
-    //             ON worker.User_Id = Conversation_WorkerId
+            activity.LastMessage
 
-    //         WHERE
-    //             Conversation_ClientId = @UserId
-    //             OR Conversation_WorkerId = @UserId
+        FROM tbl_Conversation 
 
-    //         ORDER BY
-    //             Conversation_LastMessageAt DESC;
-    //         """;
+        INNER JOIN tbl_User otherUser
+            ON otherUser.User_Id =
+                CASE
+                    WHEN c.Conversation_ClientId = @UserId
+                        THEN c.Conversation_WorkerId
+                    ELSE c.Conversation_ClientId
+                END
 
-    //     var conversations =
-    //         await connection.QueryAsync<ConversationListItemResp>(
-    //             sql,
-    //             new { UserId = userId });
+        OUTER APPLY
+        (
+            SELECT COUNT(*) AS UnreadCount
+            FROM tbl_Message 
+            WHERE Message_ConversationId = Conversation_Id
+              AND Message_SenderId != @UserId
+              AND Message_IsRead = 0
+        ) unread
 
-    //     return new ApiResponse<List<ConversationListItemResp>>
-    //     {
-    //         Success = true,
-    //         Message = "Conversations retrieved successfully.",
-    //         Data = conversations.ToList()
-    //     };
-    // }
+        OUTER APPLY
+        (
+            SELECT TOP 1
+                x.LastActivityType,
+                x.LastMessage
+            FROM
+            (
+                SELECT
+                    Message_SentAt AS ActivityDate,
+                    'Message' AS LastActivityType,
+                    Message_Content AS LastMessage
+                FROM tbl_Message 
+                WHERE Message_ConversationId = Conversation_Id
+
+                UNION ALL
+
+                SELECT
+                    obPostConversation_CreatedAt AS ActivityDate,
+                    'JobPost' AS LastActivityType,
+                    CONCAT(
+                        'Connected to ',
+                        JobPost_Title
+                    ) AS LastMessage
+                FROM tbl_JobPostConversation 
+                INNER JOIN tbl_JobPost 
+                    ON JobPost_Id = JobPostConversation_JobPostId
+                WHERE JobPostConversation_ConversationId =
+                      Conversation_Id
+
+                UNION ALL
+
+                SELECT
+                    HireOffer_OfferedAt AS ActivityDate,
+                    'HireOffer' AS LastActivityType,
+                    CONCAT(
+                        'Hire offer: ',
+                        HireOffer_Title
+                    ) AS LastMessage
+                FROM tbl_HireOffer 
+                WHERE HireOffer_ConversationId = Conversation_Id
+
+            ) x
+            ORDER BY x.ActivityDate DESC
+        ) activity
+
+        WHERE
+            c.Conversation_ClientId = @UserId
+            OR c.Conversation_WorkerId = @UserId
+
+        ORDER BY
+            c.Conversation_LastMessageAt DESC;
+        """;
+
+    var conversations =
+        (
+            await connection.QueryAsync<ConversationListItemResp>(
+                sql,
+                new { UserId = userId }
+            )
+        ).ToList();
+
+    return new ApiResponse<List<ConversationListItemResp>>
+    {
+        Success = true,
+        Message = "Conversations retrieved successfully.",
+        Data = conversations
+    };
+    }
 
 }

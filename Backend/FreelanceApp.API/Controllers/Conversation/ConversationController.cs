@@ -84,6 +84,18 @@ public class ConversationController : ControllerBase
             : BadRequest(result);
     }
 
+    [HttpGet]
+    public async Task<IActionResult> GetUserConversations()
+    {
+        var userId = GetUserId();
+
+        var result = await _conversationService.GetUserConversationsAsync(userId);
+
+        return result.Success
+            ? Ok(result)
+            : BadRequest(result);
+    }
+
     private int GetUserId()
     {
         var claim = User.FindFirstValue(
