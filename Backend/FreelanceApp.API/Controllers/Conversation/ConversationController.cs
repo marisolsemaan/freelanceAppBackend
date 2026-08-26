@@ -47,7 +47,7 @@ public class ConversationController : ControllerBase
 
         if (conversationResult.Success)
         {
-            var conversation = conversationResult.Data;
+            var conversation = conversationResult.Data!;
 
             await NotifyConversationUpdated(
                 result.Data,
@@ -100,7 +100,7 @@ public class ConversationController : ControllerBase
 
         if (conversationResult.Success)
         {
-            var conversation = conversationResult.Data;
+            var conversation = conversationResult.Data!;
 
             await NotifyConversationUpdated(
                 conversationId,

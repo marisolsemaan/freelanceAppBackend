@@ -1,16 +1,21 @@
 import MessageBubble from "./MessageBuble";
 import JobPostMessageCard from "./JopPostMessageCard";
-import {useEffect, useRef} from "react"
+import HireOfferCard from "./HireOfferCard";
 
-export default function ConversationTimeline({items,})
-{
-  const bottomRef= useRef(null);
+import { useEffect, useRef,} from "react";
 
-  useEffect(()=>{
+
+export default function ConversationTimeline({ items, onOfferUpdated,}) {
+  const bottomRef =
+    useRef(null);
+
+
+  useEffect(() => {
     bottomRef.current?.scrollIntoView({
-      bahaviour:"smooth",
+      behavior: "smooth",
     });
-  },[items]);
+  }, [items]);
+
 
   if (!items?.length) {
     return (
@@ -24,14 +29,17 @@ export default function ConversationTimeline({items,})
     );
   }
 
+
   return (
     <div className="conversation-timeline">
+
       {items.map((item, index) => {
         const key =
           item.message?.messageId ||
           item.jobPost?.jobPostId ||
           item.hireOffer?.hireOfferId ||
           `${item.type}-${index}`;
+
 
         switch (item.type) {
           case "Message":
@@ -42,6 +50,7 @@ export default function ConversationTimeline({items,})
               />
             );
 
+
           case "JobPost":
             return (
               <JobPostMessageCard
@@ -50,22 +59,27 @@ export default function ConversationTimeline({items,})
               />
             );
 
+
           case "HireOffer":
             return (
-              <div
+              <HireOfferCard
                 key={key}
-                className="timeline-pending-component"
-              >
-                Hire offer
-              </div>
+                item={item}
+                onOfferUpdated={
+                  onOfferUpdated
+                }
+              />
             );
+
 
           default:
             return null;
         }
       })}
 
-      <div ref={bottomRef}/>
+
+      <div ref={bottomRef} />
+
     </div>
   );
 }

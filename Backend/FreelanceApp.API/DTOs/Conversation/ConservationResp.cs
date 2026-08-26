@@ -27,6 +27,5 @@ public class ConversationResp
 
     public DateTime? LastMessageAt { get; set; }
 
-    public IEnumerable<ConversationItemResp> Items { get; set; }
-        = new List<ConversationItemResp>();
+    public IEnumerable<ConversationItemResp> Items { get; set; } = new List<ConversationItemResp>();
 }

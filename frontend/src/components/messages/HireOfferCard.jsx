@@ -1,160 +1,233 @@
-import "../../style/messages.css";
+import {useState,} from "react";
 
-export default function HireOfferCard({
-  offer,
-  currentUserId,
-  userRole,
-  onAccept,
-  onReject,
-  onRate,
-}) {
-  const isClient =
-    userRole === "client";
+import { getAuth } from "../../utils/jwtStorage";
+
+import { updateHireOfferStatus,} from "../../services/conversationService";
+
+export default function HireOfferCard({ item, onOfferUpdated,}) {
+  const offer = item.hireOffer;
+
+  const auth = getAuth();
+
+  const currentUserId =
+    auth?.userId ||
+    auth?.id ||
+    auth?.user?.userId;
 
   const isWorker =
-    userRole === "worker";
+    Number(currentUserId) !== Number(offer.senderId);
+
+  const [updating, setUpdating] =
+    useState(false);
+
+  const [error, setError] =
+    useState("");
+
+  if (!offer) {
+    return null;
+  }
+
+
+  const statusMap = {
+    0: {
+      label: "Pending",
+      icon: "bi-hourglass-split",
+      className: "pending",
+    },
+
+    1: {
+      label: "Accepted",
+      icon: "bi-check-circle-fill",
+      className: "accepted",
+    },
+
+    2: {
+      label: "Rejected",
+      icon: "bi-x-circle-fill",
+      className: "rejected",
+    },
+  };
+
+
+  const status =
+    statusMap[offer.offerStatus] ||
+    statusMap[0];
+
+
+  const handleUpdateStatus = async (
+    newStatus
+  ) => {
+    try {
+      setUpdating(true);
+      setError("");
+
+      const response =
+        await updateHireOfferStatus(
+          offer.hireOfferId,
+          newStatus
+        );
+
+      if (!response.success) {
+        setError(
+          response.message ||
+          "Failed to update hire offer."
+        );
+
+        return;
+      }
+
+      onOfferUpdated?.(
+        response.data
+      );
+
+    } catch (error) {
+      setError(
+        error.response?.data?.message ||
+        "Failed to update hire offer."
+      );
+    } finally {
+      setUpdating(false);
+    }
+  };
+
 
   const isPending =
-    offer.offerStatus === "Pending" ||
-    offer.offerStatus === 0;
+    Number(offer.offerStatus) === 0;
 
-  const isAccepted =
-    offer.offerStatus === "Accepted" ||
-    offer.offerStatus === 1;
-
-  const isRejected =
-    offer.offerStatus === "Rejected" ||
-    offer.offerStatus === 2;
-
-  /*
-   * Hire offers are created by the client.
-   * Therefore the client owns/sent the offer.
-   *
-   * Depending on the exact DTO returned by the API,
-   * SenderId or HireOffer_WorkerId may be present.
-   */
-  const isMine =
-    offer.senderId === currentUserId ||
-    (
-      isClient &&
-      offer.hireOfferWorkerId !== currentUserId
-    );
 
   return (
-    <div className="hire-offer-card">
+    <div className="hire-offer-timeline-wrapper">
 
-      {/* Header */}
-      <div className="hire-offer-header">
+      <div className="hire-offer-card">
 
-        <div className="d-flex align-items-center gap-2">
-          <div className="hire-offer-icon">
-            <i className="bi bi-briefcase-fill" />
+        <div className="hire-offer-card-header">
+
+          <div className="hire-offer-card-icon">
+            <i className="bi bi-briefcase-fill"></i>
           </div>
 
           <div>
-            <div className="hire-offer-label">
+            <div className="hire-offer-card-label">
               Hire Offer
             </div>
 
-            <div className="hire-offer-subtitle">
-              {isMine
-                ? "Offer sent"
-                : "Offer received"}
+            <div className="hire-offer-card-date">
+              {new Date(
+                offer.createdAt
+              ).toLocaleString()}
             </div>
           </div>
+
         </div>
 
-        <span className="hire-offer-id">
-          #{offer.hireOfferId}
-        </span>
+
+        <div className="hire-offer-card-body">
+
+          <h6 className="hire-offer-card-title">
+            {offer.offerTitle}
+          </h6>
+
+
+          <div className="hire-offer-price">
+            <span>
+              Agreed Price
+            </span>
+
+            <strong>
+              ${Number(
+                offer.offerPrice
+              ).toFixed(2)}
+            </strong>
+          </div>
+
+
+          {offer.scopeTerms && (
+            <div className="hire-offer-scope">
+
+              <span className="hire-offer-scope-label">
+                Scope / Terms
+              </span>
+
+              <p>
+                {offer.scopeTerms}
+              </p>
+
+            </div>
+          )}
+
+        </div>
+
+
+        <div className="hire-offer-card-footer">
+
+          {isPending ? (
+            <>
+              {isWorker ? (
+                <div className="hire-offer-actions">
+
+                  <button
+                    type="button"
+                    className="btn btn-outline-danger"
+                    disabled={updating}
+                    onClick={() =>
+                      handleUpdateStatus(2)
+                    }
+                  >
+                    Reject
+                  </button>
+
+
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    disabled={updating}
+                    onClick={() =>
+                      handleUpdateStatus(1)
+                    }
+                  >
+                    {updating ? (
+                      <>
+                        <span className="spinner-border spinner-border-sm me-2" />
+                        Updating...
+                      </>
+                    ) : (
+                      <>
+                        <i className="bi bi-check-lg me-1"></i>
+                        Accept Offer
+                      </>
+                    )}
+                  </button>
+
+                </div>
+              ) : (
+                <div className="hire-offer-client-pending">
+                  <i className="bi bi-hourglass-split"></i>
+
+                  Waiting for worker response
+                </div>
+              )}
+            </>
+          ) : (
+            <div
+              className={`hire-offer-status ${status.className}`}
+            >
+              <i className={`bi ${status.icon}`}></i>
+
+              {status.label}
+            </div>
+          )}
+
+        </div>
 
       </div>
 
-      {/* Body there is inside the card where the client should choose a direct hire or from the job post title of the client*/} 
-      <div className="hire-offer-body">
 
-        <h6 className="hire-offer-title">
-          {offer.offerTitle}
-        </h6>
-
-        <div className="hire-offer-price">
-          ${Number(offer.offerPrice).toFixed(2)}
+      {error && (
+        <div className="alert alert-danger mt-2 mb-0">
+          {error}
         </div>
+      )}
 
-        {offer.scopeTerms && (
-          <p className="hire-offer-scope">
-            {offer.scopeTerms}
-          </p>
-        )}
-
-        {/* Pending */}
-        {isPending && (
-          <div className="hire-offer-status pending">
-            <i className="bi bi-clock me-1" />
-            Pending
-          </div>
-        )}
-
-        {/* Accepted */}
-        {isAccepted && (
-          <div className="hire-offer-status accepted">
-            <i className="bi bi-check-circle-fill me-1" />
-            Accepted
-          </div>
-        )}
-
-        {/* Rejected */}
-        {isRejected && (
-          <div className="hire-offer-status rejected">
-            <i className="bi bi-x-circle-fill me-1" />
-            Rejected
-          </div>
-        )}
-
-        {/* Worker actions */}
-        {isWorker && !isMine && isPending && (
-          <div className="hire-offer-actions">
-
-            <button
-              type="button"
-              className="btn btn-sm btn-outline-danger"
-              onClick={() =>
-                onReject(offer.hireOfferId)
-              }
-            >
-              <i className="bi bi-x-lg me-1" />
-              Reject
-            </button>
-
-            <button
-              type="button"
-              className="btn btn-sm btn-primary"
-              onClick={() =>
-                onAccept(offer.hireOfferId)
-              }
-            >
-              <i className="bi bi-check-lg me-1" />
-              Accept
-            </button>
-
-          </div>
-        )}
-
-        {/* Accepted hire → rating */}
-        {isAccepted && (
-          <button
-            type="button"
-            className="btn btn-sm hire-rate-button"
-            onClick={() =>
-              onRate(offer.hireOfferId)
-            }
-          >
-            <i className="bi bi-star-fill me-1" />
-            Rate
-          </button>
-        )}
-
-      </div>
     </div>
   );
 }

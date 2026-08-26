@@ -348,7 +348,7 @@ public class ConversationService : IConversationService
                 new { ConversationId = conversationId });
 
         var offerItems= offers.Select(offer=>new ConversationItemResp{
-            Type="Hire Offer",
+            Type="HireOffer",
             CreatedAt=offer.CreatedAt,
             HireOffer=offer
         });

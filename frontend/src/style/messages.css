@@ -413,3 +413,873 @@
     display: none;
   }
 }
+
+
+
+/* =========================
+   HIRE OFFER MODAL
+========================= */
+
+.hire-offer-modal-backdrop {
+  position: fixed;
+  inset: 0;
+
+  z-index: 1050;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 1rem;
+
+  background: rgba(15, 23, 42, 0.45);
+}
+
+.hire-offer-modal {
+  width: 100%;
+  max-width: 560px;
+  max-height: calc(100vh - 2rem);
+
+  overflow-y: auto;
+
+  background: var(--FreelanceApp-surface);
+
+  border-radius: 16px;
+
+  box-shadow:
+    0 25px 50px rgba(15, 23, 42, 0.2);
+}
+
+.hire-offer-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  padding: 1.25rem 1.5rem;
+
+  border-bottom:
+    1px solid var(--FreelanceApp-border);
+}
+
+.hire-offer-modal-header h5 {
+  margin: 0;
+
+  color: var(--FreelanceApp-text);
+
+  font-weight: 700;
+}
+
+.hire-offer-modal-header p {
+  margin: 0.25rem 0 0;
+
+  color: var(--FreelanceApp-secondary);
+
+  font-size: 0.875rem;
+}
+
+.hire-offer-close-btn {
+  border: 0;
+  background: transparent;
+
+  color: var(--FreelanceApp-secondary);
+
+  font-size: 1.1rem;
+}
+
+.hire-offer-content {
+  padding: 1.5rem;
+}
+
+.hire-offer-section-title {
+  margin-bottom: 1rem;
+
+  font-weight: 700;
+
+  color: var(--FreelanceApp-text);
+}
+
+
+/* =========================
+   JOB SELECTION
+========================= */
+
+.hire-job-option,
+.hire-direct-option {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+
+  padding: 1rem;
+
+  margin-bottom: 0.75rem;
+
+  text-align: left;
+
+  border:
+    1px solid var(--FreelanceApp-border);
+
+  border-radius: 12px;
+
+  background:
+    var(--FreelanceApp-surface);
+
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.hire-job-option:hover,
+.hire-direct-option:hover {
+  border-color:
+    var(--FreelanceApp-primary);
+
+  background:
+    var(--FreelanceApp-background);
+}
+
+.hire-job-icon,
+.hire-direct-icon {
+  width: 38px;
+  height: 38px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 10px;
+
+  color:
+    var(--FreelanceApp-primary);
+
+  background:
+    rgba(15, 159, 166, 0.1);
+}
+
+.hire-direct-option {
+  border-style: dashed;
+}
+
+.hire-direct-icon {
+  background: transparent;
+
+  border:
+    2px dashed var(--FreelanceApp-border);
+}
+
+.hire-job-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.hire-job-title,
+.hire-direct-title {
+  font-size: 0.9rem;
+
+  font-weight: 600;
+
+  color:
+    var(--FreelanceApp-text);
+}
+
+.hire-direct-description {
+  margin-top: 0.2rem;
+
+  font-size: 0.78rem;
+
+  color:
+    var(--FreelanceApp-secondary);
+}
+
+.hire-job-arrow {
+  color:
+    var(--FreelanceApp-muted);
+}
+
+
+/* =========================
+   OFFER FORM
+========================= */
+
+.hire-offer-back {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+
+  padding: 0;
+
+  margin-bottom: 1rem;
+
+  border: 0;
+
+  background: transparent;
+
+  color:
+    var(--FreelanceApp-primary);
+
+  font-size: 0.85rem;
+
+  font-weight: 600;
+}
+
+.hire-offer-linked-job {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  margin-bottom: 1.25rem;
+
+  padding: 0.75rem;
+
+  border-radius: 10px;
+
+  background:
+    rgba(15, 159, 166, 0.08);
+
+  border:
+    1px solid rgba(15, 159, 166, 0.2);
+
+  color:
+    var(--FreelanceApp-primary-dark);
+
+  font-size: 0.82rem;
+
+  font-weight: 600;
+}
+
+.hire-offer-field {
+  margin-bottom: 1rem;
+}
+
+.hire-offer-field label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  margin-bottom: 0.4rem;
+
+  color:
+    var(--FreelanceApp-secondary);
+
+  font-size: 0.82rem;
+
+  font-weight: 600;
+}
+
+.hire-offer-field .form-control {
+  border-radius: 10px;
+
+  border-color:
+    var(--FreelanceApp-border);
+}
+
+.hire-offer-field .form-control:focus {
+  border-color:
+    var(--FreelanceApp-primary);
+
+  box-shadow:
+    0 0 0 0.2rem
+    rgba(15, 159, 166, 0.12);
+}
+
+.optional-label {
+  font-size: 0.72rem;
+
+  font-weight: 400;
+
+  color:
+    var(--FreelanceApp-muted);
+}
+
+.hire-offer-submit {
+  width: 100%;
+
+  border-radius: 10px;
+
+  font-weight: 600;
+}
+
+
+/* =========================
+   HIRE OFFER TIMELINE CARD
+========================= */
+
+.hire-offer-timeline-wrapper {
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.hire-offer-card {
+  width: 100%;
+  max-width: 520px;
+
+  overflow: hidden;
+
+  background:
+    var(--FreelanceApp-surface);
+
+  border:
+    1px solid var(--FreelanceApp-border);
+
+  border-radius: 14px;
+
+  box-shadow:
+    0 4px 14px rgba(15, 23, 42, 0.06);
+}
+
+.hire-offer-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+
+  padding: 1rem;
+
+  background:
+    rgba(15, 159, 166, 0.06);
+
+  border-bottom:
+    1px solid var(--FreelanceApp-border);
+}
+
+.hire-offer-card-icon {
+  width: 40px;
+  height: 40px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 10px;
+
+  color:
+    var(--FreelanceApp-primary);
+
+  background:
+    var(--FreelanceApp-surface);
+}
+
+.hire-offer-card-label {
+  font-weight: 700;
+
+  color:
+    var(--FreelanceApp-text);
+}
+
+.hire-offer-card-date {
+  margin-top: 0.15rem;
+
+  font-size: 0.72rem;
+
+  color:
+    var(--FreelanceApp-secondary);
+}
+
+.hire-offer-card-body {
+  padding: 1rem;
+}
+
+.hire-offer-card-title {
+  margin-bottom: 1rem;
+
+  font-size: 1rem;
+
+  font-weight: 700;
+
+  color:
+    var(--FreelanceApp-text);
+}
+
+.hire-offer-price {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 0.75rem;
+
+  margin-bottom: 1rem;
+
+  border-radius: 10px;
+
+  background:
+    var(--FreelanceApp-background);
+}
+
+.hire-offer-price span {
+  color:
+    var(--FreelanceApp-secondary);
+
+  font-size: 0.8rem;
+}
+
+.hire-offer-price strong {
+  color:
+    var(--FreelanceApp-primary);
+
+  font-size: 1.1rem;
+}
+
+.hire-offer-scope-label {
+  display: block;
+
+  margin-bottom: 0.4rem;
+
+  font-size: 0.78rem;
+
+  font-weight: 700;
+
+  color:
+    var(--FreelanceApp-secondary);
+}
+
+.hire-offer-scope p {
+  margin: 0;
+
+  white-space: pre-wrap;
+
+  color:
+    var(--FreelanceApp-text);
+
+  font-size: 0.88rem;
+}
+
+.hire-offer-card-footer {
+  padding: 1rem;
+
+  border-top:
+    1px solid var(--FreelanceApp-border);
+}
+
+.hire-offer-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.hire-offer-actions .btn {
+  border-radius: 9px;
+
+  font-size: 0.85rem;
+
+  font-weight: 600;
+}
+
+.hire-offer-client-pending {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+
+  color:
+    var(--FreelanceApp-secondary);
+
+  font-size: 0.85rem;
+
+  font-weight: 600;
+}
+
+.hire-offer-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+
+  padding: 0.5rem;
+
+  border-radius: 8px;
+
+  font-size: 0.85rem;
+
+  font-weight: 700;
+}
+
+.hire-offer-status.accepted {
+  color: #198754;
+
+  background:
+    rgba(25, 135, 84, 0.1);
+}
+
+.hire-offer-status.rejected {
+  color:
+    var(--FreelanceApp-danger);
+
+  background:
+    rgba(220, 53, 69, 0.1);
+}
+
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 576px) {
+  .hire-offer-actions {
+    flex-direction: column-reverse;
+  }
+
+  .hire-offer-actions .btn {
+    width: 100%;
+  }
+
+  .hire-offer-modal {
+    max-height:
+      calc(100vh - 1rem);
+  }
+}
+/* =========================
+   CONVERSATION HEADER ACTIONS
+========================= */
+
+.conversation-header-actions {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 0.5rem;
+
+  margin-left: auto;
+
+}
+
+
+/* =========================
+   RATING MODAL
+========================= */
+
+.rating-modal-backdrop {
+
+  position: fixed;
+
+  inset: 0;
+
+  z-index: 2000;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  padding: 1rem;
+
+  background: rgba(15, 23, 42, 0.45);
+
+}
+
+
+.rating-modal {
+
+  position: relative;
+
+  width: 100%;
+
+  max-width: 460px;
+
+  padding: 2rem;
+
+  border-radius: 16px;
+
+  background:
+    var(--FreelanceApp-surface);
+
+  box-shadow:
+    0 20px 50px
+    rgba(15, 23, 42, 0.2);
+
+}
+
+
+.rating-modal-close {
+
+  position: absolute;
+
+  top: 1rem;
+
+  right: 1rem;
+
+  width: 34px;
+
+  height: 34px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border: none;
+
+  border-radius: 50%;
+
+  background:
+    transparent;
+
+  color:
+    var(--FreelanceApp-secondary);
+
+  cursor: pointer;
+
+}
+
+
+.rating-modal-close:hover {
+
+  background:
+    var(--FreelanceApp-background);
+
+}
+
+
+.rating-modal-icon {
+
+  width: 54px;
+
+  height: 54px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  margin-bottom: 1rem;
+
+  border-radius: 50%;
+
+  background:
+    rgba(245, 166, 35, 0.12);
+
+  color:
+    #f5a623;
+
+  font-size: 1.4rem;
+
+}
+
+
+.rating-modal h4 {
+
+  margin-bottom: 0.4rem;
+
+  color:
+    var(--FreelanceApp-text);
+
+  font-weight: 700;
+
+}
+
+
+.rating-modal-description {
+
+  margin-bottom: 1.5rem;
+
+  color:
+    var(--FreelanceApp-secondary);
+
+}
+
+
+.rating-stars {
+
+  display: flex;
+
+  justify-content: center;
+
+  gap: 0.45rem;
+
+  margin-bottom: 0.5rem;
+
+}
+
+
+.rating-star {
+
+  padding: 0;
+
+  border: none;
+
+  background:
+    transparent;
+
+  color:
+    var(--FreelanceApp-border);
+
+  font-size: 2rem;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.15s,
+    color 0.15s;
+
+}
+
+
+.rating-star:hover {
+
+  transform:
+    scale(1.1);
+
+}
+
+
+.rating-star.selected {
+
+  color:
+    #f5a623;
+
+}
+
+
+.rating-selected-text {
+
+  margin-bottom: 1.5rem;
+
+  text-align: center;
+
+  color:
+    var(--FreelanceApp-secondary);
+
+  font-size: 0.875rem;
+
+}
+
+
+.rating-comment-group {
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 0.5rem;
+
+}
+
+
+.rating-comment-group label {
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  color:
+    var(--FreelanceApp-text);
+
+  font-size: 0.875rem;
+
+  font-weight: 600;
+
+}
+
+
+.rating-comment-group label span {
+
+  color:
+    var(--FreelanceApp-muted);
+
+  font-size: 0.75rem;
+
+  font-weight: 400;
+
+}
+
+
+.rating-comment-group textarea {
+
+  width: 100%;
+
+  padding: 0.75rem;
+
+  border:
+    1px solid
+    var(--FreelanceApp-border);
+
+  border-radius: 10px;
+
+  outline: none;
+
+  resize: vertical;
+
+  color:
+    var(--FreelanceApp-text);
+
+  background:
+    var(--FreelanceApp-surface);
+
+}
+
+
+.rating-comment-group textarea:focus {
+
+  border-color:
+    var(--FreelanceApp-primary);
+
+}
+
+
+.rating-modal-error {
+
+  margin-bottom: 1rem;
+
+  padding: 0.65rem 0.75rem;
+
+  border-radius: 8px;
+
+  background:
+    rgba(220, 53, 69, 0.08);
+
+  color:
+    var(--FreelanceApp-danger);
+
+  font-size: 0.8rem;
+
+}
+
+
+.rating-modal-actions {
+
+  display: flex;
+
+  justify-content: flex-end;
+
+  gap: 0.75rem;
+
+  margin-top: 1.5rem;
+
+}
+
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 576px) {
+
+  .rating-modal {
+
+    padding: 1.5rem;
+
+  }
+
+  .rating-modal-actions {
+
+    flex-direction: column-reverse;
+
+  }
+
+  .rating-modal-actions button {
+
+    width: 100%;
+
+  }
+
+}

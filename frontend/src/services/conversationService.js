@@ -88,6 +88,15 @@ export const updateHireOfferStatus = async (
   return response.data;
 };
 
+export const getClientJobPostTitles =
+  async () => {
+    const response = await api.get(
+      "/client/job-posts/titles"
+    );
+
+    return response.data;
+  };
+
 // Create review
 export const createReview = async (review) => {
   const response = await api.post(
