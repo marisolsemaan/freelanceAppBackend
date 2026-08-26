@@ -1,4 +1,11 @@
-import { useEffect, useState } from "react";
+import {
+  useEffect,
+  useState,
+  useCallback,
+  useRef,
+} from "react";
+
+import { useParams } from "react-router-dom";
 
 import Navbar from "../../components/layout/Navbar";
 
@@ -14,9 +21,17 @@ import {
   markConversationAsRead,
 } from "../../services/conversationService";
 
+import {
+  startConversationHub,
+  stopConversationHub,
+} from "../../services/conversationHub";
+
 import "../../style/messages.css";
 
+
 export default function Messages() {
+  const { conversationId } = useParams();
+
   const [conversations, setConversations] = useState([]);
 
   const [
@@ -43,11 +58,17 @@ export default function Messages() {
 
   const [sending, setSending] = useState(false);
 
-  useEffect(() => {
-    loadConversations();
-  }, []);
 
-  const loadConversations = async () => {
+  const selectedConversationIdRef = useRef(null);
+
+
+  useEffect(() => {
+    selectedConversationIdRef.current =
+      selectedConversationId;
+  }, [selectedConversationId]);
+
+
+  const loadConversations = useCallback(async () => {
     try {
       setConversationsLoading(true);
       setError("");
@@ -58,24 +79,26 @@ export default function Messages() {
       if (!response.success) {
         setError(
           response.message ||
-            "Failed to load conversations."
+          "Failed to load conversations."
         );
 
         return;
       }
 
       setConversations(response.data || []);
+
     } catch (error) {
       setError(
         error.response?.data?.message ||
-          "Failed to load conversations."
+        "Failed to load conversations."
       );
     } finally {
       setConversationsLoading(false);
     }
-  };
+  }, []);
 
-  const handleSelectConversation =
+
+  const handleSelectConversation = useCallback(
     async (conversationId) => {
       try {
         setSelectedConversationId(conversationId);
@@ -88,7 +111,7 @@ export default function Messages() {
         if (!response.success) {
           setError(
             response.message ||
-              "Failed to load conversation."
+            "Failed to load conversation."
           );
 
           return;
@@ -102,8 +125,8 @@ export default function Messages() {
 
         setConversations((current) =>
           current.map((conversation) =>
-            conversation.conversationId ===
-            conversationId
+            Number(conversation.conversationId) ===
+            Number(conversationId)
               ? {
                   ...conversation,
                   unreadCount: 0,
@@ -111,15 +134,98 @@ export default function Messages() {
               : conversation
           )
         );
+
       } catch (error) {
         setError(
           error.response?.data?.message ||
-            "Failed to load conversation."
+          "Failed to load conversation."
         );
       } finally {
         setConversationLoading(false);
       }
+    },
+    []
+  );
+
+
+  useEffect(() => {
+    loadConversations();
+  }, [loadConversations]);
+
+
+  useEffect(() => {
+    if (!conversationId || !conversations.length) return;
+
+    const conversationExists = conversations.some(
+      (conversation) =>
+        Number(conversation.conversationId) ===
+        Number(conversationId)
+    );
+
+    if (
+      conversationExists &&
+      Number(selectedConversationId) !==
+        Number(conversationId)
+    ) {
+      handleSelectConversation(
+        Number(conversationId)
+      );
+    }
+
+  }, [
+    conversationId,
+    conversations,
+    selectedConversationId,
+    handleSelectConversation,
+  ]);
+
+
+  useEffect(() => {
+    const handleConversationUpdated =
+      async (updatedConversationId) => {
+
+        await loadConversations();
+
+        if (
+          Number(updatedConversationId) ===
+          Number(selectedConversationIdRef.current)
+        ) {
+          try {
+            const response =
+              await getConversation(
+                updatedConversationId
+              );
+
+            if (response.success) {
+              setActiveConversation(response.data);
+            }
+
+          } catch (error) {
+            console.error(
+              "Failed to refresh conversation:",
+              error
+            );
+          }
+        }
+      };
+
+
+    startConversationHub(
+      handleConversationUpdated
+    ).catch((error) => {
+      console.error(
+        "Failed to connect to SignalR:",
+        error
+      );
+    });
+
+
+    return () => {
+      stopConversationHub();
     };
+
+  }, [loadConversations]);
+
 
   const handleSendMessage =
     async (content) => {
@@ -136,46 +242,33 @@ export default function Messages() {
         if (!response.success) {
           setError(
             response.message ||
-              "Failed to send message."
+            "Failed to send message."
           );
 
           return false;
         }
 
-        // Reload the conversation so the backend
-        // remains the source of truth for the timeline.
-        const conversationResponse =
-          await getConversation(
-            selectedConversationId
-          );
-
-        if (conversationResponse.success) {
-          setActiveConversation(
-            conversationResponse.data
-          );
-        }
-
-        // Refresh the sidebar so the last message
-        // preview and LastMessageAt stay correct.
-        await loadConversations();
-
         return true;
+
       } catch (error) {
         setError(
           error.response?.data?.message ||
-            "Failed to send message."
+          "Failed to send message."
         );
 
         return false;
+
       } finally {
         setSending(false);
       }
     };
 
+
   const handleBackToList = () => {
     setSelectedConversationId(null);
     setActiveConversation(null);
   };
+
 
   return (
     <>
@@ -213,6 +306,7 @@ export default function Messages() {
             />
           </aside>
 
+
           <section
             className={`conversation-panel ${
               selectedConversationId
@@ -235,11 +329,13 @@ export default function Messages() {
               </div>
             )}
 
+
             {conversationLoading && (
               <div className="conversation-loading">
                 <div className="spinner-border" />
               </div>
             )}
+
 
             {!conversationLoading &&
               activeConversation && (
@@ -253,17 +349,20 @@ export default function Messages() {
                     }
                   />
 
+
                   {error && (
                     <div className="alert alert-danger m-3 mb-0">
                       {error}
                     </div>
                   )}
 
+
                   <ConversationTimeline
                     items={
                       activeConversation.items
                     }
                   />
+
 
                   <MessageInput
                     onSend={
@@ -274,6 +373,7 @@ export default function Messages() {
                 </>
               )}
           </section>
+
         </div>
       </main>
     </>

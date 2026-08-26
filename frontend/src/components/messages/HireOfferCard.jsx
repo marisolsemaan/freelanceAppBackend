@@ -70,7 +70,7 @@ export default function HireOfferCard({
 
       </div>
 
-      {/* Body */}
+      {/* Body there is inside the card where the client should choose a direct hire or from the job post title of the client*/} 
       <div className="hire-offer-body">
 
         <h6 className="hire-offer-title">

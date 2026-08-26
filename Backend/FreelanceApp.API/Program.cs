@@ -16,6 +16,7 @@ using FreelanceApp.API.Services.Rating;
 using System.Text;
 using System.Text.Json.Serialization;
 using FreelanceApp.API.Services.Lookup;
+using FreelanceApp.API.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,9 +37,29 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(key),
             ClockSkew = TimeSpan.Zero
         };
+
+        options.Events= new JwtBearerEvents
+        {
+             OnMessageReceived = context =>
+            {
+            var accessToken =
+                context.Request.Query["access_token"];
+
+            var path =
+                context.HttpContext.Request.Path;
+
+            if (
+                !string.IsNullOrEmpty(accessToken) &&
+                path.StartsWithSegments("/conversationHub")
+            )
+            {
+                context.Token = accessToken;
+            }
+
+            return Task.CompletedTask;
+            }
+        };
     });
-
-
 
 builder.Services.AddEndpointsApiExplorer();
 
@@ -66,16 +87,6 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-// builder.Services.AddCors(options =>
-// {
-//     options.AddPolicy("Frontend", policy =>
-//     {
-//         policy
-//             .WithOrigins("http://localhost:5173")
-//             .AllowAnyHeader()
-//             .AllowAnyMethod();
-//     });
-// });
 
 builder.Services.AddCors(options =>
 {
@@ -85,6 +96,7 @@ builder.Services.AddCors(options =>
               .AllowAnyMethod());
 });
 
+builder.Services.AddSignalR();
 // Add services to the container.
 builder.Services.AddOpenApi();
 //return the type into a serialisable string instead of numbers for readability
@@ -133,6 +145,7 @@ app.UseCors("frontend");
 app.UseAuthentication();      //  Check JWT token
 app.UseAuthorization(); 
 app.MapControllers();
+app.MapHub<ConversationHub>("/conversationHub");
 
 app.Run();
 

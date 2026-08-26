@@ -1,8 +1,17 @@
 import MessageBubble from "./MessageBuble";
 import JobPostMessageCard from "./JopPostMessageCard";
+import {useEffect, useRef} from "react"
 
 export default function ConversationTimeline({items,})
 {
+  const bottomRef= useRef(null);
+
+  useEffect(()=>{
+    bottomRef.current?.scrollIntoView({
+      bahaviour:"smooth",
+    });
+  },[items]);
+
   if (!items?.length) {
     return (
       <div className="conversation-empty-timeline">
@@ -55,6 +64,8 @@ export default function ConversationTimeline({items,})
             return null;
         }
       })}
+
+      <div ref={bottomRef}/>
     </div>
   );
 }

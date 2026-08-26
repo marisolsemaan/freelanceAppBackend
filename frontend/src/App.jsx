@@ -4,10 +4,8 @@ import Login from "./components/auth/Login";
 import Register from "./components/auth/Register";
 import CreateJob from "./pages/client/CreateJob";
 import MyJobs from "./pages/client/MyJobs";
-// import WorkerJobs from "./pages/worker/WorkerJobs";
 
 import SearchJobs from "./pages/worker/SearchJobs";
-import Conversation from "./pages/conversation/Conversation";
 
 import WorkerProfile from "./components/worker/WorkerProfile";
 
@@ -33,8 +31,6 @@ function App() {
         <Route path="/client/jobs/create" element={<ProtectedRoute allowedRole={1}> <CreateJob /> </ProtectedRoute>}/>
 
         <Route path="/worker/search-jobs" element={ <ProtectedRoute allowedRole={2}>  <SearchJobs />  </ProtectedRoute> }  />
-
-        <Route path="/worker/conversations/:jobPostId" element={<Conversation />}/>
 
         <Route path="/worker/profile" element={ <ProtectedRoute allowedRole={2}> <WorkerProfile /> </ProtectedRoute> } />
 

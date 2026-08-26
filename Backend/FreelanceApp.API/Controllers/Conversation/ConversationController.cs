@@ -3,6 +3,8 @@ using FreelanceApp.API.DTOs.Conversation;
 using FreelanceApp.API.Services.Conversation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using FreelanceApp.API.Hubs;
+using Microsoft.AspNetCore.SignalR;
 
 namespace FreelanceApp.API.Controllers.Conversation;
 
@@ -12,11 +14,12 @@ namespace FreelanceApp.API.Controllers.Conversation;
 public class ConversationController : ControllerBase
 {
     private readonly IConversationService _conversationService;
+    private readonly IHubContext<ConversationHub> _hubContext;
 
-    public ConversationController(
-        IConversationService conversationService)
+    public ConversationController(IConversationService conversationService, IHubContext<ConversationHub>  hubContext)
     {
         _conversationService = conversationService;
+        _hubContext= hubContext;
     }
 
     // Worker clicks on connect in a job post
@@ -31,9 +34,29 @@ public class ConversationController : ControllerBase
                 jobPostId
             );
 
-        return result.Success
-            ? Ok(result)
-            : BadRequest(result);
+        if (!result.Success)
+        {
+            return BadRequest(result);
+        }
+
+        var conversationResult =
+            await _conversationService.GetConversationAsync(
+                workerId,
+                result.Data
+            );
+
+        if (conversationResult.Success)
+        {
+            var conversation = conversationResult.Data;
+
+            await NotifyConversationUpdated(
+                result.Data,
+                conversation.ClientId,
+                conversation.WorkerId
+            );
+        }
+
+        return Ok(result);
     }
 
     // Get conversation and ordered timeline of messages
@@ -61,11 +84,32 @@ public class ConversationController : ControllerBase
             await _conversationService.SendMessageAsync(
                 userId,
                 conversationId,
-                request);
+                request
+            );
 
-        return result.Success
-            ? Ok(result)
-            : BadRequest(result);
+        if (!result.Success)
+        {
+            return BadRequest(result);
+        }
+
+        var conversationResult =
+            await _conversationService.GetConversationAsync(
+                userId,
+                conversationId
+            );
+
+        if (conversationResult.Success)
+        {
+            var conversation = conversationResult.Data;
+
+            await NotifyConversationUpdated(
+                conversationId,
+                conversation.ClientId,
+                conversation.WorkerId
+            );
+        }
+
+        return Ok(result);
     }
 
     // Mark received items as read
@@ -106,5 +150,9 @@ public class ConversationController : ControllerBase
                 "User ID was not found in the token.");
 
         return int.Parse(claim);
+    }
+
+    private async Task NotifyConversationUpdated(int conversationId, int clientId, int workerId){
+        await _hubContext.Clients.Users(clientId.ToString(), workerId.ToString()).SendAsync("ConversationUpdated", conversationId);
     }
 }

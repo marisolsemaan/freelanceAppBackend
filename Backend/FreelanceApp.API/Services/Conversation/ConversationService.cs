@@ -575,9 +575,9 @@ public class ConversationService : IConversationService
         INNER JOIN tbl_User otherUser
             ON otherUser.User_Id =
                 CASE
-                    WHEN c.Conversation_ClientId = @UserId
-                        THEN c.Conversation_WorkerId
-                    ELSE c.Conversation_ClientId
+                    WHEN Conversation_ClientId = @UserId
+                        THEN Conversation_WorkerId
+                    ELSE Conversation_ClientId
                 END
 
         OUTER APPLY
@@ -606,7 +606,7 @@ public class ConversationService : IConversationService
                 UNION ALL
 
                 SELECT
-                    obPostConversation_CreatedAt AS ActivityDate,
+                    JobPostConversation_CreatedAt AS ActivityDate,
                     'JobPost' AS LastActivityType,
                     CONCAT(
                         'Connected to ',
@@ -635,11 +635,11 @@ public class ConversationService : IConversationService
         ) activity
 
         WHERE
-            c.Conversation_ClientId = @UserId
-            OR c.Conversation_WorkerId = @UserId
+            Conversation_ClientId = @UserId
+            OR Conversation_WorkerId = @UserId
 
         ORDER BY
-            c.Conversation_LastMessageAt DESC;
+            Conversation_LastMessageAt DESC;
         """;
 
     var conversations =

@@ -139,16 +139,16 @@
 /* PROFESSION */
 
 .job-tag-profession {
-  background: rgba(15, 159, 166, 0.1);
+  background: rgba(149, 223, 198, 0.89);
 
-  color: var(--FreelanceApp-primary-dark);
+  color: rgb(46, 43, 43);
 }
 
 
 /* CITY */
 
 .job-tag-city {
-  background: #f1f3f5;
+  background: #69adf0;
 
   color: var(--slate-600);
 }

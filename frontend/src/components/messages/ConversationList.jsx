@@ -1,6 +1,6 @@
 import { timeAgo } from "../../utils/format";
 
-export default function ConversationList({ conversations, selectedConversationId,  onSelect,  loading,}) 
+export default function ConversationList({ conversations = [], selectedConversationId,  onSelect,  loading,})
 {
   if (loading) {
     return (
@@ -13,7 +13,7 @@ export default function ConversationList({ conversations, selectedConversationId
   if (!conversations.length) {
     return (
       <div className="conversation-list-state">
-        <i className="bi bi-chat-dots"></i>
+        <i className="bi bi-chat-dots" />
         <p>No conversations yet.</p>
       </div>
     );
@@ -23,7 +23,8 @@ export default function ConversationList({ conversations, selectedConversationId
     <div className="conversation-list">
       {conversations.map((conversation) => {
         const isActive =
-          conversation.conversationId === selectedConversationId;
+          Number(conversation.conversationId) ===
+          Number(selectedConversationId);
 
         return (
           <button
@@ -44,24 +45,26 @@ export default function ConversationList({ conversations, selectedConversationId
 
             <div className="conversation-list-content">
               <div className="conversation-list-top">
-                <span className="conversation-name">
+                <strong>
                   {conversation.otherUserFullName}
-                </span>
+                </strong>
 
-                <span className="conversation-time">
-                  {conversation.lastMessageAt
-                    ? timeAgo(conversation.lastMessageAt)
-                    : ""}
-                </span>
+                {conversation.lastMessageAt && (
+                  <span className="conversation-time">
+                    {timeAgo(
+                      conversation.lastMessageAt
+                    )}
+                  </span>
+                )}
               </div>
 
-              <div className="conversation-list-bottom">
-                <span className="conversation-preview">
-                  {conversation.lastActivityPreview ||
+              <div className="conversation-list-bottom d-flex justify-content-between">
+                <span className="conversation-last-message">
+                  {conversation.lastMessage ||
                     "No messages yet"}
                 </span>
 
-                {conversation.unreadCount > 0 && (
+                {Number(conversation.unreadCount) > 0 && (
                   <span className="conversation-unread">
                     {conversation.unreadCount}
                   </span>

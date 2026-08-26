@@ -2,15 +2,29 @@ import api from "./axios";
 
 // Get all conversations for the logged-in user
 export const getUserConversations = async () => {
-  const response = await api.get("/api/conversations");
+  const response = await api.get("/conversations");
 
-  return response.data;
+  const result= response.data;
+
+  return {
+    ...result,
+    data: result.data.map((conversation) => ({
+      conversationId: conversation.conversation_Id,
+      otherUserId: conversation.otherUser_Id,
+      otherUserFullName: conversation.otherUser_FullName,
+      otherUserRole: conversation.otherUser_Role,
+      lastMessageAt: conversation.conversation_LastMessageAt,
+      lastMessage: conversation.lastMessage,
+      lastActivityType: conversation.lastActivityType,
+      unreadCount: conversation.unreadCount,
+    })),
+  };
 };
 
 // Get one conversation with its complete ordered timeline
 export const getConversation = async (conversationId) => {
   const response = await api.get(
-    `/api/conversations/${conversationId}`
+    `/conversations/${conversationId}`
   );
 
   return response.data;
@@ -19,7 +33,7 @@ export const getConversation = async (conversationId) => {
 // Send normal message
 export const sendMessage = async (conversationId, content) => {
   const response = await api.post(
-    `/api/conversations/${conversationId}/messages`,
+    `/conversations/${conversationId}/messages`,
     {
       content,
     }
@@ -31,7 +45,7 @@ export const sendMessage = async (conversationId, content) => {
 // Mark conversation as read
 export const markConversationAsRead = async (conversationId) => {
   const response = await api.patch(
-    `/api/conversations/${conversationId}/read`
+    `/conversations/${conversationId}/read`
   );
 
   return response.data;
@@ -40,7 +54,7 @@ export const markConversationAsRead = async (conversationId) => {
 // Worker connects to a job post
 export const connectToJobPost = async (jobPostId) => {
   const response = await api.post(
-    `/api/worker/job-posts/${jobPostId}/connect`
+    `/worker/job-posts/${jobPostId}/connect`
   );
 
   return response.data;
@@ -52,7 +66,7 @@ export const createHireOffer = async (
   offer
 ) => {
   const response = await api.post(
-    `/api/conversations/${conversationId}/hire-offers`,
+    `/conversations/${conversationId}/hire-offer`,
     offer
   );
 
@@ -65,7 +79,7 @@ export const updateHireOfferStatus = async (
   status
 ) => {
   const response = await api.patch(
-    `/api/hire-offers/${hireOfferId}/status`,
+    `/worker/hire-offers/${hireOfferId}/status`,
     {
       hireOffer_Status: status,
     }
@@ -77,7 +91,7 @@ export const updateHireOfferStatus = async (
 // Create review
 export const createReview = async (review) => {
   const response = await api.post(
-    "/api/reviews",
+    "/ratings",
     review
   );
 

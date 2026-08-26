@@ -7,6 +7,7 @@ export default function JobPostMessageCard({ item }) {
 
   if (!jobPost) return null;
 
+  /*there is no endpoint for that yet */
   const handleViewJob = () => {
     navigate(`/job-posts/${jobPost.jobPostId}`);
   };

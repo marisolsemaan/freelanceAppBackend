@@ -1,14 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-
+import { connectToJobPost } from "../../services/conversationService";
 import {timeAgo, getInitials, formatPrice,} from "../../utils/format";
 import "../../style/jobCard.css";
 
 export default function JobCard({job, cities, professions,})
 {
-  console.log("cities:", cities);
-console.log("professions:", professions);
-console.log("job:", job);
   const city = cities.find(
     (item) =>
       Number(item.city_Id) === Number(job.cityId)
@@ -23,14 +20,30 @@ console.log("job:", job);
   const navigate = useNavigate();
   const [expanded, setExpanded] = useState(false);
 
-  const handleConnect = () => {
-    navigate(`/worker/conversations/${job.id}`, {
-      state: {
-        jobTitle: job.title,
-        clientName: job.clientName,
-        clientId: job.clientId,
-      },
-    });
+  const handleConnect = async () => {
+    try{
+      const result= await connectToJobPost(job.id);
+
+      if(!result.success){
+        throw new Error("Failed to connect to this job "+ result.message);
+        
+      }
+
+      const conversationId= result.data;
+
+      if(!conversationId){
+          console.Log("the server did not return a conversation id");
+          throw new Error("no conversation id was returned");
+      }
+      
+      navigate(`/messages/${conversationId}`)
+    
+      
+    } catch(error){
+      console.error("Failed to connect", error);
+
+      alert( error.response?.data?.message ||error.message ||"Failed to connect to this job.");
+    }
   };
 
   const handleClientProfile = () => {
