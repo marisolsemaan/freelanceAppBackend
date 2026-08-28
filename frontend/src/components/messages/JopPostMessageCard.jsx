@@ -49,14 +49,14 @@ export default function JobPostMessageCard({ item }) {
               ${jobPost.jobPostPrice}
             </div>
           )}
-
+{/* 
           <button
             type="button"
             className="btn btn-outline-primary btn-sm"
             onClick={handleViewJob}
           >
             View Job
-          </button>
+          </button> */}
         </div>
       </div>
 

@@ -3,6 +3,9 @@ using FreelanceApp.API.DTOs.HireOffer;
 using FreelanceApp.API.Services.HireOffer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using FreelanceApp.API.Hubs;
+using Microsoft.AspNetCore.SignalR;
+using FreelanceApp.API.Services.Conversation;
 
 namespace FreelanceApp.API.Controllers.HireOffer;
 
@@ -12,10 +15,14 @@ namespace FreelanceApp.API.Controllers.HireOffer;
 public class HireOfferController : ControllerBase
 {
     private readonly IHireOfferService _service;
+    private readonly IHubContext<ConversationHub> _hubContext;
+    private readonly IConversationService _conversationService;
 
-    public HireOfferController(IHireOfferService service)
+    public HireOfferController(IHireOfferService service, IHubContext<ConversationHub> hubContext, IConversationService cs)
     {
         _service = service;
+        _hubContext= hubContext;
+        _conversationService = cs;
     }
 
     // Client click on hire offer button in conversation with worker
@@ -24,14 +31,21 @@ public class HireOfferController : ControllerBase
     {
         var clientId = GetUserId();
 
-        var result =
-            await _service.CreateHireOfferAsync(
-                clientId,
-                conversationId,
-                request);
+        var result = await _service.CreateHireOfferAsync(clientId, conversationId, request);
 
         if (!result.Success)
             return BadRequest(result);
+
+        //get the users of this converstaion
+        var conversationResult = await _conversationService.GetConversationAsync(clientId, conversationId );
+
+        if(conversationResult.Success)
+        {
+            var conversation= conversationResult.Data!;
+
+            await _hubContext.Clients.Users(conversation.ClientId.ToString(), conversation.WorkerId.ToString())
+                .SendAsync("conversationUpdated",conversationId);
+        }
 
         return Ok(result);
     }
@@ -50,6 +64,17 @@ public class HireOfferController : ControllerBase
 
         if (!result.Success)
             return BadRequest(result);
+
+        var conversationResult= await _conversationService.GetConversationAsync(workerId, 
+            result.Data!.HireOffer_ConversationId);
+
+        if(conversationResult.Success)
+        {
+            var conversation= conversationResult.Data!;
+
+            await _hubContext.Clients.Users(conversation.ClientId.ToString(), conversation.WorkerId.ToString())
+                .SendAsync("conversationUpdated",result.Data.HireOffer_ConversationId);
+        }
 
         return Ok(result);
     }

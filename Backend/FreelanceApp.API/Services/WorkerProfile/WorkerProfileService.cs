@@ -118,7 +118,7 @@ public class WorkerProfileService : IWorkerProfileService
             SELECT
                 Review_Id,
                 Review_ReviewerId,
-                User_FullName as ReviewerFullName
+                User_FullName as ReviewerFullName,
                 Review_Rating,
                 Review_Comment,
                 Review_CreatedAt 

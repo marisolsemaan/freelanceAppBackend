@@ -58,7 +58,7 @@ public class ClientJobPostController : ControllerBase
         return Ok(result);
     }
 
-    [HttpGet("/titles")] // get titles of job posts as dropdown so client can choose from for hire offers
+    [HttpGet("titles")] // get titles of job posts as dropdown so client can choose from for hire offers
     public async Task<IActionResult> GetJobPostTitles()
     {
         var clientId = GetUserId();

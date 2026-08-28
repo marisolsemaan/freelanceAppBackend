@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback, useRef,} from "react";
 
 import RatingModal from "../../components/rating/RatingModal";
 import {createReview} from "../../services/conversationService";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import {getAuth} from "../../utils/jwtStorage";
 import Navbar from "../../components/layout/Navbar";
 
@@ -25,6 +25,7 @@ import "../../style/messages.css";
 
 export default function Messages() {
   const { conversationId } = useParams();
+  const navigate= useNavigate();
 
   const [conversations, setConversations] = useState([]);
 
@@ -55,17 +56,13 @@ export default function Messages() {
 
   const selectedConversationIdRef = useRef(null);
 
-  const [showRatingModal, setShowRatingModal] =
-  useState(false);
+  const [showRatingModal, setShowRatingModal] = useState(false);
 
-  const [ratingHireOffer, setRatingHireOffer] =
-    useState(null);
+  const [ratingHireOffer, setRatingHireOffer] = useState(null);
 
-  const [submittingReview, setSubmittingReview] =
-    useState(false);
+  const [submittingReview, setSubmittingReview] = useState(false);
 
-  const [ratedHireOfferIds, setRatedHireOfferIds] =
-    useState([]);
+  const [ratedHireOfferIds, setRatedHireOfferIds] =useState([]);
 
   const acceptedHireOffers =
   activeConversation?.items?.filter(
@@ -177,23 +174,22 @@ export default function Messages() {
   const loadConversations = useCallback(async () => {
     try {
       setConversationsLoading(true);
-      setError("");
 
-      const response =
-        await getUserConversations();
+      const response = await getUserConversations();
 
-      if (!response.success) {
+      if (response.success) {
+        setConversations(response.data);
+      } else {
         setError(
-          response.message ||
-          "Failed to load conversations."
+          response.message || "Failed to load conversations."
         );
-
-        return;
       }
-
-      setConversations(response.data || []);
-
     } catch (error) {
+      console.error(
+        "Failed to load conversations:",
+        error
+      );
+
       setError(
         error.response?.data?.message ||
         "Failed to load conversations."
@@ -203,13 +199,16 @@ export default function Messages() {
     }
   }, []);
 
-
   const handleSelectConversation = useCallback(
-    async (conversationId) => {
+    async (conversationId, updateUrl = true) => {
       try {
         setSelectedConversationId(conversationId);
         setConversationLoading(true);
         setError("");
+
+        if (updateUrl) {
+          navigate(`/messages/${conversationId}`);
+        }
 
         const response =
           await getConversation(conversationId);
@@ -225,9 +224,7 @@ export default function Messages() {
 
         setActiveConversation(response.data);
 
-        await markConversationAsRead(
-          conversationId
-        );
+        await markConversationAsRead(conversationId);
 
         setConversations((current) =>
           current.map((conversation) =>
@@ -250,7 +247,7 @@ export default function Messages() {
         setConversationLoading(false);
       }
     },
-    []
+    [navigate]
   );
 
 
@@ -274,7 +271,8 @@ export default function Messages() {
         Number(conversationId)
     ) {
       handleSelectConversation(
-        Number(conversationId)
+        Number(conversationId), 
+        false
       );
     }
 
@@ -285,27 +283,46 @@ export default function Messages() {
     handleSelectConversation,
   ]);
 
-  useEffect(() => { const handleConversationUpdated = async (updatedConversationId) => {
-      
-    await loadConversations();
+  useEffect(() => {
+    const handleConversationUpdated = async (
+      updatedConversationId
+    ) => {
+      console.log(
+        "ConversationUpdated received:",
+        updatedConversationId
+      );
 
-      if (
-        Number(updatedConversationId) ===
-        Number(selectedConversationIdRef.current)
-      ) {
-        try {
+      try {
+        await loadConversations();
+
+        if (
+          Number(updatedConversationId) ===
+          Number(selectedConversationIdRef.current)
+        ) {
           const response =
-            await getConversation(updatedConversationId);
+            await getConversation(
+              updatedConversationId
+            );
 
           if (response.success) {
             setActiveConversation(response.data);
           }
-        } catch (error) {
-          console.error(
-            "Failed to refresh conversation:",
-            error
+
+          await markConversationAsRead(updatedConversationId);
+
+          setConversations((current)=>
+            current.map((conversation)=>
+              Number(conversation.conversationId)=== Number(updatedConversationId)
+              ? {...conversation, unreadCount:0,}
+              :conversation
+            )
           );
         }
+      } catch (error) {
+        console.error(
+          "Failed to update conversation:",
+          error
+        );
       }
     };
 
@@ -319,7 +336,8 @@ export default function Messages() {
     });
 
     return () => {
-      stopConversationHub();
+      // IMPORTANT:
+      // Do not stop the shared connection here for now.
     };
   }, [loadConversations]);
 
@@ -400,6 +418,7 @@ export default function Messages() {
   const handleBackToList = () => {
     setSelectedConversationId(null);
     setActiveConversation(null);
+    navigate("/messages");
   };
 
 

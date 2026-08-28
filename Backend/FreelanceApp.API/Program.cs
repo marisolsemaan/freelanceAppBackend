@@ -17,6 +17,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using FreelanceApp.API.Services.Lookup;
 using FreelanceApp.API.Hubs;
+using Microsoft.AspNetCore.SignalR;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -99,6 +100,7 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddSignalR();
+builder.Services.AddSingleton<IUserIdProvider, NameIdentifierUserIdProvider>();
 // Add services to the container.
 builder.Services.AddOpenApi();
 //return the type into a serialisable string instead of numbers for readability

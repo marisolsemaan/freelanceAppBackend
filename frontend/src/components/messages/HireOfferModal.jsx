@@ -6,19 +6,15 @@ export default function HireOfferModal({ conversationId, onClose,  onOfferCreate
   const [step, setStep] = useState("selection");
 
   const [jobPosts, setJobPosts] = useState([]);
-  const [loadingJobs, setLoadingJobs] =
-    useState(false);
+  const [loadingJobs, setLoadingJobs] = useState(false);
 
-  const [selectedJob, setSelectedJob] =
-    useState(null);
+  const [selectedJob, setSelectedJob] =  useState(null);
 
   const [title, setTitle] = useState("");
   const [price, setPrice] = useState("");
-  const [scopeTerms, setScopeTerms] =
-    useState("");
+  const [scopeTerms, setScopeTerms] =  useState("");
 
-  const [submitting, setSubmitting] =
-    useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const [error, setError] = useState("");
 
@@ -30,10 +26,20 @@ export default function HireOfferModal({ conversationId, onClose,  onOfferCreate
         const response =
           await getClientJobPostTitles();
 
+          console.log(
+            "Hire offer job posts response:",
+            response
+          );
+
+          console.log(
+            "Hire offer job posts data:",
+            response.data
+          );
+
         if (!response.success) {
           setError(
             response.message ||
-            "Failed to load job posts."
+            "Failed to load job posts titles."
           );
 
           return;
@@ -54,17 +60,13 @@ export default function HireOfferModal({ conversationId, onClose,  onOfferCreate
     loadJobPosts();
   }, []);
 
-
   const handleSelectJob = (jobPost) => {
     setSelectedJob(jobPost);
 
-    setTitle(
-      jobPost.jobPost_Title
-    );
+    setTitle( jobPost.jobPost_Title );
 
     setStep("details");
   };
-
 
   const handleDirectHire = () => {
     setSelectedJob(null);
@@ -72,12 +74,10 @@ export default function HireOfferModal({ conversationId, onClose,  onOfferCreate
     setStep("details");
   };
 
-
   const handleBack = () => {
     setError("");
     setStep("selection");
   };
-
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -204,30 +204,50 @@ export default function HireOfferModal({ conversationId, onClose,  onOfferCreate
             )}
 
 
-            {!loadingJobs &&
-              jobPosts.map((jobPost) => (
-                <button
-                  key={jobPost.jobPost_Id}
-                  type="button"
-                  className="hire-job-option"
-                  onClick={() =>
-                    handleSelectJob(jobPost)
+            {!loadingJobs && (
+              <div className="hire-offer-field">
+                <label>
+                  Select Job Post
+                </label>
+
+                <select
+                  className="form-control"
+                  value={
+                    selectedJob
+                      ? selectedJob.jobPost_Id
+                      : ""
                   }
+                  onChange={(event) => {
+                    const jobPostId =
+                      Number(event.target.value);
+
+                    const jobPost =
+                      jobPosts.find(
+                        (job) =>
+                          Number(job.jobPost_Id) ===
+                          jobPostId
+                      );
+
+                    if (jobPost) {
+                      handleSelectJob(jobPost);
+                    }
+                  }}
                 >
-                  <div className="hire-job-icon">
-                    <i className="bi bi-briefcase-fill"></i>
-                  </div>
+                  <option value="">
+                    Select a job post...
+                  </option>
 
-                  <div className="hire-job-info">
-                    <div className="hire-job-title">
+                  {jobPosts.map((jobPost) => (
+                    <option
+                      key={jobPost.jobPost_Id}
+                      value={jobPost.jobPost_Id}
+                    >
                       {jobPost.jobPost_Title}
-                    </div>
-                  </div>
-
-                  <i className="bi bi-chevron-right hire-job-arrow"></i>
-                </button>
-              ))}
-
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
 
             <button
               type="button"

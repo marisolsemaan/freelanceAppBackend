@@ -36,6 +36,7 @@ function MyJobs() {
         );
         return;
       }
+      console.log("Job data sample:", response.data.jobs[0]);
 
       setJobs(response.data.jobs || []);
 
