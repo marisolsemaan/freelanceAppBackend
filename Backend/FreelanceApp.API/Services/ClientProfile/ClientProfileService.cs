@@ -3,6 +3,8 @@ using FreelanceApp.API.DTOs;
 using FreelanceApp.API.DTOs.Rating;
 using FreelanceApp.API.Data;
 using FreelanceApp.API.DTOs.ClientProfile;
+using FreelanceApp.API.DTOs.Enums;
+using FreelanceApp.API.DTOs.WorkerProfile;
 
 namespace FreelanceApp.API.Services.ClientProfile;
 
@@ -73,6 +75,29 @@ public class ClientProfileService : IClientProfileService
                 new { ClientId = clientId });
 
         profile.Reviews = reviews.ToList();
+
+        const string photoSql = """
+            SELECT
+                Document_FileData,
+                Document_ContentType
+            FROM tbl_Document
+            WHERE Document_UserId = @ClientId
+            AND Document_Type = @DocumentType;
+            """;
+
+        var photo =
+            await connection.QuerySingleOrDefaultAsync<ProfilePhotoData>(
+                photoSql,
+                new
+                {
+                    ClientId = clientId,
+                    DocumentType = 3
+                });
+
+        profile.ProfilePhoto = photo?.Document_FileData;
+
+        profile.ProfilePhotoContentType =
+            photo?.Document_ContentType;
 
         return new ApiResponse<ClientProfileResp>
         {

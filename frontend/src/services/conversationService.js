@@ -74,10 +74,7 @@ export const createHireOffer = async (
 };
 
 // Worker accepts/rejects a hire offer
-export const updateHireOfferStatus = async (
-  hireOfferId,
-  status
-) => {
+export const updateHireOfferStatus = async ( hireOfferId, status) => {
   const response = await api.patch(
     `/worker/hire-offers/${hireOfferId}/status`,
     {
@@ -102,6 +99,14 @@ export const createReview = async (review) => {
   const response = await api.post(
     "/ratings",
     review
+  );
+
+  return response.data;
+};
+
+export const completeHireOffer = async ( hireOfferId) => {
+  const response = await api.patch(
+    `/client/hire-offers/${hireOfferId}/complete`
   );
 
   return response.data;

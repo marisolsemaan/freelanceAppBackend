@@ -8,4 +8,6 @@ public interface IHireOfferService
     Task<ApiResponse<HireOfferResp>> CreateHireOfferAsync( int clientId,int conversationId, HireOfferReq request);
 
     Task<ApiResponse<HireOfferResp>> UpdateOfferStatusAsync(  int workerId, int hireOfferId, UpdateHireOfferStatusReq request);
+
+    Task<ApiResponse<HireOfferResp>> CompleteHireOfferAsync( int clientId, int hireOfferId);
 }

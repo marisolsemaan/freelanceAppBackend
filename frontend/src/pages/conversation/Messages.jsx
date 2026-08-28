@@ -1,9 +1,8 @@
 import { useEffect, useState, useCallback, useRef,} from "react";
-
-import RatingModal from "../../components/rating/RatingModal";
-import {createReview} from "../../services/conversationService";
+// import RatingModal from "../../components/rating/RatingModal";
+// import {createReview} from "../../services/conversationService";
 import { useParams, useNavigate } from "react-router-dom";
-import {getAuth} from "../../utils/jwtStorage";
+// import {getAuth} from "../../utils/jwtStorage";
 import Navbar from "../../components/layout/Navbar";
 
 import ConversationList from "../../components/messages/ConversationList";
@@ -21,7 +20,6 @@ import {
 import { startConversationHub, stopConversationHub,} from "../../services/conversationHub";
 
 import "../../style/messages.css";
-
 
 export default function Messages() {
   const { conversationId } = useParams();
@@ -56,114 +54,111 @@ export default function Messages() {
 
   const selectedConversationIdRef = useRef(null);
 
-  const [showRatingModal, setShowRatingModal] = useState(false);
+  // const [showRatingModal, setShowRatingModal] = useState(false);
 
-  const [ratingHireOffer, setRatingHireOffer] = useState(null);
+  // const [ratingHireOffer, setRatingHireOffer] = useState(null);
 
-  const [submittingReview, setSubmittingReview] = useState(false);
+  // const [submittingReview, setSubmittingReview] = useState(false);
 
-  const [ratedHireOfferIds, setRatedHireOfferIds] =useState([]);
+  // const [ratedHireOfferIds, setRatedHireOfferIds] =useState([]);
 
-  const acceptedHireOffers =
-  activeConversation?.items?.filter(
-    (item) =>
-      item.type === "HireOffer" &&
-      Number(item.hireOffer?.offerStatus) === 1
-  ) || [];
+  // const acceptedHireOffers =
+  // activeConversation?.items?.filter(
+  //   (item) =>
+  //     item.type === "HireOffer" &&
+  //     Number(item.hireOffer?.offerStatus) === 1
+  // ) || [];
 
-  const acceptedHireOffer =
-  acceptedHireOffers.length > 0
-    ? acceptedHireOffers[
-        acceptedHireOffers.length - 1
-      ].hireOffer
-    : null;
+  // const acceptedHireOffer =
+  // acceptedHireOffers.length > 0
+  //   ? acceptedHireOffers[
+  //       acceptedHireOffers.length - 1
+  //     ].hireOffer
+  //   : null;
 
-  const auth = getAuth();
+  // const auth = getAuth();
 
-  const currentUserId =
-    auth?.userId ||
-    auth?.id ||
-    auth?.user?.userId;
+  // const currentUserId = auth?.userId 
 
-  const canRateAcceptedOffer =
-  acceptedHireOffer &&
-  !ratedHireOfferIds.includes(
-    Number(acceptedHireOffer.hireOfferId)
-  );
+  // const canRateAcceptedOffer =
+  // acceptedHireOffer &&
+  // !ratedHireOfferIds.includes(
+  //   Number(acceptedHireOffer.hireOfferId)
+  // );
 
-  const handleOpenRatingModal = () => {
-    if (!acceptedHireOffer) return;
+  // const handleOpenRatingModal = () => {
+  //   if (!acceptedHireOffer) return;
 
-    setRatingHireOffer(
-      acceptedHireOffer
-    );
+  //   setRatingHireOffer(
+  //     acceptedHireOffer
+  //   );
 
-    setShowRatingModal(true);
-  };
+  //   setShowRatingModal(true);
+  // };
 
-    const handleSubmitReview = async ({
-    rating,
-    comment,
-  }) => {
-    if (!ratingHireOffer) {
-      return false;
-    }
+  //   const handleSubmitReview = async ({
+  //   rating,
+  //   comment,
+  // }) => {
+  //   if (!ratingHireOffer) {
+  //     return false;
+  //   }
 
-    try {
-      setSubmittingReview(true);
-      setError("");
+  //   try {
+  //     setSubmittingReview(true);
+  //     setError("");
 
-      const response =
-        await createReview({
-          Review_HireOfferId:
-            ratingHireOffer.hireOfferId,
+  //     const response =
+  //       await createReview({
+  //         Review_HireOfferId:
+  //           ratingHireOffer.hireOfferId,
 
-          Review_Rating:
-            rating,
+  //         Review_Rating:
+  //           rating,
 
-          Review_Comment:
-            comment,
-        });
+  //         Review_Comment:
+  //           comment,
+  //       });
 
-      if (!response.success) {
-        setError(
-          response.message ||
-          "Failed to submit review."
-        );
+  //     if (!response.success) {
+  //       setError(
+  //         response.message ||
+  //         "Failed to submit review."
+  //       );
 
-        return false;
-      }
+  //       return false;
+  //     }
 
-      setRatedHireOfferIds(
-        (current) => [
-          ...current,
-          Number(
-            ratingHireOffer.hireOfferId
-          ),
-        ]
-      );
+  //     setRatedHireOfferIds(
+  //       (current) => [
+  //         ...current,
+  //         Number(
+  //           ratingHireOffer.hireOfferId
+  //         ),
+  //       ]
+  //     );
 
-      setShowRatingModal(false);
+  //     setShowRatingModal(false);
 
-      setRatingHireOffer(null);
+  //     setRatingHireOffer(null);
 
-      return true;
+  //     return true;
 
-    } catch (error) {
+  //   } catch (error) {
 
-      setError(
-        error.response?.data?.message ||
-        "Failed to submit review."
-      );
+  //     setError(
+  //       error.response?.data?.message ||
+  //       "Failed to submit review."
+  //     );
 
-      return false;
+  //     return false;
 
-    } finally {
+  //   } finally {
 
-      setSubmittingReview(false);
+  //     setSubmittingReview(false);
 
-    }
-  };
+  //   }
+  // };
 
   useEffect(() => {
     selectedConversationIdRef.current =
@@ -428,7 +423,7 @@ export default function Messages() {
 
       <main className="messages-page">
 
-        <RatingModal
+        {/* <RatingModal
           show={showRatingModal}
           onClose={() => {
             setShowRatingModal(false);
@@ -444,7 +439,7 @@ export default function Messages() {
                   : activeConversation.clientFullName
               : ""
           }
-        />
+        /> */}
         
         <div className="messages-container">
 
@@ -518,12 +513,6 @@ export default function Messages() {
                     onBack={
                       handleBackToList
                     }
-                    onRate={
-                      handleOpenRatingModal
-                    }
-                    canRate={
-                      canRateAcceptedOffer
-                    }
                   />
 
 
@@ -535,12 +524,9 @@ export default function Messages() {
 
 
                  <ConversationTimeline
-                    items={
-                      activeConversation.items
-                    }
-                    onOfferUpdated={
-                      refreshActiveConversation
-                    }
+                   items={activeConversation.items}
+                    conversation={activeConversation}
+                    onOfferUpdated={refreshActiveConversation}
                   />
 
 

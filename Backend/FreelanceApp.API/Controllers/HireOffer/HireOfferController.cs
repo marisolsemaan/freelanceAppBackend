@@ -44,7 +44,7 @@ public class HireOfferController : ControllerBase
             var conversation= conversationResult.Data!;
 
             await _hubContext.Clients.Users(conversation.ClientId.ToString(), conversation.WorkerId.ToString())
-                .SendAsync("conversationUpdated",conversationId);
+                .SendAsync("ConversationUpdated",conversationId);
         }
 
         return Ok(result);
@@ -73,7 +73,41 @@ public class HireOfferController : ControllerBase
             var conversation= conversationResult.Data!;
 
             await _hubContext.Clients.Users(conversation.ClientId.ToString(), conversation.WorkerId.ToString())
-                .SendAsync("conversationUpdated",result.Data.HireOffer_ConversationId);
+                .SendAsync("ConversationUpdated",result.Data.HireOffer_ConversationId);
+        }
+
+        return Ok(result);
+    }
+
+    [HttpPatch("client/hire-offers/{hireOfferId}/complete")] // client close hire offer after worker's work completion
+    public async Task<IActionResult> CompleteHireOffer(int hireOfferId)
+    {
+        var clientId = GetUserId();
+
+        var result =
+            await _service.CompleteHireOfferAsync(
+                clientId,
+                hireOfferId);
+
+        if (!result.Success)
+            return BadRequest(result);
+
+        var conversationResult =
+            await _conversationService.GetConversationAsync(
+                clientId,
+                result.Data!.HireOffer_ConversationId);
+
+        if (conversationResult.Success)
+        {
+            var conversation = conversationResult.Data!;
+
+            await _hubContext.Clients
+                .Users(
+                    conversation.ClientId.ToString(),
+                    conversation.WorkerId.ToString())
+                .SendAsync(
+                    "ConversationUpdated",
+                    result.Data.HireOffer_ConversationId);
         }
 
         return Ok(result);

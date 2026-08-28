@@ -3,10 +3,7 @@ import { getAuth } from "../../utils/jwtStorage";
 export default function MessageBubble({ item }) {
   const auth = getAuth();
 
-  const currentUserId =
-    auth?.userId ||
-    auth?.id ||
-    auth?.user?.userId;
+  const currentUserId = auth?.userId 
 
   const isMine =
     Number(item.message.senderId) ===

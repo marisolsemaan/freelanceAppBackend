@@ -131,6 +131,48 @@ public class HireOfferService : IHireOfferService
                     Message = "This job post is closed."
                 };
             }
+            // send one hire offer at a time until worker update status so later when we want to close a job (same job post)
+            const string activeOfferSql = """
+                SELECT COUNT(1)
+                FROM tbl_HireOffer
+                WHERE HireOffer_ConversationId =
+                    @ConversationId
+                AND HireOffer_JobPostId =
+                    @JobPostId
+                AND HireOffer_Status IN
+                (
+                    @PendingStatus,
+                    @AcceptedStatus
+                );
+                """;
+
+            var activeOfferCount =
+                await connection.ExecuteScalarAsync<int>(
+                    activeOfferSql,
+                    new
+                    {
+                        ConversationId = conversationId,
+
+                        JobPostId =
+                            request.HireOffer_JobPostId.Value,
+
+                        PendingStatus =
+                            (short)HireOfferStatus.Pending,
+
+                        AcceptedStatus =
+                            (short)HireOfferStatus.Accepted
+                    }
+                );
+
+            if (activeOfferCount > 0)
+            {
+                return new ApiResponse<HireOfferResp>
+                {
+                    Success = false,
+                    Message =
+                        "There is already an active hire offer for this job post in this conversation."
+                };
+            }
         }
 
         // create the hire offer speciall card in the conversation between worker and client
@@ -314,6 +356,7 @@ public class HireOfferService : IHireOfferService
             SELECT
                 HireOffer_Id,
                 HireOffer_ConversationId,
+                Conversation_WorkerId HireOffer_WorkerId,
                 HireOffer_JobPostId,
                 HireOffer_Title,
                 HireOffer_Price,
@@ -321,6 +364,8 @@ public class HireOfferService : IHireOfferService
                 HireOffer_Status,
                 HireOffer_OfferedAt
             FROM tbl_HireOffer
+            INNER JOIN tbl_Conversation
+                ON Conversation_Id = HireOffer_ConversationId
             WHERE HireOffer_Id = @HireOfferId;
             """;
 
@@ -337,5 +382,199 @@ public class HireOfferService : IHireOfferService
                 : "Hire offer rejected successfully.",
             Data = updatedOffer
         };
+    }
+
+    public async Task<ApiResponse<HireOfferResp>> CompleteHireOfferAsync(int clientId,int hireOfferId)
+    {
+        var isVerified =await _verificationService.IsUserVerifiedAsync(clientId);
+
+        if (!isVerified)
+        {
+            return new ApiResponse<HireOfferResp>
+            {
+                Success = false,
+                Message = "Your account must be verified before completing a hire offer."
+            };
+        }
+
+        await using var connection =_dbConnection.CreateConnection();
+
+        await connection.OpenAsync();
+
+        await using var transaction =
+            await connection.BeginTransactionAsync();
+
+        try
+        {
+            const string offerSql = """
+                SELECT
+                    HireOffer_Id,
+                    HireOffer_ConversationId,
+                    HireOffer_JobPostId,
+                    HireOffer_Title,
+                    HireOffer_Price,
+                    HireOffer_Status,
+                    HireOffer_OfferedAt,
+                    HireOffer_ScopeTerms,
+
+                    Conversation_ClientId,
+                    Conversation_WorkerId
+
+                FROM tbl_HireOffer
+
+                INNER JOIN tbl_Conversation
+                    ON Conversation_Id = HireOffer_ConversationId
+
+                WHERE HireOffer_Id = @HireOfferId;
+                """;
+
+            var offer =
+                await connection.QuerySingleOrDefaultAsync<dynamic>(
+                    offerSql,
+                    new
+                    {
+                        HireOfferId = hireOfferId
+                    },
+                    transaction);
+
+            if (offer == null)
+            {
+                await transaction.RollbackAsync();
+
+                return new ApiResponse<HireOfferResp>
+                {
+                    Success = false,
+                    Message = "Hire offer not found."
+                };
+            }
+
+            if ((int)offer.Conversation_ClientId != clientId)
+            {
+                await transaction.RollbackAsync();
+
+                return new ApiResponse<HireOfferResp>
+                {
+                    Success = false,
+                    Message =
+                        "You are not the client of this hire offer."
+                };
+            }
+
+            if ((short)offer.HireOffer_Status !=
+                (short)HireOfferStatus.Accepted)
+            {
+                await transaction.RollbackAsync();
+
+                return new ApiResponse<HireOfferResp>
+                {
+                    Success = false,
+                    Message = "Only an accepted hire offer can be completed."
+                };
+            }
+
+            const string completeOfferSql = """
+                UPDATE tbl_HireOffer
+                SET HireOffer_Status = @CompletedStatus
+                WHERE HireOffer_Id = @HireOfferId
+                AND HireOffer_Status = @AcceptedStatus;
+                """;
+
+            var affectedRows =
+                await connection.ExecuteAsync(
+                    completeOfferSql,
+                    new
+                    {
+                        HireOfferId = hireOfferId,
+
+                        CompletedStatus =
+                            (short)HireOfferStatus.Completed,
+
+                        AcceptedStatus =
+                            (short)HireOfferStatus.Accepted
+                    },
+                    transaction);
+
+            if (affectedRows == 0)
+            {
+                await transaction.RollbackAsync();
+
+                return new ApiResponse<HireOfferResp>
+                {
+                    Success = false,
+                    Message =
+                        "This hire offer could not be completed."
+                };
+            }
+
+            // If this offer came from a job post,
+            // close only that job post inside this conversation.
+            if (offer.HireOffer_JobPostId != null)
+            {
+                const string closeConversationJobPostSql = """
+                    UPDATE tbl_JobPostConversation
+                    SET JobPostConversation_IsActive = 1
+                    WHERE JobPostConversation_ConversationId =
+                        @ConversationId
+                    AND JobPostConversation_JobPostId =
+                        @JobPostId;
+                    """;
+
+                await connection.ExecuteAsync(
+                    closeConversationJobPostSql,
+                    new
+                    {
+                        ConversationId =
+                            (int)offer.HireOffer_ConversationId,
+
+                        JobPostId =
+                            (int)offer.HireOffer_JobPostId
+                    },
+                    transaction);
+            }
+
+            await transaction.CommitAsync();
+
+            var result = new HireOfferResp
+            {
+                HireOffer_Id = offer.HireOffer_Id,
+                HireOffer_ConversationId =
+                    offer.HireOffer_ConversationId,
+
+                HireOffer_JobPostId =
+                    offer.HireOffer_JobPostId,
+
+                HireOffer_Title =
+                    offer.HireOffer_Title,
+
+                HireOffer_Price =
+                    offer.HireOffer_Price,
+
+                HireOffer_ScopeTerms =
+                    offer.HireOffer_ScopeTerms,
+
+                HireOffer_Status =
+                    HireOfferStatus.Completed,
+
+                HireOffer_OfferedAt =
+                    offer.HireOffer_OfferedAt
+            };
+
+            return new ApiResponse<HireOfferResp>
+            {
+                Success = true,
+                Message = "Hire offer completed successfully.",
+                Data = result
+            };
+        }
+        catch (Exception ex)
+        {
+            await transaction.RollbackAsync();
+
+            return new ApiResponse<HireOfferResp>
+            {
+                Success = false,
+                Message = $"Failed to complete hire offer. {ex.Message}"
+            };
+        }
     }
 }

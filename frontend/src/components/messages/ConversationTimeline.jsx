@@ -7,6 +7,9 @@ import { useEffect, useRef } from "react";
 export default function ConversationTimeline({
   items,
   onOfferUpdated,
+  // onCompleteOffer,
+  // onRateOffer,
+  conversation,
 }) {
   const timelineRef = useRef(null);
   const previousItemCountRef = useRef(0);
@@ -80,6 +83,9 @@ export default function ConversationTimeline({
                 key={key}
                 item={item}
                 onOfferUpdated={onOfferUpdated}
+                // onCompleteOffer={onCompleteOffer}
+                // onRateOffer={onRateOffer}
+                conversation={conversation}
               />
             );
 

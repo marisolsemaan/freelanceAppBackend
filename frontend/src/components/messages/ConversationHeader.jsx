@@ -5,22 +5,13 @@ import { getAuth } from "../../utils/jwtStorage";
 import HireOfferModal from "./HireOfferModal";
 
 
-export default function ConversationHeader({
-  conversation,
-  onBack,
-  onOfferCreated,
-  onRate,
-  canRate,
-}) {
+export default function ConversationHeader({conversation, onBack, }) {
   const [showHireModal, setShowHireModal] = useState(false);
 
 
   const auth = getAuth();
 
-  const currentUserId =
-    auth?.userId ||
-    auth?.id ||
-    auth?.user?.userId;
+  const currentUserId = auth?.userId 
 
 
   const isCurrentUserClient =
@@ -117,12 +108,6 @@ export default function ConversationHeader({
             </button>
           )}
 
-          {canRate && (<button type="button" className="btn btn-outline-primary btn-sm" onClick={onRate}>
-              <i className="bi bi-star me-1"></i>
-              <span className="d-none d-sm-inline">Rate</span>
-          </button>)}
-
-
           <button
             type="button"
             className="btn btn-outline-secondary btn-sm"
@@ -143,9 +128,9 @@ export default function ConversationHeader({
           onClose={() =>
             setShowHireModal(false)
           }
-          onOfferCreated={
-            onOfferCreated
-          }
+          // onOfferCreated={
+          //   onOfferCreated
+          // }
         />
       )}
 

@@ -6,6 +6,7 @@ export default function RatingModal({
   onSubmit,
   submitting,
   otherUserName,
+  hireOfferTitle,
 }) {
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
@@ -75,7 +76,14 @@ export default function RatingModal({
 
         <p className="rating-modal-description">
           How was your experience with{" "}
-          <strong>{otherUserName}</strong>?
+          <strong>{otherUserName}</strong>
+          {hireOfferTitle && (
+            <>
+              {" "}on{" "}
+              <strong>{hireOfferTitle}</strong>
+            </>
+          )}
+          ?
         </p>
 
         <form onSubmit={handleSubmit}>

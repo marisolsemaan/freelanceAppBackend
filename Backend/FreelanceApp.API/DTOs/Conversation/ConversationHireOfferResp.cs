@@ -1,3 +1,5 @@
+using FreelanceApp.API.Enums;
+
 namespace FreelanceApp.API.DTOs.Conversation;
 
 public class ConversationHireOfferResp
@@ -7,8 +9,9 @@ public class ConversationHireOfferResp
     public int? JobPostId { get; set; }
     public string OfferTitle { get; set; } = null!;
     public decimal OfferPrice { get; set; }
-    public string ScopeTerms { get; set; } = null!;
-    public int OfferStatus { get; set; }
+    public string? ScopeTerms { get; set; } = null!;
+    public HireOfferStatus OfferStatus { get; set; }
     public bool IsRead { get; set; }
+    public bool HasCurrentUserReviewed { get; set; }
     public DateTime CreatedAt { get; set; }
 }

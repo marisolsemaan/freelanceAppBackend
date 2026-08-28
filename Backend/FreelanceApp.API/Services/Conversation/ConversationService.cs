@@ -262,14 +262,16 @@ public class ConversationService : IConversationService
 
         const string jobPostsSql = """
             SELECT
-                JobPost_Id AS JobPostId,
-                JobPost_Title AS JobPostTitle,
-                JobPost_Price AS JobPostPrice,
+                JobPost_Id  JobPostId,
+                JobPost_Title  JobPostTitle,
+                JobPost_Price  JobPostPrice,
 
-                Profession_Title AS JobPostProfession,
-                City_Name AS JobPostCity,
+                Profession_Title  JobPostProfession,
+                City_Name JobPostCity,
 
-                JobPostConversation_CreatedAt AS CreatedAt
+                JobPostConversation_IsActive IsClosed,
+
+                JobPostConversation_CreatedAt  CreatedAt
 
             FROM tbl_JobPostConversation
 
@@ -324,15 +326,25 @@ public class ConversationService : IConversationService
         const string offersSql = """
             SELECT
                 HireOffer_Id HireOfferId,
-                Conversation_ClientId AS SenderId,
-                HireOffer_OfferedAt AS CreatedAt,
+                Conversation_ClientId  SenderId,
+                HireOffer_OfferedAt  CreatedAt,
 
                 HireOffer_JobPostId JobPostId,
                 HireOffer_Title OfferTitle,
                 HireOffer_Price OfferPrice,
                 HireOffer_ScopeTerms ScopeTerms,
                 HireOffer_Status OfferStatus,
-                IsRead 
+                IsRead ,
+
+                Case 
+                    When Exists ( 
+                        Select 1 From tbl_Review
+                        Where Review_HireOfferId=HireOffer_Id 
+                        And Review_ReviewerId=@UserId
+                    )
+                    then cast(1 As BIT)
+                    Else cast(0 AS BIT)
+                End AS HasCurrentUserReviewed
 
             FROM tbl_HireOffer 
 
@@ -345,7 +357,9 @@ public class ConversationService : IConversationService
         var offers =
             await connection.QueryAsync<ConversationHireOfferResp>(
                 offersSql,
-                new { ConversationId = conversationId });
+                new { ConversationId = conversationId,
+                      UserId= userId
+                });
 
         var offerItems= offers.Select(offer=>new ConversationItemResp{
             Type="HireOffer",
@@ -546,116 +560,116 @@ public class ConversationService : IConversationService
 
     public async Task<ApiResponse<List<ConversationListItemResp>>> GetUserConversationsAsync(int userId)
     {
-    using var connection = _dbConnection.CreateConnection();
+        using var connection = _dbConnection.CreateConnection();
 
-    const string sql = """
-        SELECT
-            Conversation_Id,
+        const string sql = """
+            SELECT
+                Conversation_Id,
 
-            CASE
-                WHEN Conversation_ClientId = @UserId
-                    THEN Conversation_WorkerId
-                ELSE Conversation_ClientId
-            END AS OtherUser_Id,
-
-            otherUser.User_FullName AS OtherUser_FullName,
-
-            otherUser.User_Role AS OtherUser_Role,
-
-            Conversation_LastMessageAt,
-
-            unread.UnreadCount,
-
-            activity.LastActivityType,
-
-            activity.LastMessage
-
-        FROM tbl_Conversation 
-
-        INNER JOIN tbl_User otherUser
-            ON otherUser.User_Id =
                 CASE
                     WHEN Conversation_ClientId = @UserId
                         THEN Conversation_WorkerId
                     ELSE Conversation_ClientId
-                END
+                END AS OtherUser_Id,
 
-        OUTER APPLY
-        (
-            SELECT COUNT(*) AS UnreadCount
-            FROM tbl_Message 
-            WHERE Message_ConversationId = Conversation_Id
-              AND Message_SenderId != @UserId
-              AND Message_IsRead = 0
-        ) unread
+                otherUser.User_FullName AS OtherUser_FullName,
 
-        OUTER APPLY
-        (
-            SELECT TOP 1
-                x.LastActivityType,
-                x.LastMessage
-            FROM
+                otherUser.User_Role AS OtherUser_Role,
+
+                Conversation_LastMessageAt,
+
+                unread.UnreadCount,
+
+                activity.LastActivityType,
+
+                activity.LastMessage
+
+            FROM tbl_Conversation 
+
+            INNER JOIN tbl_User otherUser
+                ON otherUser.User_Id =
+                    CASE
+                        WHEN Conversation_ClientId = @UserId
+                            THEN Conversation_WorkerId
+                        ELSE Conversation_ClientId
+                    END
+
+            OUTER APPLY
             (
-                SELECT
-                    Message_SentAt AS ActivityDate,
-                    'Message' AS LastActivityType,
-                    Message_Content AS LastMessage
+                SELECT COUNT(*) AS UnreadCount
                 FROM tbl_Message 
                 WHERE Message_ConversationId = Conversation_Id
+                AND Message_SenderId != @UserId
+                AND Message_IsRead = 0
+            ) unread
 
-                UNION ALL
+            OUTER APPLY
+            (
+                SELECT TOP 1
+                    x.LastActivityType,
+                    x.LastMessage
+                FROM
+                (
+                    SELECT
+                        Message_SentAt AS ActivityDate,
+                        'Message' AS LastActivityType,
+                        Message_Content AS LastMessage
+                    FROM tbl_Message 
+                    WHERE Message_ConversationId = Conversation_Id
 
-                SELECT
-                    JobPostConversation_CreatedAt AS ActivityDate,
-                    'JobPost' AS LastActivityType,
-                    CONCAT(
-                        'Connected to ',
-                        JobPost_Title
-                    ) AS LastMessage
-                FROM tbl_JobPostConversation 
-                INNER JOIN tbl_JobPost 
-                    ON JobPost_Id = JobPostConversation_JobPostId
-                WHERE JobPostConversation_ConversationId =
-                      Conversation_Id
+                    UNION ALL
 
-                UNION ALL
+                    SELECT
+                        JobPostConversation_CreatedAt AS ActivityDate,
+                        'JobPost' AS LastActivityType,
+                        CONCAT(
+                            'Connected to ',
+                            JobPost_Title
+                        ) AS LastMessage
+                    FROM tbl_JobPostConversation 
+                    INNER JOIN tbl_JobPost 
+                        ON JobPost_Id = JobPostConversation_JobPostId
+                    WHERE JobPostConversation_ConversationId =
+                        Conversation_Id
 
-                SELECT
-                    HireOffer_OfferedAt AS ActivityDate,
-                    'HireOffer' AS LastActivityType,
-                    CONCAT(
-                        'Hire offer: ',
-                        HireOffer_Title
-                    ) AS LastMessage
-                FROM tbl_HireOffer 
-                WHERE HireOffer_ConversationId = Conversation_Id
+                    UNION ALL
 
-            ) x
-            ORDER BY x.ActivityDate DESC
-        ) activity
+                    SELECT
+                        HireOffer_OfferedAt AS ActivityDate,
+                        'HireOffer' AS LastActivityType,
+                        CONCAT(
+                            'Hire offer: ',
+                            HireOffer_Title
+                        ) AS LastMessage
+                    FROM tbl_HireOffer 
+                    WHERE HireOffer_ConversationId = Conversation_Id
 
-        WHERE
-            Conversation_ClientId = @UserId
-            OR Conversation_WorkerId = @UserId
+                ) x
+                ORDER BY x.ActivityDate DESC
+            ) activity
 
-        ORDER BY
-            Conversation_LastMessageAt DESC;
-        """;
+            WHERE
+                Conversation_ClientId = @UserId
+                OR Conversation_WorkerId = @UserId
 
-    var conversations =
-        (
-            await connection.QueryAsync<ConversationListItemResp>(
-                sql,
-                new { UserId = userId }
-            )
-        ).ToList();
+            ORDER BY
+                Conversation_LastMessageAt DESC;
+            """;
 
-    return new ApiResponse<List<ConversationListItemResp>>
-    {
-        Success = true,
-        Message = "Conversations retrieved successfully.",
-        Data = conversations
-    };
+        var conversations =
+            (
+                await connection.QueryAsync<ConversationListItemResp>(
+                    sql,
+                    new { UserId = userId }
+                )
+            ).ToList();
+
+        return new ApiResponse<List<ConversationListItemResp>>
+        {
+            Success = true,
+            Message = "Conversations retrieved successfully.",
+            Data = conversations
+        };
     }
 
 }

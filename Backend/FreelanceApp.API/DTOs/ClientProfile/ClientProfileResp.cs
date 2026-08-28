@@ -10,6 +10,9 @@ public class ClientProfileResp
     public decimal User_AvgRating { get; set; }
 
     public int User_ReviewCount { get; set; }
+    
+    public byte[]? ProfilePhoto { get; set; }
+    public string? ProfilePhotoContentType { get; set; }
 
     public List<ReviewResp> Reviews { get; set; } = new();
 }

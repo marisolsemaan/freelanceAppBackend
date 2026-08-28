@@ -52,6 +52,7 @@ public class RatingService : IRatingService
             const string hireOfferSql = """
             SELECT
                 HireOffer_Id,
+                HireOffer_Title,
                 HireOffer_Status,
                 Conversation_ClientId,
                 Conversation_WorkerId
@@ -95,14 +96,14 @@ public class RatingService : IRatingService
                 };
             }
 
-            if ((short)hireOffer.HireOffer_Status != (short)HireOfferStatus.Accepted)
+            if ((short)hireOffer.HireOffer_Status != (short)HireOfferStatus.Completed)
             {
                 await transaction.RollbackAsync();
 
                 return new ApiResponse<ReviewResp>
                 {
                     Success = false,
-                    Message = "You can only review an accepted hire offer."
+                    Message = $"You can only review an accepted hire offer: {hireOffer.HireOffer_Title}"
                 };
             }
 

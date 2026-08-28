@@ -316,6 +316,11 @@
   padding: 16px;
 }
 
+.job-post-status{
+
+  margin-left: 15rem;
+
+}
 .job-post-message-body h6 {
   color: var(--FreelanceApp-text);
   font-weight: 700;
@@ -423,6 +428,10 @@
 
   .conversation-header .btn-outline-secondary {
     display: none;
+  }
+
+  .job-post-status{
+    margin-left: 7rem;
   }
 }
 

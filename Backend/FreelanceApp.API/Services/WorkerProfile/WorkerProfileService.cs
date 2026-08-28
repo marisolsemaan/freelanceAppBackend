@@ -191,50 +191,140 @@ public class WorkerProfileService : IWorkerProfileService
 
 
             //  Validate profession IDs
-            var professionIds = request.ProfessionIds
-                .Distinct()
-                .ToList();
+            // var professionIds = request.ProfessionIds
+            //     .Distinct()
+            //     .ToList();
 
-            const string professionValidationSql = """
-                SELECT COUNT(*)
-                FROM tbl_Profession
-                WHERE Profession_Id IN @ProfessionIds;
-                """;
+            // const string professionValidationSql = """
+            //     SELECT COUNT(*)
+            //     FROM tbl_Profession
+            //     WHERE Profession_Id IN @ProfessionIds;
+            //     """;
+            // var professionExist = await connection.ExecuteScalarAsync<int>(
+            //     professionValidationSql,
+            //     new
+            //     {
+            //         request.ProfessionId
+            //     },
+            //     transaction);
 
-            var professionCount = await connection.ExecuteScalarAsync<int>(
-                professionValidationSql,
-                new { ProfessionIds = professionIds },
-                transaction);
+            // if (professionExists == 0)
+            // {
+            //     await transaction.RollbackAsync();
 
-            if (professionCount != professionIds.Count)
-            {
-                await transaction.RollbackAsync();
-                return ("One or more profession IDs are invalid", null);
+            //     return ("Selected profession is invalid", null);
             }
+
+            // var professionCount = await connection.ExecuteScalarAsync<int>(
+            //     professionValidationSql,
+            //     new { ProfessionIds = professionIds },
+            //     transaction);
+
+            // if (professionCount != professionIds.Count)
+            // {
+            //     await transaction.RollbackAsync();
+            //     return ("One or more profession IDs are invalid", null);
+            // }
 
 
             // Validate city IDs
-            var cityIds = request.CityIds
-                .Distinct()
-                .ToList();
+            // var cityIds = request.CityIds
+            //     .Distinct()
+            //     .ToList();
 
-            const string cityValidationSql = """
-                SELECT COUNT(*)
-                FROM tbl_City
-                WHERE City_Id IN @CityIds;
-                """;
+            // const string cityValidationSql = """
+            //     SELECT COUNT(*)
+            //     FROM tbl_City
+            //     WHERE City_Id IN @CityIds;
+            //     """;
 
-            var cityCount = await connection.ExecuteScalarAsync<int>(
-                cityValidationSql,
-                new { CityIds = cityIds },
-                transaction);
+            // var cityCount = await connection.ExecuteScalarAsync<int>(
+            //     cityValidationSql,
+            //     new { CityIds = cityIds },
+            //     transaction);
 
-            if (cityCount != cityIds.Count)
-            {
-                await transaction.RollbackAsync();
-                return ("One or more city IDs are invalid", null);
-            }
+            // if (cityCount != cityIds.Count)
+            // {
+            //     await transaction.RollbackAsync();
+            //     return ("One or more city IDs are invalid", null);
+            // }
 
+
+            // const string professionValidationSql = """
+            //     SELECT COUNT(*)
+            //     FROM tbl_Profession
+            //     WHERE Profession_Id = @ProfessionId;
+            //     """;
+
+            // var professionExists = await connection.ExecuteScalarAsync<int>(
+            //     professionValidationSql,
+            //     new
+            //     {
+            //         request.ProfessionId
+            //     },
+            //     transaction);
+
+            // if (professionExists == 0)
+            // {
+            //     await transaction.RollbackAsync();
+
+            //     return ("Selected profession is invalid", null);
+            // }
+
+            // const string cityValidationSql = """
+            //     SELECT COUNT(*)
+            //     FROM tbl_City
+            //     WHERE City_Id = @CityId;
+            //     """;
+
+            // var cityExists = await connection.ExecuteScalarAsync<int>(
+            //     cityValidationSql,
+            //     new
+            //     {
+            //         request.CityId
+            //     },
+            //     transaction);
+
+            // if (cityExists == 0)
+            // {
+            //     await transaction.RollbackAsync();
+
+            //     return ("Selected city is invalid", null);
+            // }
+
+            const string deleteProfessionSql = """
+    DELETE FROM tbl_ProfessionWorker
+    WHERE ProfessionWorker_WorkerId = @UserId;
+    """;
+
+await connection.ExecuteAsync(
+    deleteProfessionSql,
+    new { UserId = userId },
+    transaction);
+
+const string insertProfessionSql = """
+    INSERT INTO tbl_ProfessionWorker
+    (
+        ProfessionWorker_WorkerId,
+        ProfessionWorker_ProfessionId
+    )
+    VALUES
+    (
+        @UserId,
+        @ProfessionId
+    );
+    """;
+
+await connection.ExecuteAsync(
+    insertProfessionSql,
+    new
+    {
+        UserId = userId,
+        ProfessionId = request.ProfessionId
+    },
+    transaction);
+
+    
 
             //  Check if the worker already has a profile
             const string profileCheckSql = """

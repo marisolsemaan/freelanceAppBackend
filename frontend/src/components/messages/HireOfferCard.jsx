@@ -1,62 +1,70 @@
-import {useState,} from "react";
+import {useEffect, useState,} from "react";
 
 import { getAuth } from "../../utils/jwtStorage";
 
-import { updateHireOfferStatus,} from "../../services/conversationService";
+import {   updateHireOfferStatus, completeHireOffer,createReview,} from "../../services/conversationService";
 
-export default function HireOfferCard({ item, onOfferUpdated,}) {
+import RatingModal from "../rating/RatingModal";
+
+export default function HireOfferCard({ item, onOfferUpdated, conversation,}) {
   const offer = item.hireOffer;
 
   const auth = getAuth();
 
-  const currentUserId =
-    auth?.userId ||
-    auth?.id ||
-    auth?.user?.userId;
+  const currentUserId = auth?.userId 
 
-  const isWorker =
-    Number(currentUserId) !== Number(offer.senderId);
+  const isCurrentUserClient =
+    Number(currentUserId) ===
+    Number(conversation.clientId);
 
-  const [updating, setUpdating] =
-    useState(false);
+  const isCurrentUserWorker =
+    Number(currentUserId) ===
+    Number(conversation.workerId);
 
-  const [error, setError] =
-    useState("");
+  const [updating, setUpdating] =useState(false);
 
+  const [error, setError] =useState("");
+
+  const [showRatingModal, setShowRatingModal] = useState(false);
+
+  const [submittingReview, setSubmittingReview] = useState(false);
+
+  const [hasReviewed, setHasReviewed] = useState( Boolean(offer?.hasCurrentUserReviewed) );
+
+  useEffect(()=>{
+    if (offer?.hasCurrentUserReviewed== true){
+      setHasReviewed(true);
+    }
+  }, [offer?.hasCurrentUserReviewed]);
+
+  
   if (!offer) {
     return null;
   }
 
+  const offerStatus = String(offer.offerStatus || "") .trim() .toLowerCase(); 
+  const isPending = offerStatus === "pending";
+  const isAccepted = offerStatus === "accepted";
+  const isRejected = offerStatus === "rejected";
+  const isCompleted = offerStatus === "completed"; 
+  const statusMap = { 
+    pending: { label: "Pending", icon: "bi-hourglass-split", className: "pending", },
+    accepted: { label: "Accepted", icon: "bi-check-circle-fill", className: "accepted", }, 
+    rejected: { label: "Rejected", icon: "bi-x-circle-fill", className: "rejected", }, 
+    completed: { label: "Completed", icon: "bi-check-circle-fill", className: "completed",},};
 
-  const statusMap = {
-    0: {
-      label: "Pending",
-      icon: "bi-hourglass-split",
-      className: "pending",
-    },
+  const status = statusMap[offerStatus] || statusMap.pending;
 
-    1: {
-      label: "Accepted",
-      icon: "bi-check-circle-fill",
-      className: "accepted",
-    },
+  console.log("HIRE OFFER DEBUG", {
+    currentUserId,
+    clientId: conversation.clientId,
+    workerId: conversation.workerId,
+    offerStatus: offer.offerStatus,
+    isCurrentUserClient,
+    isCurrentUserWorker,
+  });
 
-    2: {
-      label: "Rejected",
-      icon: "bi-x-circle-fill",
-      className: "rejected",
-    },
-  };
-
-
-  const status =
-    statusMap[offer.offerStatus] ||
-    statusMap[0];
-
-
-  const handleUpdateStatus = async (
-    newStatus
-  ) => {
+  const handleUpdateStatus = async (newStatus) => {
     try {
       setUpdating(true);
       setError("");
@@ -90,10 +98,84 @@ export default function HireOfferCard({ item, onOfferUpdated,}) {
     }
   };
 
+  const handleCompleteOffer = async () => {
+    try {
+      setUpdating(true);
+      setError("");
 
-  const isPending =
-    Number(offer.offerStatus) === 0;
+      const response =
+        await completeHireOffer(
+          offer.hireOfferId
+        );
 
+      if (!response.success) {
+        setError(
+          response.message ||
+          "Failed to complete this hire offer."
+        );
+
+        return;
+      }
+
+      onOfferUpdated?.(response.data);
+
+    } catch (error) {
+      setError(
+        error.response?.data?.message ||
+        "Failed to complete this hire offer."
+      );
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  const handleSubmitReview = async ({ rating, comment,}) => {
+    try {
+      setSubmittingReview(true);
+      setError("");
+
+      const response =
+        await createReview({
+          Review_HireOfferId:
+            offer.hireOfferId,
+
+          Review_Rating:
+            rating,
+
+          Review_Comment:
+            comment,
+        });
+
+      if (!response.success) {
+        setError(
+          response.message ||
+          `You already rated "${offer.offerTitle}".`
+        );
+
+        return false;
+      }
+      setHasReviewed(true);
+      setShowRatingModal(false);
+
+      await onOfferUpdated?.();
+
+      return true;
+
+    } catch (error) {
+      const message =
+        error.response?.data?.message;
+
+      setError(
+        message ||
+        `Unable to submit your review for "${offer.offerTitle}".`
+      );
+
+      return false;
+
+    } finally {
+      setSubmittingReview(false);
+    }
+  };
 
   return (
     <div className="hire-offer-timeline-wrapper">
@@ -158,68 +240,146 @@ export default function HireOfferCard({ item, onOfferUpdated,}) {
         </div>
 
 
-        <div className="hire-offer-card-footer">
+      <div className="hire-offer-card-footer">
 
-          {isPending ? (
-            <>
-              {isWorker ? (
-                <div className="hire-offer-actions">
+        {isPending && (
+          <>
+            {isCurrentUserWorker ? (
+              <div className="hire-offer-actions">
 
-                  <button
-                    type="button"
-                    className="btn btn-outline-danger"
-                    disabled={updating}
-                    onClick={() =>
-                      handleUpdateStatus(2)
-                    }
-                  >
-                    Reject
-                  </button>
+                <button
+                  type="button"
+                  className="btn btn-outline-danger"
+                  disabled={updating}
+                  onClick={() =>
+                    handleUpdateStatus(2)
+                  }
+                >
+                  Reject
+                </button>
+
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  disabled={updating}
+                  onClick={() =>
+                    handleUpdateStatus(1)
+                  }
+                >
+                  {updating ? (
+                    <>
+                      <span className="spinner-border spinner-border-sm me-2" />
+                      Updating...
+                    </>
+                  ) : (
+                    <>
+                      <i className="bi bi-check-lg me-1"></i>
+                      Accept Offer
+                    </>
+                  )}
+                </button>
+
+              </div>
+            ) : (
+              <div className="hire-offer-client-pending">
+                <i className="bi bi-hourglass-split"></i>
+                Waiting for worker response
+              </div>
+            )}
+          </>
+        )}
 
 
-                  <button
-                    type="button"
-                    className="btn btn-primary"
-                    disabled={updating}
-                    onClick={() =>
-                      handleUpdateStatus(1)
-                    }
-                  >
-                    {updating ? (
-                      <>
-                        <span className="spinner-border spinner-border-sm me-2" />
-                        Updating...
-                      </>
-                    ) : (
-                      <>
-                        <i className="bi bi-check-lg me-1"></i>
-                        Accept Offer
-                      </>
-                    )}
-                  </button>
+        {isAccepted && (
+          <div className="hire-offer-actions">
 
-                </div>
-              ) : (
-                <div className="hire-offer-client-pending">
-                  <i className="bi bi-hourglass-split"></i>
+            {isCurrentUserClient ? (
+              <button
+                type="button"
+                className="btn btn-primary"
+                disabled={updating}
+                onClick={handleCompleteOffer}
+              >
+                {updating ? (
+                  <>
+                    <span className="spinner-border spinner-border-sm me-2" />
+                    Completing...
+                  </>
+                ) : (
+                  <>
+                    <i className="bi bi-check2-circle me-1"></i>
+                    Mark as Complete
+                  </>
+                )}
+              </button>
+            ) : (
+              <div className="hire-offer-status accepted">
+                <i className="bi bi-briefcase-check-fill"></i>
+                Job in progress
+              </div>
+            )}
 
-                  Waiting for worker response
-                </div>
-              )}
-            </>
-          ) : (
-            <div
-              className={`hire-offer-status ${status.className}`}
-            >
-              <i className={`bi ${status.icon}`}></i>
+          </div>
+        )}
 
-              {status.label}
+
+        {isRejected && (
+          <div className="hire-offer-status rejected">
+            <i className="bi bi-x-circle-fill"></i>
+            Rejected
+          </div>
+        )}
+
+
+        {isCompleted && (
+          <div className="completed-offer-actions">
+
+            <div className="hire-offer-status completed">
+              <i className="bi bi-check-circle-fill"></i>
+              Completed
             </div>
-          )}
 
-        </div>
+            <button
+              type="button"
+              className={`btn ${ hasReviewed ? "btn-outline-secondary" : "btn-outline-primary" }`}
+              disabled={hasReviewed || submittingReview}
+              onClick={() =>{
+                if(hasReviewed) return;
+                setError("");
+                setShowRatingModal(true)
+              }}
+            >
+              <i className={`bi ${ hasReviewed ? "bi-star-fill" : "bi-star" } me-1`}></i>
+
+              {hasReviewed
+                ? "You rated this offer"
+                : "Rate"}
+            </button>
+
+          </div>
+        )}
 
       </div>
+
+      
+      </div>
+
+        <RatingModal
+          show={showRatingModal}
+          onClose={() => {
+            if (submittingReview) return;
+
+            setShowRatingModal(false);
+          }}
+          onSubmit={handleSubmitReview}
+          submitting={submittingReview}
+          otherUserName={
+            isCurrentUserClient
+              ? conversation.workerFullName
+              : conversation.clientFullName
+          }
+          hireOfferTitle={offer.offerTitle}
+        />
 
 
       {error && (
@@ -227,6 +387,7 @@ export default function HireOfferCard({ item, onOfferUpdated,}) {
           {error}
         </div>
       )}
+
 
     </div>
   );

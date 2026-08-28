@@ -8,9 +8,13 @@ public class UpdateWorkerProfileReq
 
     public string? Skills { get; set; }
 
-    public List<int> ProfessionIds { get; set; } = new();
+    public int ProfessionIds { get; set; } 
 
-    public List<int> CityIds { get; set; } = new();
+    public int CityIds { get; set; } 
 
-    public IFormFile? ProfilePhoto { get; set; }
+    // public List<int> ProfessionIds { get; set; } = new();
+
+    // public List<int> CityIds { get; set; } = new();
+
+    // public IFormFile? ProfilePhoto { get; set; }
 }

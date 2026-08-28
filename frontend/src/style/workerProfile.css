@@ -725,3 +725,124 @@
 .empty-reviews i {
   font-size: 1.5rem;
 }
+
+.profile-single-select {
+  width: 100%;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid var(--FreelanceApp-border);
+  border-radius: 7px;
+  background-color: var(--FreelanceApp-surface);
+  color: var(--FreelanceApp-text);
+  font-size: 0.9rem;
+  outline: none;
+}
+
+.profile-single-select:focus {
+  border-color: var(--FreelanceApp-primary);
+  box-shadow: 0 0 0 3px rgba(15, 159, 166, 0.1);
+}
+
+.profession-picker {
+  position: relative;
+  width: 100%;
+}
+
+.profession-picker > input {
+  width: 100%;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid var(--FreelanceApp-border);
+  border-radius: 7px;
+  background-color: var(--FreelanceApp-surface);
+  color: var(--FreelanceApp-text);
+  font-size: 0.9rem;
+  outline: none;
+}
+
+.profession-picker > input:focus {
+  border-color: var(--FreelanceApp-primary);
+  box-shadow: 0 0 0 3px rgba(15, 159, 166, 0.1);
+}
+
+.profession-dropdown {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 0.3rem);
+  left: 0;
+  right: 0;
+  max-height: 240px;
+  overflow-y: auto;
+  padding: 0.35rem;
+  border: 1px solid var(--FreelanceApp-border);
+  border-radius: 7px;
+  background-color: var(--FreelanceApp-surface);
+  box-shadow: var(--FreelanceApp-shadow);
+}
+
+.profession-option,
+.profession-add-option {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 0.7rem 0.75rem;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--FreelanceApp-text);
+  font-size: 0.875rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.profession-option:hover {
+  background-color: rgba(15, 159, 166, 0.08);
+  color: var(--FreelanceApp-primary-dark);
+}
+
+.profession-add-option {
+  gap: 0.5rem;
+  color: var(--FreelanceApp-primary-dark);
+  font-weight: 600;
+  border-top: 1px solid var(--FreelanceApp-border);
+  border-radius: 0;
+}
+
+.profession-add-option:hover {
+  background-color: rgba(15, 159, 166, 0.08);
+}
+
+.profession-empty {
+  padding: 0.8rem;
+  color: var(--FreelanceApp-secondary);
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.profile-error {
+  margin-bottom: 1rem;
+  padding: 0.8rem 1rem;
+  border: 1px solid rgba(220, 53, 69, 0.25);
+  border-radius: 7px;
+  background-color: rgba(220, 53, 69, 0.08);
+  color: var(--FreelanceApp-danger);
+  font-size: 0.875rem;
+}
+
+.save-profile-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: 7px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.save-profile-button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
