@@ -33,6 +33,7 @@ function Register() {
       [name]: value,
     }));
 
+    //clears the state error when the user input on the field
     setErrors((previous) => ({
       ...previous,
       [name]: "",
@@ -40,7 +41,7 @@ function Register() {
   };
 
   const handleIdFileChange = (e) => {
-    setIdFile(e.target.files[0] || null);
+    setIdFile(e.target.files[0] || null); // acesss the first file uploaded - updates the idfile state and clears any error message
 
     setErrors((previous) => ({
       ...previous,
@@ -66,17 +67,17 @@ function Register() {
 
     const handleSubmit = async (e) =>
   {
-    e.preventDefault();
+    e.preventDefault(); // prevent to submit again so it wont trigger a refresh and clear inputs
 
     const validationErrors = validateForm();
 
     setErrors(validationErrors);
 
-    if (Object.keys(validationErrors).length > 0) {
+    if (Object.keys(validationErrors).length > 0) { // is any missing fields error exist it stop from calling an api
         return;
     }
 
-    const data = new FormData();
+    const data = new FormData(); // needed to transfer binary data (for the documents uploaded) in a multi-form data api request endpoint
 
     data.append("FullName", formData.fullName.trim());
     data.append("Phone", formData.phone.trim());
@@ -87,7 +88,7 @@ function Register() {
     data.append("idFile", idFile);
     data.append("photoFile", photoFile);
 
-    if (Number(formData.role) === 2) {
+    if (Number(formData.role) === 2) { // append only the profession proof doc if the role is a worker
         data.append(
         "professionProofFile",
         professionProofFile
@@ -97,9 +98,9 @@ function Register() {
     try {
         setLoading(true);
 
-        const result = await registerUser(data);
+        const result = await registerUser(data); // wait for the backend response
 
-        saveAuth(result);
+        saveAuth(result); // store the users jwt payload and user info
 
         console.log("registration response:", result);
       
@@ -120,14 +121,14 @@ function Register() {
 
     } finally {
 
-      setLoading(false);
+      setLoading(false); 
     
     }
   };
 
 
   const validateForm = () => {
-    const newErrors = {};
+    const newErrors = {}; //key-value dictionary
 
     // check required fields
     if (!formData.fullName.trim()) {
@@ -174,7 +175,7 @@ function Register() {
         <div className="auth-card-body">
           <h2 className="auth-heading mb-2" >Create account</h2>
           {errors.server && ( <div className="auth-error"> {errors.server} </div> )}
-          <form onSubmit={handleSubmit} className="auth-form" noValidate>
+          <form onSubmit={handleSubmit} className="auth-form" noValidate> {/*noValidate the react will show validation not the html*/}
             {/* full name */}
             <div className="auth-field">
               <label htmlFor="fullName">
