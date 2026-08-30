@@ -1,5 +1,10 @@
 using FreelanceApp.API.Services.Lookup;
 using Microsoft.AspNetCore.Mvc;
+using FreelanceApp.API.Data;
+using Microsoft.AspNetCore.Authorization;
+using FreelanceApp.API.DTOs.WorkerProfile;
+using System.Security.Claims;
+using FreelanceApp.API.Helpers;
 
 namespace FreelanceApp.API.Controllers;
 
@@ -9,12 +14,9 @@ public class LookupController : ControllerBase
 {
     private readonly ILookupService _lookupService;
 
-    private readonly DbConnectionFactory _connection;
-
-    public LookupController(ILookupService lookupService, DBConnection c)
+    public LookupController(ILookupService lookupService)
     {
         _lookupService = lookupService;
-        _connection=c;
     }
 
     [HttpGet("professions")]
@@ -45,54 +47,30 @@ public class LookupController : ControllerBase
 
     [HttpPost("professions")]
     [Authorize]
-    public async Task<IActionResult> CreateProfession(
-        [FromBody] CreateProfessionReq request)
+    public async Task<IActionResult> CreateProfession( [FromBody] CreateProfessionReq request)
     {
-        if (string.IsNullOrWhiteSpace(request.Title))
+        var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+
+        if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out var workerId))
         {
-            return BadRequest(new
+            return Unauthorized(new
             {
-                message = "Profession title is required."
+                success = false,
+                message = "User ID not found."
             });
         }
 
-        var title = request.Title.Trim();
+        var result = await _lookupService.CreateProfessionAsync( request, workerId);
 
-        const string existingSql = """
-            SELECT 
-                Profession_Id,
-                Profession_Title
-            FROM tbl_Profession
-            WHERE LOWER(LTRIM(RTRIM(Profession_Title))) = LOWER(@Title);
-            """;
-
-        var existing = await _connection.QuerySingleOrDefaultAsync<ProfessionDto>(
-            existingSql,
-            new { Title = title });
-
-        if (existing != null)
+        if (!result.Success)
         {
-            return Ok(new
-            {
-                id = existing.Profession_Id,
-                title = existing.Profession_Title
-            });
+            return BadRequest(result);
         }
-
-        const string insertSql = """
-            INSERT INTO tbl_Profession (Profession_Title)
-            OUTPUT INSERTED.Profession_Id
-            VALUES (@Title);
-            """;
-
-        var professionId = await _connection.ExecuteScalarAsync<int>(
-            insertSql,
-            new { Title = title });
 
         return Ok(new
         {
-            id = professionId,
-            title = title
+            id = result.Data!.Profession_Id,
+            title = result.Data.Profession_Title
         });
     }
 }

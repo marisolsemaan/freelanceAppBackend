@@ -3,8 +3,8 @@ using FreelanceApp.API.Data;
 using FreelanceApp.API.DTOs.Rating;
 using FreelanceApp.API.DTOs.WorkerProfile;
 using FreelanceApp.API.Enums;
-using WorkerProfileModel = FreelanceApp.API.Models.WorkerProfile.WorkerProfile;
 using FreelanceApp.API.Models.Auth;
+using WorkerProfileModel = FreelanceApp.API.Models.WorkerProfile.WorkerProfile;
 
 namespace FreelanceApp.API.Services.WorkerProfile;
 
@@ -20,14 +20,15 @@ public class WorkerProfileService : IWorkerProfileService
     public async Task<(string message, GetWorkerProfileResp? profile)> GetWorkerProfileAsync(int workerId)
     {
         await using var connection = _db.CreateConnection();
+        await connection.OpenAsync();
 
-        // Get basic user information
+       //find worker
         const string userSql = """
             SELECT
                 User_Id,
                 User_FullName,
-                User_AvgRating,
-                User_ReviewCount
+                ISNULL(User_AvgRating, 0) AS User_AvgRating,
+                ISNULL(User_ReviewCount, 0) AS User_ReviewCount
             FROM tbl_User
             WHERE User_Id = @WorkerId
               AND User_Role = @Role;
@@ -35,13 +36,17 @@ public class WorkerProfileService : IWorkerProfileService
 
         var user = await connection.QuerySingleOrDefaultAsync<User>(
             userSql,
-            new { WorkerId = workerId, Role = (short)UserRole.Worker });
+            new
+            {
+                WorkerId = workerId,
+                Role = (short)UserRole.Worker
+            });
 
-        if (user is null)
-            return ("User not found", null);
+        if (user is null) {
+            return ("Worker not found", null);
+        }
 
-
-        // Get worker profile information
+        //worker profile
         const string workerProfileSql = """
             SELECT
                 WorkerProfile_HourlyRate,
@@ -57,131 +62,139 @@ public class WorkerProfileService : IWorkerProfileService
                 new { WorkerId = workerId });
 
         if (workerProfile is null)
+        {
             return ("Worker profile not found", null);
-
-
-        // Get professions
-        const string professionsSql = """
+        }
+        
+        const string professionSql = """
             SELECT
                 Profession_Id,
                 Profession_Title
             FROM tbl_ProfessionWorker 
             INNER JOIN tbl_Profession 
-                ON tbl_Profession.Profession_Id = tbl_ProfessionWorker.ProfessionWorker_ProfessionId
-            WHERE tbl_ProfessionWorker.ProfessionWorker_WorkerId = @WorkerId
+                ON Profession_Id = ProfessionWorker_ProfessionId
+            WHERE ProfessionWorker_WorkerId = @WorkerId;
             """;
 
-        var professions = (await connection.QueryAsync<ProfessionDto>(
-            professionsSql,
-            new { WorkerId = workerId }))
+        var professions =
+            (await connection.QueryAsync<ProfessionDto>(
+                professionSql,
+                new { WorkerId = workerId }))
             .ToList();
 
-
-        // Get cities
-        const string citiesSql = """
+        //city query
+        const string citySql = """
             SELECT
                 City_Id,
                 City_Name
             FROM tbl_CityWorker 
             INNER JOIN tbl_City 
-                ON tbl_City.City_Id = tbl_CityWorker.CityWorker_CityId
-            WHERE tbl_CityWorker.CityWorker_WorkerId = @WorkerId
+                ON City_Id = CityWorker_CityId
+            WHERE CityWorker_WorkerId = @WorkerId;
             """;
 
-        var cities = (await connection.QueryAsync<CityDto>(
-            citiesSql,
-            new { WorkerId = workerId }))
+        var cities =
+            (await connection.QueryAsync<CityDto>(
+                citySql,
+                new { WorkerId = workerId }))
             .ToList();
 
-
-        // Get profile photo
+        // retrieve photo from the dbase
         const string photoSql = """
             SELECT
                 Document_FileData,
                 Document_ContentType
             FROM tbl_Document
             WHERE Document_UserId = @WorkerId
-              AND Document_Type = @DocumentType
+              AND Document_Type = @DocumentType;
             """;
 
-        var photo = await connection.QuerySingleOrDefaultAsync<ProfilePhotoData>(
-            photoSql,
-            new
-            {
-                WorkerId = workerId,
-                DocumentType = (short)DocumentType.Photo
-            });
-
-
-        // Get reviews
+        var photo =
+            await connection.QuerySingleOrDefaultAsync<ProfilePhotoData>(
+                photoSql,
+                new
+                {
+                    WorkerId = workerId,
+                    DocumentType = (short)DocumentType.Photo
+                });
+        
+        //retrieve the reviews left for this user worker
         const string reviewsSql = """
             SELECT
                 Review_Id,
                 Review_ReviewerId,
-                User_FullName as ReviewerFullName,
+                User_FullName AS ReviewerFullName,
                 Review_Rating,
                 Review_Comment,
-                Review_CreatedAt 
-            FROM tbl_Review Inner Join tbl_User 
-            on User_Id=Review_ReviewerId
+                Review_CreatedAt
+            FROM tbl_Review 
+            INNER JOIN tbl_User 
+                ON User_Id = Review_ReviewerId
             WHERE Review_RevieweeId = @WorkerId
             ORDER BY Review_CreatedAt DESC;
             """;
 
-        var reviews = (await connection.QueryAsync<ReviewResp>(
-            reviewsSql,
-            new { WorkerId = workerId }))
+        var reviews =
+            (await connection.QueryAsync<ReviewResp>(
+                reviewsSql,
+                new { WorkerId = workerId }))
             .ToList();
 
+        return (
+            "Profile found",
+            new GetWorkerProfileResp
+            {
+                UserId = user.User_Id,
+                FullName = user.User_FullName,
 
-        // Build the response
-        return ("profile found", new GetWorkerProfileResp
-        {
-            UserId = user.User_Id,
-            FullName = user.User_FullName,
-            
-            ProfilePhoto = photo?.Document_FileData,
-            ProfilePhotoContentType = photo?.Document_ContentType,
+                ProfilePhoto = photo?.Document_FileData,
+                ProfilePhotoContentType = photo?.Document_ContentType,
 
-            HourlyRate = workerProfile.WorkerProfile_HourlyRate,
-            AboutMe = workerProfile.WorkerProfile_AboutMe,
-            Skills = workerProfile.WorkerProfile_Skills,
+                HourlyRate = workerProfile.WorkerProfile_HourlyRate,
 
-            Professions = professions,
-            Cities = cities,
+                AboutMe = workerProfile.WorkerProfile_AboutMe,
 
-            AverageRating = user.User_AvgRating,
-            ReviewCount = user.User_ReviewCount,
-            Reviews = reviews,
+                Skills = workerProfile.WorkerProfile_Skills,
 
-        });
+                Professions = professions,
+                Cities = cities,
+
+                AverageRating = user.User_AvgRating,
+                ReviewCount = user.User_ReviewCount,
+
+                Reviews = reviews
+            }
+        );
     }
+
 
     public async Task<(string message, GetWorkerProfileResp? profile)> UpdateWorkerProfileAsync(int userId, UpdateWorkerProfileReq request)
     {
         await using var connection = _db.CreateConnection();
         await connection.OpenAsync();
 
-        await using var transaction = await connection.BeginTransactionAsync();
+        await using var transaction =
+            await connection.BeginTransactionAsync();
 
         try
         {
-            // Check that the user exists and is a Worker
+           //worker is in the table found
             const string workerCheckSql = """
                 SELECT COUNT(1)
                 FROM tbl_User
                 WHERE User_Id = @UserId
-                AND User_Role = @WorkerRole;
+                  AND User_Role = @WorkerRole;
                 """;
 
-            var workerExists = await connection.ExecuteScalarAsync<int>(
-                workerCheckSql,
-                new
-                {
-                    UserId = userId,
-                    WorkerRole = (short)UserRole.Worker
-                },
-                transaction);
+            var workerExists =
+                await connection.ExecuteScalarAsync<int>(
+                    workerCheckSql,
+                    new
+                    {
+                        UserId = userId,
+                        WorkerRole = (short)UserRole.Worker
+                    },
+                    transaction);
 
             if (workerExists == 0)
             {
@@ -189,157 +202,71 @@ public class WorkerProfileService : IWorkerProfileService
                 return ("Worker not found", null);
             }
 
+            //check for valiid profession
+            const string professionCheckSql = """
+                SELECT COUNT(1)
+                FROM tbl_Profession
+                WHERE Profession_Id = @ProfessionId;
+                """;
 
-            //  Validate profession IDs
-            // var professionIds = request.ProfessionIds
-            //     .Distinct()
-            //     .ToList();
+            var professionExists =
+                await connection.ExecuteScalarAsync<int>(
+                    professionCheckSql,
+                    new
+                    {
+                        ProfessionId = request.ProfessionId
+                    },
+                    transaction);
 
-            // const string professionValidationSql = """
-            //     SELECT COUNT(*)
-            //     FROM tbl_Profession
-            //     WHERE Profession_Id IN @ProfessionIds;
-            //     """;
-            // var professionExist = await connection.ExecuteScalarAsync<int>(
-            //     professionValidationSql,
-            //     new
-            //     {
-            //         request.ProfessionId
-            //     },
-            //     transaction);
+            if (professionExists == 0)
+            {
+                await transaction.RollbackAsync();
 
-            // if (professionExists == 0)
-            // {
-            //     await transaction.RollbackAsync();
-
-            //     return ("Selected profession is invalid", null);
+                return (
+                    "Selected profession does not exist.",
+                    null
+                );
             }
 
-            // var professionCount = await connection.ExecuteScalarAsync<int>(
-            //     professionValidationSql,
-            //     new { ProfessionIds = professionIds },
-            //     transaction);
+            //check for city existence
+            const string cityCheckSql = """
+                SELECT COUNT(1)
+                FROM tbl_City
+                WHERE City_Id = @CityId;
+                """;
 
-            // if (professionCount != professionIds.Count)
-            // {
-            //     await transaction.RollbackAsync();
-            //     return ("One or more profession IDs are invalid", null);
-            // }
+            var cityExists =
+                await connection.ExecuteScalarAsync<int>(
+                    cityCheckSql,
+                    new
+                    {
+                        CityId = request.CityId
+                    },
+                    transaction);
 
+            if (cityExists == 0)
+            {
+                await transaction.RollbackAsync();
 
-            // Validate city IDs
-            // var cityIds = request.CityIds
-            //     .Distinct()
-            //     .ToList();
+                return (
+                    "Selected city does not exist.",
+                    null
+                );
+            }
 
-            // const string cityValidationSql = """
-            //     SELECT COUNT(*)
-            //     FROM tbl_City
-            //     WHERE City_Id IN @CityIds;
-            //     """;
-
-            // var cityCount = await connection.ExecuteScalarAsync<int>(
-            //     cityValidationSql,
-            //     new { CityIds = cityIds },
-            //     transaction);
-
-            // if (cityCount != cityIds.Count)
-            // {
-            //     await transaction.RollbackAsync();
-            //     return ("One or more city IDs are invalid", null);
-            // }
-
-
-            // const string professionValidationSql = """
-            //     SELECT COUNT(*)
-            //     FROM tbl_Profession
-            //     WHERE Profession_Id = @ProfessionId;
-            //     """;
-
-            // var professionExists = await connection.ExecuteScalarAsync<int>(
-            //     professionValidationSql,
-            //     new
-            //     {
-            //         request.ProfessionId
-            //     },
-            //     transaction);
-
-            // if (professionExists == 0)
-            // {
-            //     await transaction.RollbackAsync();
-
-            //     return ("Selected profession is invalid", null);
-            // }
-
-            // const string cityValidationSql = """
-            //     SELECT COUNT(*)
-            //     FROM tbl_City
-            //     WHERE City_Id = @CityId;
-            //     """;
-
-            // var cityExists = await connection.ExecuteScalarAsync<int>(
-            //     cityValidationSql,
-            //     new
-            //     {
-            //         request.CityId
-            //     },
-            //     transaction);
-
-            // if (cityExists == 0)
-            // {
-            //     await transaction.RollbackAsync();
-
-            //     return ("Selected city is invalid", null);
-            // }
-
-            const string deleteProfessionSql = """
-    DELETE FROM tbl_ProfessionWorker
-    WHERE ProfessionWorker_WorkerId = @UserId;
-    """;
-
-await connection.ExecuteAsync(
-    deleteProfessionSql,
-    new { UserId = userId },
-    transaction);
-
-const string insertProfessionSql = """
-    INSERT INTO tbl_ProfessionWorker
-    (
-        ProfessionWorker_WorkerId,
-        ProfessionWorker_ProfessionId
-    )
-    VALUES
-    (
-        @UserId,
-        @ProfessionId
-    );
-    """;
-
-await connection.ExecuteAsync(
-    insertProfessionSql,
-    new
-    {
-        UserId = userId,
-        ProfessionId = request.ProfessionId
-    },
-    transaction);
-
-    
-
-            //  Check if the worker already has a profile
+            //if profile created before modify row, if not create a new profile row for this worker
             const string profileCheckSql = """
                 SELECT COUNT(1)
                 FROM tbl_WorkerProfile
                 WHERE WorkerProfile_UserId = @UserId;
                 """;
 
-            var profileExists = await connection.ExecuteScalarAsync<int>(
-                profileCheckSql,
-                new { UserId = userId },
-                transaction);
+            var profileExists =
+                await connection.ExecuteScalarAsync<int>(
+                    profileCheckSql,
+                    new { UserId = userId },
+                    transaction);
 
-
-            // If profile exists → UPDATE
             if (profileExists > 0)
             {
                 const string updateProfileSql = """
@@ -362,7 +289,6 @@ await connection.ExecuteAsync(
                     },
                     transaction);
             }
-            //  If profile does not exist → INSERT
             else
             {
                 const string insertProfileSql = """
@@ -394,20 +320,17 @@ await connection.ExecuteAsync(
                     transaction);
             }
 
-
-            // Remove existing professions
-            const string deleteProfessionsSql = """
+           //replace profession when user edit and change it
+            const string deleteProfessionSql = """
                 DELETE FROM tbl_ProfessionWorker
                 WHERE ProfessionWorker_WorkerId = @UserId;
                 """;
 
             await connection.ExecuteAsync(
-                deleteProfessionsSql,
+                deleteProfessionSql,
                 new { UserId = userId },
                 transaction);
 
-
-            // Add selected professions
             const string insertProfessionSql = """
                 INSERT INTO tbl_ProfessionWorker
                 (
@@ -421,32 +344,26 @@ await connection.ExecuteAsync(
                 );
                 """;
 
-            foreach (var professionId in professionIds)
-            {
-                await connection.ExecuteAsync(
-                    insertProfessionSql,
-                    new
-                    {
-                        UserId = userId,
-                        ProfessionId = professionId
-                    },
-                    transaction);
-            }
+            await connection.ExecuteAsync(
+                insertProfessionSql,
+                new
+                {
+                    UserId = userId,
+                    ProfessionId = request.ProfessionId
+                },
+                transaction);
 
-
-            // Remove existing cities
-            const string deleteCitiesSql = """
+            //same for city replace value depending on user/worker change
+            const string deleteCitySql = """
                 DELETE FROM tbl_CityWorker
                 WHERE CityWorker_WorkerId = @UserId;
                 """;
 
             await connection.ExecuteAsync(
-                deleteCitiesSql,
+                deleteCitySql,
                 new { UserId = userId },
                 transaction);
 
-
-            // Add selected cities
             const string insertCitySql = """
                 INSERT INTO tbl_CityWorker
                 (
@@ -460,34 +377,34 @@ await connection.ExecuteAsync(
                 );
                 """;
 
-            foreach (var cityId in cityIds)
-            {
-                await connection.ExecuteAsync(
-                    insertCitySql,
-                    new
-                    {
-                        UserId = userId,
-                        CityId = cityId
-                    },
-                    transaction);
-            }
+            await connection.ExecuteAsync(
+                insertCitySql,
+                new
+                {
+                    UserId = userId,
+                    CityId = request.CityId
+                },
+                transaction);
 
-
-            //  Everything succeeded
+            //apply changes
             await transaction.CommitAsync();
 
-
-            // Get the updated profile
+            // Get fresh profile after commit
             var result = await GetWorkerProfileAsync(userId);
 
-            return ("Worker profile updated successfully", result.profile);
+            return (
+                "Worker profile updated successfully",
+                result.profile
+            );
         }
         catch
         {
             await transaction.RollbackAsync();
 
-            return ("An error occurred while updating the worker profile", null);
+            return (
+                "An error occurred while updating the worker profile.",
+                null
+            );
         }
     }
-
 }

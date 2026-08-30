@@ -8,9 +8,9 @@ public class UpdateWorkerProfileReq
 
     public string? Skills { get; set; }
 
-    public int ProfessionIds { get; set; } 
+    public int ProfessionId { get; set; } 
 
-    public int CityIds { get; set; } 
+    public int CityId { get; set; } 
 
     // public List<int> ProfessionIds { get; set; } = new();
 

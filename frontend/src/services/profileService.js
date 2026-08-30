@@ -1,7 +1,7 @@
-import api from "./api";
+import api from "./axios";
 
-export const getWorkerProfile = async (workerId) => {
-  const response = await api.get(`/worker/${workerId}/profile`);
+export const getWorkerProfile = async () => {
+  const response = await api.get(`/worker/profile`);
   return response.data;
 };
 
@@ -10,18 +10,8 @@ export const updateWorkerProfile = async (profileData) => {
   return response.data;
 };
 
-export const getClientProfile = async (userId) => {
-  const response = await api.get(`/users/${userId}/profile`);
-  return response.data;
-};
-
-export const getProfessions = async () => {
-  const response = await api.get("/lookups/professions");
-  return response.data;
-};
-
-export const getCities = async () => {
-  const response = await api.get("/lookups/cities");
+export const getClientProfile = async () => {
+  const response = await api.get(`/users/profile`);
   return response.data;
 };
 
@@ -32,3 +22,24 @@ export const createProfession = async (title) => {
 
   return response.data;
 };
+
+export const getTheClientProfile = async (clientId) => {
+  const response =
+    await api.get(`/users/${clientId}/profile`);
+
+  return response.data;
+};
+
+export const getTheWorkerProfile = async (workerId) => {
+  const response =
+    await api.get(`/worker/${workerId}/profile`);
+
+  return response.data;
+};
+
+
+
+
+
+
+

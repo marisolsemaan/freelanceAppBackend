@@ -3,7 +3,7 @@ using FreelanceApp.API.DTOs;
 using FreelanceApp.API.DTOs.Rating;
 using FreelanceApp.API.Data;
 using FreelanceApp.API.DTOs.ClientProfile;
-using FreelanceApp.API.DTOs.Enums;
+using FreelanceApp.API.Enums;
 using FreelanceApp.API.DTOs.WorkerProfile;
 
 namespace FreelanceApp.API.Services.ClientProfile;
@@ -26,8 +26,8 @@ public class ClientProfileService : IClientProfileService
             SELECT
                 User_Id ,
                 User_FullName ,
-                ISNULL(User_AvgRating, 0),
-                ISNULL(User_ReviewCount, 0)
+                ISNULL(User_AvgRating, 0) AS User_AvgRating,
+                ISNULL(User_ReviewCount, 0) AS User_ReviewCount
             FROM tbl_User
             WHERE User_Id = @ClientId
               AND User_Role = @ClientRole;
@@ -96,8 +96,7 @@ public class ClientProfileService : IClientProfileService
 
         profile.ProfilePhoto = photo?.Document_FileData;
 
-        profile.ProfilePhotoContentType =
-            photo?.Document_ContentType;
+        profile.ProfilePhotoContentType = photo?.Document_ContentType;
 
         return new ApiResponse<ClientProfileResp>
         {

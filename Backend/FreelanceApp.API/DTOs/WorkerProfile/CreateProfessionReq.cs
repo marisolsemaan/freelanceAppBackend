@@ -1,4 +1,4 @@
-namespace FreelanceApp.API.DTOs;
+namespace FreelanceApp.API.DTOs.WorkerProfile;
 
 public class CreateProfessionReq
 {

@@ -4,11 +4,13 @@ import { getAuth } from "../../utils/jwtStorage";
 
 import HireOfferModal from "./HireOfferModal";
 
+import { useNavigate } from "react-router-dom";
 
 export default function ConversationHeader({conversation, onBack, }) {
   const [showHireModal, setShowHireModal] = useState(false);
 
-
+  const navigate= useNavigate();
+  
   const auth = getAuth();
 
   const currentUserId = auth?.userId 
@@ -36,6 +38,21 @@ export default function ConversationHeader({conversation, onBack, }) {
       ? "Worker"
       : "Client";
 
+    const handleViewProfile = () => {
+      if (isCurrentUserClient) {
+        // Current user is the client.
+        // Preview the worker.
+        navigate(
+          `/client/workers/${conversation.workerId}`
+        );
+      } else {
+        // Current user is the worker.
+        // Preview the client.
+        navigate(
+          `/worker/clients/${conversation.clientId}`
+        );
+      }
+    };
 
   return (
     <>
@@ -111,6 +128,7 @@ export default function ConversationHeader({conversation, onBack, }) {
           <button
             type="button"
             className="btn btn-outline-secondary btn-sm"
+            onClick={handleViewProfile}
           >
             View Profile
           </button>

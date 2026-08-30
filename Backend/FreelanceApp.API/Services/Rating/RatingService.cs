@@ -143,6 +143,7 @@ public class RatingService : IRatingService
 
             // Insert review
             const string insertSql = """
+                Declare @InsertedId Table (Review_Id int);
                 INSERT INTO tbl_Review
                 (
                     Review_RevieweeId,
@@ -152,21 +153,27 @@ public class RatingService : IRatingService
                     Review_CreatedAt,
                     Review_HireOfferId
                 )
-                OUTPUT
-                    INSERTED.Review_Id,
-                    INSERTED.Review_ReviewerId ,
-                    INSERTED.Review_Rating ,
-                    INSERTED.Review_Comment,
-                    INSERTED.Review_CreatedAt 
-                VALUES
+                OUTPUT INSERTED.Review_Id Into @InsertedId 
+                Values
                 (
                     @RevieweeId,
                     @ReviewerId,
                     @Rating,
                     @Comment,
-                    SYSUTCDATETIME(),
+                    GETUTCDATE(),
                     @HireOfferId
                 );
+
+                SELECT 
+                    Review_Id,
+                    Review_ReviewerId,
+                    Review_Rating,
+                    Review_Comment,
+                    Review_CreatedAt,
+                    User_FullName AS ReviewerFullName
+                FROM tbl_Review 
+                INNER JOIN tbl_User  ON User_Id = Review_ReviewerId
+                WHERE Review_Id = (SELECT Review_Id FROM @InsertedId);
                 """;
 
             var review = await connection.QuerySingleAsync<ReviewResp>(

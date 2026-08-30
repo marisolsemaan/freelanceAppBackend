@@ -4,7 +4,7 @@ import Login from "./components/auth/Login";
 import Register from "./components/auth/Register";
 import CreateJob from "./pages/client/CreateJob";
 import MyJobs from "./pages/client/MyJobs";
-
+import WorkerProfilePreview from "./pages/worker/WorkerProfilePreview";
 import SearchJobs from "./pages/worker/SearchJobs";
 
 import WorkerProfile from "./components/worker/WorkerProfile";
@@ -39,10 +39,30 @@ function App() {
        <Route path="/messages/:conversationId" element={<Messages />}/>
 
        <Route path="/messages" element={<Messages />} />
+       
+       <Route path="/worker/clients/:clientId" element={ <ProtectedRoute allowedRole={2}> <ClientProfile /></ProtectedRoute>}/>
 
-      </Routes>
+       <Route path="/client/workers/:workerId"  element={ <ProtectedRoute allowedRole={1}> <WorkerProfilePreview />   </ProtectedRoute> }/>
+
+        </Routes >
+  
     </BrowserRouter>
+    
   );
+  
 }
 
 export default App;
+
+
+
+
+
+
+
+
+
+
+
+
+
