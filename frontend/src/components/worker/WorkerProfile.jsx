@@ -24,7 +24,7 @@ function WorkerProfile() {
    const [profile, setProfile] = useState(null);
 
   const averageRating = profile?.averageRating ?? profile?.user_AvgRating ?? 0;
-const reviewCount = profile?.reviewCount ?? profile?.user_ReviewCount ?? 0;
+  const reviewCount = profile?.reviewCount ?? profile?.user_ReviewCount ?? 0;
  
  
 
@@ -257,6 +257,42 @@ const reviewCount = profile?.reviewCount ?? profile?.user_ReviewCount ?? 0;
     }
   };
 
+  const resetFormToProfile = () => {
+    setFormData({
+      hourlyRate: profile?.hourlyRate ?? "",
+      aboutMe: profile?.aboutMe ?? "",
+      skills: profile?.skills ?? "",
+    });
+
+    const workerProfession = profile?.professions?.[0];
+
+    setSelectedProfessionId(
+      workerProfession?.profession_Id ??
+        workerProfession?.professionId ??
+        workerProfession?.id ??
+        ""
+    );
+
+    setProfessionSearch(
+      workerProfession?.profession_Title ??
+        workerProfession?.professionTitle ??
+        workerProfession?.title ??
+        ""
+    );
+
+    const workerCity = profile?.cities?.[0];
+
+    setSelectedCityId(
+      workerCity?.city_Id ??
+        workerCity?.cityId ??
+        workerCity?.id ??
+        ""
+    );
+
+    setProfessionDropdownOpen(false);
+    setSaveError("");
+};
+
   const handleSave = async () => {
     
     if (!selectedProfessionId) {
@@ -418,7 +454,7 @@ const reviewCount = profile?.reviewCount ?? profile?.user_ReviewCount ?? 0;
           <button
             type="button"
             className="back-button"
-            onClick={() => navigate(-1)}
+            onClick={() => navigate('/client/jobs')}
           >
             <i className="bi bi-arrow-left"></i>
             Back
@@ -450,12 +486,12 @@ const reviewCount = profile?.reviewCount ?? profile?.user_ReviewCount ?? 0;
 
                     <span>
                       {Number(
-                        profile.averageRating || 0
+                        averageRating || 0
                       ).toFixed(1)}
                     </span>
 
                     <span className="review-count">
-                      ({profile.reviewCount || 0})
+                      ({reviewCount || 0})
                     </span>
                   </div>
                 </div>
@@ -466,8 +502,13 @@ const reviewCount = profile?.reviewCount ?? profile?.user_ReviewCount ?? 0;
               type="button"
               className="FreelanceApp-primary edit-profile-button"
               onClick={() => {
+                if(isEditing){
+                  resetFormToProfile();
+                  setIsEditing(false);
+                } else { 
                 setSaveError("");
-                setIsEditing((previous) => !previous);
+                setIsEditing(true);
+                }
               }}
               disabled={saving}
             >
@@ -482,33 +523,6 @@ const reviewCount = profile?.reviewCount ?? profile?.user_ReviewCount ?? 0;
               {isEditing ? "Cancel" : "Edit Profile"}
             </button>
             
-          </div>
-
-          {/* PHOTO */}
-
-          <div className="profile-section">
-
-            <div className="section-header">
-              <h2>Profile Photo</h2>
-              <p>
-                Your profile photo is the photo uploaded
-                during registration.
-              </p>
-            </div>
-
-            <div className="photo-upload">
-              <div className="worker-photo large">
-                {getProfilePhotoUrl() ? (
-                  <img
-                    src={getProfilePhotoUrl()}
-                    alt={profile.fullName}
-                  />
-                ) : (
-                  <i className="bi bi-person-fill"></i>
-                )}
-              </div>
-            </div>
-
           </div>
 
           {/* PROFESSION */}

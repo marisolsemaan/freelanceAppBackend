@@ -31,6 +31,35 @@ function JobCard({ job, onClose }) {
 
             </div>
 
+                <div className="job-card-meta">
+
+                <span>
+                  <i className="bi bi-briefcase"></i>
+                  {job.jobPost_ProfessionTitle}
+                </span>
+
+              {job.jobPost_CityName && (
+                <span>
+                  <i className="bi bi-geo-alt"></i>
+                  {job.jobPost_CityName}
+                </span>
+              )}
+
+            <span>
+              <i className="bi bi-calendar3"></i>
+              <small>
+              {new Date(job.jobPost_CreatedAt).toLocaleDateString("en-US", {
+                month: "short",
+                day: "numeric",
+                year: "numeric"
+              })}
+              </small>
+            </span>
+
+            </div>
+
+
+
             <p className="job-description">
               {job.jobPost_Description}
             </p>

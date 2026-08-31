@@ -236,13 +236,21 @@ public class ClientJobPostService : IClientJobPostService
                 JobPost_Price ,
                 JobPost_BudgetType ,
                 JobPost_ProfessionId,
+                Profession_Title JobPost_ProfessionTitle,
                 JobPost_CityId,
+                City_Name AS JobPost_CityName,
                 JobPost_Status,
                 JobPost_CreatedAt,
                                             
                 COUNT(DISTINCT JobPostConversation_ConversationId) AS ConversationCount
 
             FROM tbl_JobPost 
+
+            LEFT JOIN tbl_Profession 
+                ON Profession_Id = JobPost_ProfessionId
+
+            LEFT JOIN tbl_City 
+                ON City_Id = JobPost_CityId
 
             LEFT JOIN tbl_JobPostConversation 
                 ON JobPost_Id = JobPostConversation_JobPostId
@@ -256,6 +264,8 @@ public class ClientJobPostService : IClientJobPostService
                 JobPost_Price,
                 JobPost_BudgetType,
                 JobPost_ProfessionId,
+                Profession_Title,
+                City_Name,
                 JobPost_CityId,
                 JobPost_Status,
                 JobPost_CreatedAt
@@ -340,12 +350,20 @@ public class ClientJobPostService : IClientJobPostService
                 JobPost_Price ,
                 JobPost_BudgetType,
                 JobPost_ProfessionId,
+                Profession_Title JobPost_ProfessionTitle,
                 JobPost_CityId,
+                City_Name JobPost_CityName,
                 JobPost_Status,
                 JobPost_CreatedAt,
                 COUNT(DISTINCT JobPostConversation_ConversationId) AS ConversationCount
 
             FROM tbl_JobPost 
+
+            Left Join tbl_Profession 
+                On Profession_Id= JobPost_ProfessionId
+            
+            Left Join tbl_City 
+                On City_Id = JobPost_CityId
 
             LEFT JOIN tbl_JobPostConversation 
                 ON JobPostConversation_JobPostId = JobPost_Id
@@ -360,9 +378,13 @@ public class ClientJobPostService : IClientJobPostService
                 JobPost_Price,
                 JobPost_BudgetType,
                 JobPost_ProfessionId,
+                Profession_Title,
+                City_Name,
                 JobPost_CityId,
                 JobPost_Status,
-                JobPost_CreatedAt;
+                JobPost_CreatedAt
+            
+            Order by JobPost_CreatedAt Desc;
             """;
 
         return await connection.QuerySingleOrDefaultAsync<ClientJobPostResp>(

@@ -98,5 +98,5 @@ export const getUserRole = () => {
 
 export const getUserStatus = () => {
   const auth = getAuth();
-  return auth?.verificationStatus || null;
+  return auth?.verificationStatus ?? null;
 };

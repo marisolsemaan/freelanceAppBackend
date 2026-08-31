@@ -7,13 +7,6 @@ export default function JobPostMessageCard({ item }) {
 
   if (!jobPost) return null;
 
-  const isClosed = Number(jobPost.isActive) === 1;
-
-  /*there is no endpoint for that yet */
-  const handleViewJob = () => {
-    navigate(`/job-posts/${jobPost.jobPostId}`);
-  };
-
   return (
     <div className="timeline-job-post">
       <div className="job-post-message-card">
@@ -24,17 +17,7 @@ export default function JobPostMessageCard({ item }) {
             JOB POST
           </span>
 
-          <span
-            className={`job-post-status ${
-              isClosed
-                ? "closed"
-                : "active"
-            }`}
-          >
-            {isClosed
-              ? "CLOSED"
-              : "ACTIVE"}
-          </span>
+         
         </div>
 
         <div className="job-post-message-body">
@@ -63,14 +46,7 @@ export default function JobPostMessageCard({ item }) {
               ${jobPost.jobPostPrice}
             </div>
           )}
-          {/* 
-          <button
-            type="button"
-            className="btn btn-outline-primary btn-sm"
-            onClick={handleViewJob}
-          >
-            View Job
-          </button> */}
+      
           
         </div>
       </div>

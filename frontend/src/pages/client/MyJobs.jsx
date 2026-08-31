@@ -5,10 +5,14 @@ import JobStats from "../../components/client/jobs/JobStats";
 import JobCard from "../../components/client/jobs/JobCard";
 import { getMyJobPosts, closeJobPost,} from "../../services/jobPostClientService";
 import "../../style/myJob.css";
-
+import { getUserStatus } from "../../utils/jwtStorage";
 function MyJobs() {
 
   const navigate = useNavigate();
+
+  const verificationStatus = getUserStatus();
+  const isPending = verificationStatus === 0;
+
   const [jobs, setJobs] = useState([]);
   const [stats, setStats] = useState({
     totalJobs: 0,
@@ -99,7 +103,9 @@ function MyJobs() {
               </p>
             </div>
 
-            <button className="btn  post-job-button" onClick={() => navigate("/client/jobs/create")}>
+            <button className="btn  post-job-button" onClick={() => navigate("/client/jobs/create")}
+              disabled={isPending} title={isPending ? "Wait for Admin verification" : ""}
+            >
 
               <i className="bi bi-plus-lg"></i>
 

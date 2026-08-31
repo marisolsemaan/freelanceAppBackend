@@ -4,7 +4,7 @@ import { connectToJobPost } from "../../services/conversationService";
 import {timeAgo, getInitials, formatPrice,} from "../../utils/format";
 import "../../style/jobCard.css";
 
-export default function JobCard({job, cities, professions,})
+export default function JobCard({job, cities, professions, isPending})
 {
   const city = cities.find(
     (item) =>
@@ -148,6 +148,8 @@ export default function JobCard({job, cities, professions,})
             type="button"
             className="btn job-connect-btn"
             onClick={handleConnect}
+            disabled={isPending}
+            title={isPending ? "your account is still pending" : ""}
           >
             <i className="bi bi-chat-square-text" />
             Connect 

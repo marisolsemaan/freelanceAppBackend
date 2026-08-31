@@ -16,6 +16,9 @@ public class ClientJobPostResp
 
     public int JobPost_ProfessionId { get; set; }
 
+    public string JobPost_ProfessionTitle { get; set; }=string.Empty;
+    public string? JobPost_CityName { get; set; }
+
     public int JobPost_CityId { get; set; }
 
     public JobPostStatus JobPost_Status { get; set; }

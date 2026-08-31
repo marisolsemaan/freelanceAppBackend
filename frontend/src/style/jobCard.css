@@ -28,7 +28,27 @@
     0 12px 30px rgba(15, 23, 42, 0.08);
 }
 
+.job-card-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
 
+  color: #6c757d;
+  font-size: 0.82rem;
+}
+
+.job-card-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.job-card-meta i {
+  font-size: 0.85rem;
+  color: var(--FreelanceApp-primary);
+}
 
 
 .job-card-header {
