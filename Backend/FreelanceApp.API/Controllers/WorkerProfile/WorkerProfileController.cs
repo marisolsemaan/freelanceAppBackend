@@ -4,7 +4,6 @@ using FreelanceApp.API.Services.WorkerProfile;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-
 namespace FreelanceApp.API.Controllers;
 
 [ApiController]

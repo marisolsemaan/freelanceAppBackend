@@ -59,12 +59,9 @@ public class WorkerProfileService : IWorkerProfileService
         var workerProfile =
             await connection.QuerySingleOrDefaultAsync<WorkerProfileModel>(
                 workerProfileSql,
-                new { WorkerId = workerId });
+                new { WorkerId = workerId }) ?? new WorkerProfileModel() ;
 
-        if (workerProfile is null)
-        {
-            return ("Worker profile not found", null);
-        }
+      
         
         const string professionSql = """
             SELECT
